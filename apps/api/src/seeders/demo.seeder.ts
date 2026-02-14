@@ -102,6 +102,24 @@ const CATEGORIES = [
     icon: "van",
     description: { en: "Light commercial vehicles and vans", de: "Leichte Nutzfahrzeuge und Transporter", fr: "Vehicules utilitaires legers" },
   },
+  {
+    name: { en: "Cars", de: "PKW", fr: "Voitures" },
+    slug: "cars",
+    icon: "car",
+    description: { en: "Passenger cars, SUVs, and campers", de: "PKW, SUVs und Camper", fr: "Voitures, SUVs et camping-cars" },
+  },
+  {
+    name: { en: "Containers", de: "Container", fr: "Conteneurs" },
+    slug: "containers",
+    icon: "container",
+    description: { en: "Shipping, storage, and swap body containers", de: "Versand-, Lager- und Wechselbehaelter", fr: "Conteneurs maritimes et de stockage" },
+  },
+  {
+    name: { en: "Parts & Accessories", de: "Teile & Zubehoer", fr: "Pieces et accessoires" },
+    slug: "parts",
+    icon: "wrench",
+    description: { en: "Truck parts, engines, and accessories", de: "LKW-Teile, Motoren und Zubehoer", fr: "Pieces de camion, moteurs et accessoires" },
+  },
 ];
 
 const TRUCK_TITLES = [
@@ -174,6 +192,55 @@ const VAN_TITLES = [
   "TGE 3.180 L4H3",
   "Sprinter 516 CDI L3 Chassis",
   "Daily 50C18 Flatbed",
+  "Transit Custom 2.0 EcoBlue DCIV",
+  "Sprinter 314 CDI L1H1",
+  "Crafter 2.0 TDI Chassis Cab",
+  "Kangoo 1.5 dCi L1 Express",
+  "Caddy 2.0 TDI Cargo",
+];
+
+const CAR_TITLES = [
+  "Volkswagen Transporter T6.1 Caravelle",
+  "Ford Ranger Wildtrak 2.0 EcoBlue",
+  "Toyota Hilux Invincible 2.8 D-4D",
+  "Fiat Ducato Camper Van 2.3 MJT",
+  "Mercedes-Benz Vito Tourer 119 CDI",
+  "Peugeot Expert Combi 2.0 BlueHDi",
+  "Nissan Navara N-Guard 2.3 dCi",
+  "VW California Beach 2.0 TDI",
+  "Renault Trafic SpaceClass 2.0 dCi",
+  "Citroen SpaceTourer Business L2",
+];
+
+const CONTAINER_TITLES = [
+  "20ft Standard Shipping Container",
+  "40ft High Cube Container",
+  "20ft Refrigerated Container (Reefer)",
+  "40ft Open Top Container",
+  "20ft Office Container Portable",
+  "40ft HC Pallet Wide Container",
+  "10ft Storage Container",
+  "20ft Tank Container IBC",
+  "Swap Body Container 7.45m",
+  "45ft High Cube Pallet Wide",
+];
+
+const PARTS_TITLES = [
+  "Mercedes OM471 Engine Assembly 450HP",
+  "ZF TraXon 12-Speed Automated Gearbox",
+  "BPW Trailer Axle Assembly 9T",
+  "Wabco EBS Trailer Modulator",
+  "Continental 315/80R22.5 Truck Tire Set",
+  "Volvo D13 Turbocharger Assembly",
+  "MAN TGX Cabin Complete LX",
+  "Scania R Series LED Headlight Set",
+  "DAF XF Fuel Tank 600L Aluminium",
+  "Knorr-Bremse Disc Brake Caliper Set",
+  "Mercedes Actros Clutch Kit Complete",
+  "SAF Holland Fifth Wheel Coupling",
+  "Haldex ABS Sensor Kit",
+  "Bosch Common Rail Injector Set",
+  "Webasto Night Heater Air Top 2000",
 ];
 
 const SELLER_COMPANIES = [
@@ -551,9 +618,9 @@ async function seed() {
   console.log("  Assigned subscriptions to sellers.\n");
 
   // ================================================================
-  // 8. Create 200 demo listings
+  // 8. Create 500 demo listings
   // ================================================================
-  console.log("Creating 200 demo listings...");
+  console.log("Creating 500 demo listings...");
 
   const fuelTypes = ["DIESEL", "PETROL", "ELECTRIC", "HYBRID", "LPG", "CNG"] as const;
   const transmissions = ["MANUAL", "AUTOMATIC", "SEMI_AUTOMATIC"] as const;
@@ -561,12 +628,34 @@ async function seed() {
   const emissionClasses = ["EURO3", "EURO4", "EURO5", "EURO6", "EURO6D"] as const;
   const statuses = ["ACTIVE", "ACTIVE", "ACTIVE", "ACTIVE", "ACTIVE", "ACTIVE", "ACTIVE", "DRAFT", "SOLD"] as const;
 
+  // Distribution: 150 trucks, 100 trailers, 80 vans, 70 equipment, 50 parts, 30 cars, 20 containers = 500
+  const categoryDistribution: { slug: string; count: number }[] = [
+    { slug: "trucks", count: 150 },
+    { slug: "trailers", count: 100 },
+    { slug: "vans", count: 80 },
+    { slug: "construction-equipment", count: 70 },
+    { slug: "parts", count: 50 },
+    { slug: "cars", count: 30 },
+    { slug: "containers", count: 20 },
+  ];
+
+  // Build ordered list of categories to create
+  const orderedCategories: typeof categoryRecords = [];
+  for (const dist of categoryDistribution) {
+    const cat = categoryRecords.find((c) => c.slug === dist.slug);
+    if (cat) {
+      for (let n = 0; n < dist.count; n++) {
+        orderedCategories.push(cat);
+      }
+    }
+  }
+
   const listingRecords = [];
   let listingCounter = 0;
 
-  for (let i = 0; i < 200; i++) {
+  for (let i = 0; i < orderedCategories.length; i++) {
     listingCounter++;
-    const category = randomItem(categoryRecords);
+    const category = orderedCategories[i];
     const seller = randomItem(sellerUsers);
     const country = randomItem(EUROPEAN_COUNTRIES);
     const city = randomItem(CITIES_BY_COUNTRY[country] || ["Unknown"]);
@@ -588,8 +677,26 @@ async function seed() {
     } else if (category.slug === "construction-equipment") {
       title = randomItem(EQUIPMENT_TITLES);
       applicableBrands = brandRecords.filter((b) => b.slug === "caterpillar");
-    } else {
+    } else if (category.slug === "vans") {
       title = randomItem(VAN_TITLES);
+      applicableBrands = brandRecords.filter(
+        (b) => ["mercedes-benz", "iveco", "renault-trucks", "man", "volvo"].includes(b.slug)
+      );
+    } else if (category.slug === "cars") {
+      title = randomItem(CAR_TITLES);
+      applicableBrands = brandRecords.filter(
+        (b) => ["mercedes-benz", "volvo", "renault-trucks"].includes(b.slug)
+      );
+    } else if (category.slug === "containers") {
+      title = randomItem(CONTAINER_TITLES);
+      applicableBrands = [];
+    } else if (category.slug === "parts") {
+      title = randomItem(PARTS_TITLES);
+      applicableBrands = brandRecords.filter(
+        (b) => !["krone", "schmitz-cargobull", "caterpillar"].includes(b.slug)
+      );
+    } else {
+      title = randomItem(TRUCK_TITLES);
       applicableBrands = brandRecords.filter(
         (b) => !["krone", "schmitz-cargobull", "caterpillar"].includes(b.slug)
       );
@@ -600,10 +707,10 @@ async function seed() {
     const status = randomItem([...statuses]);
     const year = randomInt(2015, 2024);
     const mileageKm = condition === "NEW" ? 0 : randomInt(10000, 800000);
-    const fuelType = category.slug === "trailers" ? null : randomItem([...fuelTypes]);
-    const transmission = category.slug === "trailers" ? null : randomItem([...transmissions]);
-    const emissionClass =
-      category.slug === "trailers" ? null : randomItem([...emissionClasses]);
+    const noVehicleSpecs = ["trailers", "containers", "parts"].includes(category.slug);
+    const fuelType = noVehicleSpecs ? null : randomItem([...fuelTypes]);
+    const transmission = noVehicleSpecs ? null : randomItem([...transmissions]);
+    const emissionClass = noVehicleSpecs ? null : randomItem([...emissionClasses]);
 
     // Price ranges by category
     let priceMin: number, priceMax: number;
@@ -616,6 +723,18 @@ async function seed() {
     } else if (category.slug === "construction-equipment") {
       priceMin = 25000;
       priceMax = 350000;
+    } else if (category.slug === "vans") {
+      priceMin = 8000;
+      priceMax = 65000;
+    } else if (category.slug === "cars") {
+      priceMin = 5000;
+      priceMax = 85000;
+    } else if (category.slug === "containers") {
+      priceMin = 1500;
+      priceMax = 15000;
+    } else if (category.slug === "parts") {
+      priceMin = 50;
+      priceMax = 12000;
     } else {
       priceMin = 8000;
       priceMax = 65000;
@@ -634,8 +753,7 @@ async function seed() {
         ? new Date(Date.now() - randomInt(0, 30) * 24 * 60 * 60 * 1000)
         : null;
 
-    const powerHp =
-      category.slug === "trailers" ? null : randomInt(130, 530);
+    const powerHp = noVehicleSpecs ? null : randomInt(130, 530);
     const powerKw = powerHp ? Math.round(powerHp * 0.7457) : null;
 
     const listing = await prisma.listing.create({
@@ -694,8 +812,8 @@ async function seed() {
 
     listingRecords.push(listing);
 
-    // Create 1-3 placeholder images per listing
-    const imageCount = randomInt(1, 3);
+    // Create 2-5 placeholder images per listing
+    const imageCount = randomInt(2, 5);
     for (let j = 0; j < imageCount; j++) {
       await prisma.listingImage.create({
         data: {
@@ -738,7 +856,7 @@ async function seed() {
   const favoriteSet = new Set<string>();
   let favoritesCreated = 0;
 
-  while (favoritesCreated < 30 && activeListings.length > 0) {
+  while (favoritesCreated < 60 && activeListings.length > 0) {
     const buyer = randomItem(buyerUsers);
     const listing = randomItem(activeListings);
     const key = `${buyer.id}-${listing.id}`;
@@ -763,7 +881,7 @@ async function seed() {
   const threadSet = new Set<string>();
   let threadsCreated = 0;
 
-  while (threadsCreated < 10 && activeListings.length > 0) {
+  while (threadsCreated < 20 && activeListings.length > 0) {
     const buyer = randomItem(buyerUsers);
     const listing = randomItem(activeListings);
     const seller = sellerUsers.find((s) => s.id === listing.sellerId);
@@ -915,6 +1033,54 @@ async function seed() {
     await prisma.page.create({ data: page });
   }
   console.log(`  Created ${cmsPages.length} CMS pages.\n`);
+
+  // ================================================================
+  // 13. Create FAQs
+  // ================================================================
+  console.log("Creating FAQs...");
+  const faqs = [
+    {
+      category: "Buying",
+      question: { en: "How do I contact a seller?", de: "Wie kontaktiere ich einen Verkaeufer?" },
+      answer: { en: "You can contact sellers via the contact form on the listing page, by clicking 'Show Phone Number' to reveal their phone, or by using the WhatsApp button.", de: "Sie koennen Verkaeufer ueber das Kontaktformular, die Telefonnummer oder WhatsApp kontaktieren." },
+      sortOrder: 0,
+    },
+    {
+      category: "Buying",
+      question: { en: "Is it safe to buy on MenonTrucks?", de: "Ist es sicher, auf MenonTrucks zu kaufen?" },
+      answer: { en: "We verify dealer accounts and provide secure messaging. However, always inspect the vehicle before purchase and use secure payment methods.", de: "Wir verifizieren Haendlerkonten und bieten sicheres Messaging." },
+      sortOrder: 1,
+    },
+    {
+      category: "Selling",
+      question: { en: "How do I list a vehicle?", de: "Wie stelle ich ein Fahrzeug ein?" },
+      answer: { en: "Register as a seller, go to your dashboard, and click 'Add New Listing'. Follow the 7-step form to create your listing.", de: "Registrieren Sie sich als Verkaeufer und folgen Sie dem 7-Schritte-Formular." },
+      sortOrder: 2,
+    },
+    {
+      category: "Selling",
+      question: { en: "What are the subscription plans?", de: "Welche Abonnement-Plaene gibt es?" },
+      answer: { en: "We offer Free (3 listings), Basic (20 listings, EUR 29/mo), Pro (100 listings, EUR 79/mo), and Enterprise (unlimited) plans.", de: "Wir bieten Free, Basic, Pro und Enterprise Plaene an." },
+      sortOrder: 3,
+    },
+    {
+      category: "Account",
+      question: { en: "How do I reset my password?", de: "Wie setze ich mein Passwort zurueck?" },
+      answer: { en: "Click 'Forgot Password' on the login page, enter your email, and follow the instructions in the reset email.", de: "Klicken Sie auf 'Passwort vergessen' und folgen Sie den Anweisungen." },
+      sortOrder: 4,
+    },
+    {
+      category: "General",
+      question: { en: "Which countries do you operate in?", de: "In welchen Laendern sind Sie taetig?" },
+      answer: { en: "MenonTrucks operates across Europe including Netherlands, Germany, Belgium, France, Poland, Austria, Italy, Spain, Czech Republic, and Denmark.", de: "MenonTrucks ist in ganz Europa taetig." },
+      sortOrder: 5,
+    },
+  ];
+
+  for (const faq of faqs) {
+    await prisma.faq.create({ data: faq });
+  }
+  console.log(`  Created ${faqs.length} FAQs.\n`);
 
   // ================================================================
   // Summary
