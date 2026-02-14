@@ -1,0 +1,2044 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>MenonTrucks - Complete Development Plan v2.0</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 950px; margin: 40px auto; padding: 0 20px; color: #222222; line-height: 1.7; font-size: 14px; }
+  h1 { color: #1E3A5F; border-bottom: 3px solid #F59E0B; padding-bottom: 10px; font-size: 28px; }
+  h2 { color: #1E3A5F; border-bottom: 2px solid #F59E0B; padding-bottom: 8px; margin-top: 40px; font-size: 22px; }
+  h3 { color: #1E3A5F; font-size: 18px; margin-top: 30px; }
+  h4 { color: #F59E0B; font-size: 16px; }
+  table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+  th, td { border: 1px solid #E5E7EB; padding: 10px 12px; text-align: left; font-size: 13px; }
+  th { background-color: #1E3A5F; color: white; }
+  tr:nth-child(even) { background-color: #F5F6F7; }
+  code { background: #F5F6F7; padding: 2px 6px; border-radius: 4px; font-size: 13px; color: #1E3A5F; }
+  pre { background: #1E3A5F; color: #F5F6F7; padding: 16px; border-radius: 8px; overflow-x: auto; }
+  pre code { background: none; color: inherit; }
+  strong { color: #1E3A5F; }
+  hr { border: none; border-top: 2px solid #F59E0B; margin: 30px 0; }
+  ul, ol { padding-left: 24px; }
+  li { margin-bottom: 4px; }
+  a { color: #F59E0B; }
+  blockquote { border-left: 4px solid #F59E0B; margin: 0; padding: 10px 20px; background: #FFF8F0; }
+  input[type="checkbox"] { margin-right: 6px; }
+  @media print {
+    body { max-width: 100%; margin: 20px; font-size: 11px; }
+    h1 { font-size: 22px; }
+    h2 { font-size: 18px; page-break-before: auto; }
+    h3 { font-size: 15px; }
+    pre { font-size: 10px; }
+    table { font-size: 10px; }
+    th, td { padding: 4px 6px; }
+  }
+</style>
+</head>
+<body>
+<h1 id="menontrucks-complete-development-plan-task-list">MenonTrucks - Complete Development Plan &amp; Task List</h1>
+<h2 id="document-info">Document Info</h2>
+<ul>
+<li><strong>Version</strong>: 2.0 (Aligned with SRS v1.0 by Redstone Catalyst)</li>
+<li><strong>Client</strong>: Menon Mobility (Romeo)</li>
+<li><strong>Date</strong>: 14 February 2026</li>
+<li><strong>Reference</strong>: TrucksNL.com (www.trucks.nl) — Europe's largest commercial vehicle marketplace</li>
+</ul>
+<hr />
+<h2 id="1-project-overview">1. Project Overview</h2>
+<p><strong>MenonTrucks</strong> is a multi-vendor vehicle marketplace platform built from scratch — NOT a modified template. Custom-architected for 150,000+ listings, Europe-first launch with global extensibility.</p>
+<h3 id="what-were-building">What We're Building:</h3>
+<ul>
+<li>Full marketplace for trucks, trailers, equipment, vans, cars, containers, parts</li>
+<li>Multi-vendor (sellers + buyers + admin)</li>
+<li>44+ vehicle categories (matching TrucksNL coverage)</li>
+<li>Elasticsearch-powered search with filters &amp; aggregations</li>
+<li>Seller &amp; Admin dashboards</li>
+<li>Monetization: subscriptions + featured listings + paid packages</li>
+<li>Multi-language (10+ languages, i18n from day 1)</li>
+<li>Multi-currency support</li>
+<li>Dealer bulk upload (CSV/XML)</li>
+<li>Favorites &amp; vehicle comparison tool</li>
+<li>Buyer-seller messaging</li>
+<li>Mobile-first responsive design</li>
+<li>SSR for SEO optimization</li>
+</ul>
+<hr />
+<h2 id="2-technology-stack-per-srs">2. Technology Stack (Per SRS)</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Technology</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Frontend</strong></td>
+<td>Next.js 14 (App Router) + React 18 + TypeScript</td>
+</tr>
+<tr>
+<td><strong>Styling</strong></td>
+<td>TailwindCSS + Shadcn/UI</td>
+</tr>
+<tr>
+<td><strong>Backend</strong></td>
+<td>Node.js + Express.js + TypeScript</td>
+</tr>
+<tr>
+<td><strong>Database</strong></td>
+<td>PostgreSQL + Prisma ORM</td>
+</tr>
+<tr>
+<td><strong>Search Engine</strong></td>
+<td>Elasticsearch / OpenSearch</td>
+</tr>
+<tr>
+<td><strong>Cache / Sessions</strong></td>
+<td>Redis</td>
+</tr>
+<tr>
+<td><strong>Queue System</strong></td>
+<td>BullMQ (Redis-based)</td>
+</tr>
+<tr>
+<td><strong>Image Storage</strong></td>
+<td>AWS S3 / Cloudflare R2 (S3-compatible)</td>
+</tr>
+<tr>
+<td><strong>CDN</strong></td>
+<td>Cloudflare</td>
+</tr>
+<tr>
+<td><strong>Authentication</strong></td>
+<td>JWT + NextAuth</td>
+</tr>
+<tr>
+<td><strong>Payments</strong></td>
+<td>Stripe Integration</td>
+</tr>
+<tr>
+<td><strong>Deployment</strong></td>
+<td>Docker + Docker Compose</td>
+</tr>
+<tr>
+<td><strong>Monorepo</strong></td>
+<td>Turborepo</td>
+</tr>
+<tr>
+<td><strong>Validation</strong></td>
+<td>Zod schema validation</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>helmet.js, CSRF tokens, rate limiting</td>
+</tr>
+<tr>
+<td><strong>Frontend Port</strong></td>
+<td>3001</td>
+</tr>
+<tr>
+<td><strong>Backend Port</strong></td>
+<td>5001</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-design-color-palette-per-srs">3. Design &amp; Color Palette (Per SRS)</h2>
+<table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Color</th>
+<th>Hex Code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Primary Brand</td>
+<td>Deep Blue</td>
+<td><code>#1E3A5F</code></td>
+</tr>
+<tr>
+<td>Accent / CTA</td>
+<td>Orange</td>
+<td><code>#F59E0B</code></td>
+</tr>
+<tr>
+<td>Background</td>
+<td>Light Grey</td>
+<td><code>#F5F6F7</code></td>
+</tr>
+<tr>
+<td>Background Alt</td>
+<td>White</td>
+<td><code>#FFFFFF</code></td>
+</tr>
+<tr>
+<td>Primary Text</td>
+<td>Dark Grey</td>
+<td><code>#222222</code></td>
+</tr>
+<tr>
+<td>Secondary Text</td>
+<td>Grey</td>
+<td><code>#6B7280</code></td>
+</tr>
+<tr>
+<td>Borders</td>
+<td>Light Border</td>
+<td><code>#E5E7EB</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="design-principles">Design Principles:</h3>
+<ul>
+<li>Mobile-first responsive (Desktop, Tablet, Mobile)</li>
+<li>Fast loading (target under 3 seconds)</li>
+<li>Clean UI/UX with focus on usability</li>
+<li>Modern, professional marketplace aesthetic</li>
+<li>Clear and easy seller contact options</li>
+<li>Intuitive search and filter experience</li>
+</ul>
+<hr />
+<h2 id="4-vehicle-categories-44">4. Vehicle Categories (44+)</h2>
+<pre><code>TRANSPORT
+├── Trucks
+│   ├── Tractor Units (Heavy Duty, Mega, Torpedo)
+│   ├── Box Trucks
+│   ├── Flatbed Trucks
+│   ├── Tipper Trucks
+│   ├── Refrigerated Trucks
+│   ├── Crane Trucks
+│   ├── Tank Trucks
+│   ├── Fire Trucks
+│   ├── Garbage Trucks
+│   ├── Curtainsider Trucks
+│   └── Other Trucks
+├── Semi Trailers
+│   ├── Lowloaders
+│   ├── Flatbeds
+│   ├── Curtainsider Trailers
+│   ├── Refrigerated Trailers
+│   ├── Tank Trailers
+│   ├── Tipper Trailers
+│   ├── Container Chassis
+│   ├── Walking Floor
+│   └── Other Semi Trailers
+├── Full Trailers
+│   ├── Closed Box
+│   ├── Drop Side
+│   ├── Tilt
+│   └── Other Full Trailers
+
+EQUIPMENT
+├── Construction Machinery
+│   ├── Excavators
+│   ├── Cranes
+│   ├── Wheel Loaders
+│   ├── Bulldozers
+│   ├── Concrete Mixers
+│   ├── Compactors
+│   └── Other Construction
+├── Agricultural Machinery
+│   ├── Tractors
+│   ├── Harvesters
+│   ├── Sprayers
+│   └── Other Agricultural
+├── Material Handling
+│   ├── Forklifts
+│   ├── Reach Stackers
+│   ├── Telehandlers
+│   ├── Warehouse Equipment
+│   └── Other Material Handling
+├── Forestry &amp; Groundcare
+
+VANS / LCV / BUSES
+├── Panel Vans
+├── Box Vans
+├── Refrigerated Vans
+├── Pickup Trucks
+├── Chassis Cabs
+├── Minibuses
+├── Buses
+
+CARS
+├── Passenger Cars
+├── SUVs
+├── Campers &amp; Caravans
+├── Car Trailers
+
+CONTAINERS
+├── Shipping Containers (20ft/40ft)
+├── Construction Containers
+├── Swap Body Containers
+├── Tank Containers
+├── Reefer Containers
+├── Accommodation Containers
+├── Environmental Containers
+
+PARTS &amp; ACCESSORIES
+├── Truck Parts
+│   ├── Engines
+│   ├── Transmissions
+│   ├── Axles &amp; Suspension
+│   ├── Brakes
+│   ├── Body Parts
+│   ├── Electrical &amp; Electronics
+│   └── Hydraulics
+├── Van / LCV Parts
+├── Equipment Parts
+├── Tyres &amp; Wheels
+</code></pre>
+<hr />
+<h2 id="5-database-architecture-postgresql-prisma">5. Database Architecture (PostgreSQL + Prisma)</h2>
+<h3 id="core-tables">Core Tables:</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Table</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>users</code></td>
+<td>Buyers, sellers, admins — id, name, email, passwordHash, role (BUYER/SELLER/ADMIN), phone, whatsapp, avatarUrl, locale, isActive, emailVerifiedAt, lastLoginAt, createdAt, updatedAt, deletedAt</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>refresh_tokens</code></td>
+<td>JWT refresh tokens — userId, token, expiresAt, createdAt</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>password_reset_tokens</code></td>
+<td>Password reset flow — email, token, expiresAt</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>seller_profiles</code></td>
+<td>Seller company info — userId, companyName, slug, description, website, address, city, region, countryCode, lat, lng, logoUrl, bannerUrl, isVerified, verifiedAt, responseRate, avgResponseTime, rating, reviewCount, createdAt, updatedAt</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>seller_reviews</code></td>
+<td>Buyer reviews on sellers — buyerId, sellerId, listingId, rating (1-5), title, body, isVerifiedPurchase, sellerResponse, respondedAt, createdAt</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>categories</code></td>
+<td>Hierarchical categories — id, parentId, name (JSON i18n), slug, description (JSON i18n), icon, imageUrl, sortOrder, listingCount, isActive, metaTitle, metaDescription, createdAt, updatedAt</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>brands</code></td>
+<td>Vehicle brands — id, name, slug, logoUrl, isActive</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>brand_categories</code></td>
+<td>Brand-category pivot — brandId, categoryId</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>brand_models</code></td>
+<td>Brand models — id, brandId, name, slug, isActive</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>listings</code></td>
+<td>THE main table (50+ columns) — see detail below</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>listing_images</code></td>
+<td>Listing photos — listingId, position, originalUrl, largeUrl, mediumUrl, thumbnailUrl, webpUrl, altText, fileSize, width, height</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>specification_keys</code></td>
+<td>Dynamic specs per category — categoryId, name (JSON i18n), slug, unit, dataType, sortOrder, isFilterable</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>listing_specifications</code></td>
+<td>Spec values — listingId, specKeyId, value</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>locations</code></td>
+<td>Location reference — countryCode, countryName, region, city, lat, lng, postalCode</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>favorites</code></td>
+<td>Saved listings — userId, listingId (unique pair), createdAt</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>saved_searches</code></td>
+<td>Search alerts — userId, name, filters (JSONB), emailFrequency (NEVER/DAILY/WEEKLY), lastNotifiedAt, createdAt</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>recently_viewed</code></td>
+<td>View history — userId, listingId, viewedAt</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>listing_comparisons</code></td>
+<td>Compare tool — userId, listingIds (JSONB array, max 4)</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>message_threads</code></td>
+<td>Conversations — listingId, buyerId, sellerId, lastMessageAt, isArchivedBuyer, isArchivedSeller</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>messages</code></td>
+<td>Chat messages — threadId, senderId, body, attachments (JSONB), isRead, readAt, createdAt</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>notifications</code></td>
+<td>User notifications — userId, type, title, body, data (JSONB), isRead, readAt, createdAt</td>
+</tr>
+<tr>
+<td>22</td>
+<td><code>subscription_plans</code></td>
+<td>Plan definitions — name, slug, description, priceMonthly, priceYearly, maxListings, maxImages, features (JSONB), stripeMonthlyPriceId, stripeYearlyPriceId, sortOrder</td>
+</tr>
+<tr>
+<td>23</td>
+<td><code>user_subscriptions</code></td>
+<td>Active subscriptions — userId, planId, stripeSubscriptionId, status, periodStart, periodEnd, cancelledAt</td>
+</tr>
+<tr>
+<td>24</td>
+<td><code>featured_listings</code></td>
+<td>Promoted listings — listingId, placement (HOMEPAGE/CATEGORY/SEARCH), startsAt, endsAt, pricePaid, stripePaymentId</td>
+</tr>
+<tr>
+<td>25</td>
+<td><code>payments</code></td>
+<td>Transaction records — userId, stripePaymentIntentId, amount, currency, status, type (SUBSCRIPTION/FEATURED/LISTING), metadata (JSONB), createdAt</td>
+</tr>
+<tr>
+<td>26</td>
+<td><code>banner_ads</code></td>
+<td>Advertising — title, imageUrl, targetUrl, placement, categories (JSONB), countries (JSONB), impressions, clicks, startsAt, endsAt, isActive</td>
+</tr>
+<tr>
+<td>27</td>
+<td><code>pages</code></td>
+<td>CMS content — slug, title (JSON i18n), body (JSON i18n), isPublished, sortOrder</td>
+</tr>
+<tr>
+<td>28</td>
+<td><code>faqs</code></td>
+<td>FAQ entries — category, question (JSON i18n), answer (JSON i18n), sortOrder</td>
+</tr>
+<tr>
+<td>29</td>
+<td><code>bulk_imports</code></td>
+<td>CSV/XML imports — userId, fileName, fileUrl, status (PENDING/PROCESSING/COMPLETED/FAILED), totalRows, processedRows, errorRows, errors (JSONB), createdAt</td>
+</tr>
+</tbody>
+</table>
+<h3 id="listings-table-detail-50-columns">Listings Table Detail (50+ columns):</h3>
+<ul>
+<li><strong>Core</strong>: title, slug, description, price, priceCurrency (EUR/GBP/USD), priceOnRequest, priceNegotiable</li>
+<li><strong>Condition</strong>: NEW / USED / REFURBISHED</li>
+<li><strong>Status</strong>: DRAFT → PENDING_REVIEW → ACTIVE → SOLD / EXPIRED / REJECTED / ARCHIVED</li>
+<li><strong>Vehicle</strong>: year, mileageKm, operatingHours, fuelType, transmission, powerHp, powerKw, color, vin</li>
+<li><strong>Truck-specific</strong>: gvwKg, payloadKg, axleCount, cabType, emissionClass, wheelbaseMm, suspensionType</li>
+<li><strong>Container-specific</strong>: containerSize (20FT/40FT/45FT), containerType</li>
+<li><strong>Location</strong>: countryCode, region, city, postalCode, lat, lng</li>
+<li><strong>Contact</strong>: contactPhone, contactEmail, contactWhatsapp, hidePhone</li>
+<li><strong>Stats</strong>: viewCount, favoriteCount, contactCount, imageCount</li>
+<li><strong>Featured</strong>: isFeatured, featuredUntil, featuredPlacement</li>
+<li><strong>Dates</strong>: publishedAt, expiresAt, soldAt, rejectedReason</li>
+<li><strong>SEO</strong>: metaTitle, metaDescription</li>
+<li><strong>Timestamps</strong>: createdAt, updatedAt, deletedAt (soft delete)</li>
+</ul>
+<h3 id="key-database-indexes">Key Database Indexes:</h3>
+<ul>
+<li>Composite index on <code>categoryId + status</code> (fast category browsing)</li>
+<li>Index on <code>sellerId</code> (dashboard queries)</li>
+<li>Index on <code>brandId + modelId</code> (search optimization)</li>
+<li>Index on <code>price</code> (filter performance)</li>
+<li>Index on <code>createdAt</code> (sorting performance)</li>
+<li>Index on <code>countryCode + status</code> (location browsing)</li>
+<li>Index on <code>slug</code> (unique, URL lookups)</li>
+</ul>
+<hr />
+<h2 id="6-security-measures">6. Security Measures</h2>
+<table>
+<thead>
+<tr>
+<th>Measure</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Authentication</td>
+<td>JWT with refresh tokens (NextAuth)</td>
+</tr>
+<tr>
+<td>Rate Limiting</td>
+<td>Per IP and per user (express-rate-limit)</td>
+</tr>
+<tr>
+<td>Input Validation</td>
+<td>Zod schema validation on all endpoints</td>
+</tr>
+<tr>
+<td>SQL Injection</td>
+<td>Prevention via Prisma ORM (parameterized queries)</td>
+</tr>
+<tr>
+<td>XSS Protection</td>
+<td>helmet.js middleware</td>
+</tr>
+<tr>
+<td>CSRF Protection</td>
+<td>CSRF token validation</td>
+</tr>
+<tr>
+<td>Image Upload</td>
+<td>File type validation, size limits, sanitization</td>
+</tr>
+<tr>
+<td>HTTPS</td>
+<td>Enforced everywhere</td>
+</tr>
+<tr>
+<td>Secrets</td>
+<td>Environment variables only, no hardcoded secrets</td>
+</tr>
+<tr>
+<td>Headers</td>
+<td>Security headers via helmet.js</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-scalability-performance-architecture">7. Scalability &amp; Performance Architecture</h2>
+<h3 id="database-performance">Database Performance:</h3>
+<ul>
+<li>PostgreSQL with <strong>PgBouncer</strong> connection pooling</li>
+<li>Write-heavy operations handled through optimized batch transactions</li>
+<li>Prisma ORM with composite and partial indexes</li>
+<li>At scale: <strong>read replicas</strong> so read traffic never competes with writes</li>
+</ul>
+<h3 id="elasticsearch-strategy">Elasticsearch Strategy:</h3>
+<ul>
+<li>3 primary shards, 1 replica each (sized for 150K+ listings)</li>
+<li>Index <strong>aliases</strong> for zero-downtime reindexing</li>
+<li><strong>Lifecycle policies</strong> for automatic index management</li>
+<li>Bulk re-indexing capability for data migrations</li>
+</ul>
+<h3 id="three-layer-caching">Three-Layer Caching:</h3>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Technology</th>
+<th>What It Caches</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Layer 1</td>
+<td>Redis</td>
+<td>API response caching — search results, category data, popular listings</td>
+</tr>
+<tr>
+<td>Layer 2</td>
+<td>Cloudflare CDN</td>
+<td>Static assets, images, WebP thumbnails</td>
+</tr>
+<tr>
+<td>Layer 3</td>
+<td>Next.js ISR</td>
+<td>Category and listing pages that don't change frequently</td>
+</tr>
+</tbody>
+</table>
+<h3 id="redis-cache-configuration">Redis Cache Configuration:</h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Description</th>
+<th>TTL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET /categories</td>
+<td>Category tree</td>
+<td>5 min</td>
+</tr>
+<tr>
+<td>GET /categories/:id/listings</td>
+<td>Category listings</td>
+<td>5 min</td>
+</tr>
+<tr>
+<td>GET /search</td>
+<td>Search results</td>
+<td>2 min</td>
+</tr>
+<tr>
+<td>GET /search/aggregations</td>
+<td>Filter facet counts</td>
+<td>5 min</td>
+</tr>
+<tr>
+<td>GET /listings/:id</td>
+<td>Listing detail</td>
+<td>10 min</td>
+</tr>
+<tr>
+<td>GET /sellers/:id</td>
+<td>Seller profile</td>
+<td>15 min</td>
+</tr>
+<tr>
+<td>GET /homepage/featured</td>
+<td>Featured listings</td>
+<td>5 min</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cache-invalidation">Cache Invalidation:</h3>
+<ul>
+<li>Event-driven invalidation via Prisma middleware hooks</li>
+<li>Pattern-based deletion for related keys</li>
+<li>Normalized cache keys (sorted params, hashed)</li>
+<li>LRU eviction policy with max key limit</li>
+<li>Target: 70%+ cache hit rate</li>
+</ul>
+<h3 id="horizontal-scaling">Horizontal Scaling:</h3>
+<ul>
+<li>Stateless architecture (JWT = no server-side sessions)</li>
+<li>Docker containers replicated behind load balancer</li>
+<li>Redis shared across all instances</li>
+<li>Elasticsearch as separate cluster</li>
+<li>BullMQ workers scale independently</li>
+</ul>
+<hr />
+<h2 id="8-api-endpoints-70">8. API Endpoints (70+)</h2>
+<h3 id="authentication">Authentication:</h3>
+<pre><code>POST   /api/auth/register          — Create account (buyer/seller)
+POST   /api/auth/login             — Login, get JWT tokens
+POST   /api/auth/logout            — Invalidate refresh token
+POST   /api/auth/refresh           — Refresh access token
+GET    /api/auth/me                — Get current user
+PUT    /api/auth/me                — Update profile
+POST   /api/auth/forgot-password   — Send reset email
+POST   /api/auth/reset-password    — Reset with token
+POST   /api/auth/verify-email      — Email verification
+PUT    /api/auth/change-password   — Change password
+DELETE /api/auth/account           — Soft delete account
+</code></pre>
+<h3 id="public-listings">Public Listings:</h3>
+<pre><code>GET    /api/listings               — Paginated, filterable
+GET    /api/listings/:slug         — Full detail + view count
+GET    /api/listings/:slug/related — 6 related listings
+</code></pre>
+<h3 id="search">Search:</h3>
+<pre><code>GET    /api/search                 — Elasticsearch search with filters &amp; aggregations
+GET    /api/search/suggestions     — Autocomplete (max 8)
+GET    /api/search/aggregations    — Filter counts
+</code></pre>
+<h3 id="categories-brands">Categories &amp; Brands:</h3>
+<pre><code>GET    /api/categories             — Full category tree
+GET    /api/categories/:slug       — Category with subcategories
+GET    /api/brands                 — All brands
+GET    /api/brands/:id/models      — Models for brand
+</code></pre>
+<h3 id="seller-endpoints-auth-required-seller-role">Seller Endpoints (auth required, seller role):</h3>
+<pre><code>GET    /api/seller/dashboard       — Stats overview
+GET    /api/seller/listings        — Own listings with stats
+POST   /api/seller/listings        — Create listing (draft)
+PUT    /api/seller/listings/:id    — Update listing
+DELETE /api/seller/listings/:id    — Soft delete
+POST   /api/seller/listings/:id/publish    — Submit for review
+POST   /api/seller/listings/:id/mark-sold  — Mark as sold
+POST   /api/seller/listings/:id/renew      — Extend expiry
+POST   /api/seller/listings/:id/duplicate  — Clone listing
+POST   /api/seller/listings/:id/images     — Upload images (max 20)
+DELETE /api/seller/listings/:id/images/:imageId — Delete image
+PUT    /api/seller/listings/:id/images/reorder  — Reorder images
+GET    /api/seller/profile         — Get seller profile
+PUT    /api/seller/profile         — Update seller profile
+GET    /api/seller/messages        — Message threads
+GET    /api/seller/analytics       — Performance data
+POST   /api/seller/bulk-import     — CSV/XML upload
+GET    /api/seller/bulk-import/:id — Import status
+</code></pre>
+<h3 id="buyer-endpoints-auth-required">Buyer Endpoints (auth required):</h3>
+<pre><code>GET    /api/favorites              — User's favorites
+POST   /api/favorites/:listingId   — Add favorite
+DELETE /api/favorites/:listingId   — Remove favorite
+GET    /api/saved-searches         — Saved searches
+POST   /api/saved-searches         — Create saved search
+PUT    /api/saved-searches/:id     — Update frequency
+DELETE /api/saved-searches/:id     — Delete
+GET    /api/comparisons            — Compare list
+POST   /api/comparisons            — Add to compare
+DELETE /api/comparisons/:listingId — Remove from compare
+GET    /api/recently-viewed        — View history
+</code></pre>
+<h3 id="messaging">Messaging:</h3>
+<pre><code>GET    /api/messages/threads       — All threads
+GET    /api/messages/threads/:id   — Thread messages (paginated)
+POST   /api/messages               — Send message (creates thread if first)
+PUT    /api/messages/threads/:id/read    — Mark thread as read
+PUT    /api/messages/threads/:id/archive — Archive thread
+GET    /api/messages/unread-count  — Unread message count
+</code></pre>
+<h3 id="notifications">Notifications:</h3>
+<pre><code>GET    /api/notifications          — All notifications
+PUT    /api/notifications/:id/read — Mark as read
+PUT    /api/notifications/read-all — Mark all as read
+GET    /api/notifications/unread-count — Unread count
+</code></pre>
+<h3 id="sellers-public">Sellers (Public):</h3>
+<pre><code>GET    /api/sellers/:slug          — Public seller profile
+GET    /api/sellers/:slug/listings — Seller's active listings
+GET    /api/sellers/:slug/reviews  — Seller reviews
+POST   /api/sellers/:slug/reviews  — Submit review (auth required)
+</code></pre>
+<h3 id="monetization">Monetization:</h3>
+<pre><code>GET    /api/subscriptions/plans    — Available plans
+POST   /api/subscriptions          — Subscribe to plan
+PUT    /api/subscriptions          — Change plan
+DELETE /api/subscriptions          — Cancel subscription
+GET    /api/subscriptions/billing  — Billing history
+POST   /api/featured-listings      — Purchase featured placement
+POST   /api/stripe/webhooks        — Stripe webhook handler
+</code></pre>
+<h3 id="admin-endpoints-auth-required-admin-role">Admin Endpoints (auth required, admin role):</h3>
+<pre><code>GET    /api/admin/dashboard        — Admin stats
+GET    /api/admin/listings         — All listings (filterable by status)
+PUT    /api/admin/listings/:id/approve  — Approve listing
+PUT    /api/admin/listings/:id/reject   — Reject with reason
+DELETE /api/admin/listings/:id     — Hard delete
+GET    /api/admin/users            — All users
+PUT    /api/admin/users/:id        — Update user (role, status)
+PUT    /api/admin/users/:id/suspend     — Suspend user
+PUT    /api/admin/users/:id/activate    — Activate user
+GET    /api/admin/categories       — Category management
+POST   /api/admin/categories       — Create category
+PUT    /api/admin/categories/:id   — Update category
+DELETE /api/admin/categories/:id   — Delete category
+GET    /api/admin/brands           — Brand management
+POST   /api/admin/brands           — Create brand
+PUT    /api/admin/brands/:id       — Update brand
+GET    /api/admin/analytics        — Platform analytics
+GET    /api/admin/reports          — Reports &amp; statistics
+PUT    /api/admin/settings         — Platform settings
+</code></pre>
+<h3 id="static-contact">Static / Contact:</h3>
+<pre><code>GET    /api/pages/:slug            — CMS page content
+GET    /api/faqs                   — FAQ list
+POST   /api/contact                — Contact form submission
+</code></pre>
+<hr />
+<h2 id="9-frontend-pages-35">9. Frontend Pages (35+)</h2>
+<h3 id="public-pages">Public Pages:</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Route</th>
+<th>SSR</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Homepage</td>
+<td><code>/</code></td>
+<td>Yes</td>
+<td>Hero search, categories, featured, stats, brands</td>
+</tr>
+<tr>
+<td>Search Results</td>
+<td><code>/search</code></td>
+<td>Yes</td>
+<td>Filters + results grid + aggregations</td>
+</tr>
+<tr>
+<td>Category Page</td>
+<td><code>/[category]</code></td>
+<td>Yes</td>
+<td>Category listings with subcategory chips</td>
+</tr>
+<tr>
+<td>Subcategory Page</td>
+<td><code>/[category]/[subcategory]</code></td>
+<td>Yes</td>
+<td>Filtered by subcategory</td>
+</tr>
+<tr>
+<td>Listing Detail</td>
+<td><code>/listings/[slug]</code></td>
+<td>Yes</td>
+<td>Full listing with gallery, specs, contact</td>
+</tr>
+<tr>
+<td>Seller Profile</td>
+<td><code>/sellers/[slug]</code></td>
+<td>Yes</td>
+<td>Public seller page with listings &amp; reviews</td>
+</tr>
+<tr>
+<td>Pricing</td>
+<td><code>/pricing</code></td>
+<td>Yes</td>
+<td>Subscription plan comparison</td>
+</tr>
+<tr>
+<td>About</td>
+<td><code>/about</code></td>
+<td>Yes</td>
+<td>Company story</td>
+</tr>
+<tr>
+<td>Contact</td>
+<td><code>/contact</code></td>
+<td>Yes</td>
+<td>Contact form</td>
+</tr>
+<tr>
+<td>Terms</td>
+<td><code>/terms</code></td>
+<td>Yes</td>
+<td>Terms of Service</td>
+</tr>
+<tr>
+<td>Privacy</td>
+<td><code>/privacy</code></td>
+<td>Yes</td>
+<td>Privacy Policy (GDPR)</td>
+</tr>
+<tr>
+<td>FAQ</td>
+<td><code>/faq</code></td>
+<td>Yes</td>
+<td>FAQ accordion</td>
+</tr>
+<tr>
+<td>How It Works</td>
+<td><code>/how-it-works</code></td>
+<td>Yes</td>
+<td>Step-by-step guide</td>
+</tr>
+</tbody>
+</table>
+<h3 id="auth-pages-ssr-disabled">Auth Pages (SSR disabled):</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Route</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Login</td>
+<td><code>/login</code></td>
+<td>Email + password</td>
+</tr>
+<tr>
+<td>Register</td>
+<td><code>/register</code></td>
+<td>Buyer/Seller registration</td>
+</tr>
+<tr>
+<td>Forgot Password</td>
+<td><code>/forgot-password</code></td>
+<td>Email input</td>
+</tr>
+<tr>
+<td>Reset Password</td>
+<td><code>/reset-password</code></td>
+<td>New password with token</td>
+</tr>
+</tbody>
+</table>
+<h3 id="buyer-pages-auth-required">Buyer Pages (auth required):</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Route</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Favorites</td>
+<td><code>/favorites</code></td>
+<td>Saved listings</td>
+</tr>
+<tr>
+<td>Saved Searches</td>
+<td><code>/saved-searches</code></td>
+<td>Alert management</td>
+</tr>
+<tr>
+<td>Compare</td>
+<td><code>/compare</code></td>
+<td>Side-by-side comparison (max 4)</td>
+</tr>
+<tr>
+<td>Recently Viewed</td>
+<td><code>/recently-viewed</code></td>
+<td>View history</td>
+</tr>
+<tr>
+<td>Messages</td>
+<td><code>/messages</code></td>
+<td>Inbox with conversations</td>
+</tr>
+<tr>
+<td>Notifications</td>
+<td><code>/notifications</code></td>
+<td>All notifications</td>
+</tr>
+</tbody>
+</table>
+<h3 id="seller-dashboard-auth-seller-role">Seller Dashboard (auth + seller role):</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Route</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dashboard</td>
+<td><code>/seller</code></td>
+<td>Stats, charts, quick actions</td>
+</tr>
+<tr>
+<td>My Listings</td>
+<td><code>/seller/listings</code></td>
+<td>Manage all listings</td>
+</tr>
+<tr>
+<td>Create Listing</td>
+<td><code>/seller/listings/new</code></td>
+<td>Multi-step listing form</td>
+</tr>
+<tr>
+<td>Edit Listing</td>
+<td><code>/seller/listings/[id]</code></td>
+<td>Edit existing listing</td>
+</tr>
+<tr>
+<td>Messages</td>
+<td><code>/seller/messages</code></td>
+<td>Buyer conversations</td>
+</tr>
+<tr>
+<td>Reviews</td>
+<td><code>/seller/reviews</code></td>
+<td>Reviews received</td>
+</tr>
+<tr>
+<td>Profile</td>
+<td><code>/seller/profile</code></td>
+<td>Company profile editor</td>
+</tr>
+<tr>
+<td>Subscription</td>
+<td><code>/seller/subscription</code></td>
+<td>Plan management</td>
+</tr>
+<tr>
+<td>Analytics</td>
+<td><code>/seller/analytics</code></td>
+<td>Performance charts</td>
+</tr>
+<tr>
+<td>Bulk Import</td>
+<td><code>/seller/import</code></td>
+<td>CSV/XML upload</td>
+</tr>
+</tbody>
+</table>
+<h3 id="admin-panel-auth-admin-role">Admin Panel (auth + admin role):</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Route</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dashboard</td>
+<td><code>/admin</code></td>
+<td>Platform stats &amp; charts</td>
+</tr>
+<tr>
+<td>Listings</td>
+<td><code>/admin/listings</code></td>
+<td>Moderation queue</td>
+</tr>
+<tr>
+<td>Users</td>
+<td><code>/admin/users</code></td>
+<td>User management</td>
+</tr>
+<tr>
+<td>Categories</td>
+<td><code>/admin/categories</code></td>
+<td>Category tree CRUD</td>
+</tr>
+<tr>
+<td>Brands</td>
+<td><code>/admin/brands</code></td>
+<td>Brand management</td>
+</tr>
+<tr>
+<td>Reviews</td>
+<td><code>/admin/reviews</code></td>
+<td>Review moderation</td>
+</tr>
+<tr>
+<td>Ads</td>
+<td><code>/admin/ads</code></td>
+<td>Banner ad management</td>
+</tr>
+<tr>
+<td>Pages</td>
+<td><code>/admin/pages</code></td>
+<td>CMS editor</td>
+</tr>
+<tr>
+<td>Analytics</td>
+<td><code>/admin/analytics</code></td>
+<td>Platform analytics</td>
+</tr>
+<tr>
+<td>Settings</td>
+<td><code>/admin/settings</code></td>
+<td>Platform configuration</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-frontend-components-60">10. Frontend Components (60+)</h2>
+<h3 id="ui-components-shadcnui-based">UI Components (Shadcn/UI based):</h3>
+<ol>
+<li>Button — primary/secondary/outline/danger/ghost variants, loading state</li>
+<li>Input — label, error, icon, all types</li>
+<li>Select — searchable dropdown, multi-select</li>
+<li>Textarea — auto-resize, character count</li>
+<li>Checkbox — label, indeterminate</li>
+<li>RadioGroup — options with descriptions</li>
+<li>Switch — toggle on/off</li>
+<li>Badge — status variants</li>
+<li>Dialog / Modal — sizes, close on escape</li>
+<li>Sheet / Drawer — slide-in panels for mobile</li>
+<li>Toast — success/error/info notifications</li>
+<li>DropdownMenu — trigger + items</li>
+<li>Tabs — tab navigation</li>
+<li>Accordion — expandable sections</li>
+<li>Tooltip — hover info</li>
+<li>Avatar — image with fallback initials</li>
+<li>Pagination — page numbers, prev/next</li>
+<li>Breadcrumb — path trail</li>
+<li>Skeleton — loading placeholders</li>
+<li>AlertDialog — confirmation modal</li>
+<li>Command — search/command palette</li>
+<li>Popover — floating content</li>
+</ol>
+<h3 id="custom-components">Custom Components:</h3>
+<ol>
+<li>LanguageSwitcher — flag dropdown (10+ languages)</li>
+<li>CurrencyDisplay — formatted price with currency</li>
+<li>StarRating — 1-5 star display/input</li>
+<li>StatusBadge — listing status colors</li>
+<li>EmptyState — icon + title + description + action</li>
+<li>ListingCard — vertical card (image, title, price, specs, location)</li>
+<li>ListingCardSkeleton — loading state</li>
+<li>ListingCardHorizontal — list view variant</li>
+<li>SearchBar — keyword input with autocomplete</li>
+<li>FilterPanel — collapsible filter sections</li>
+<li>ActiveFilters — removable filter chips</li>
+<li>SortSelect — sort dropdown</li>
+<li>ImageGallery — main image + thumbnails + lightbox</li>
+<li>ImageUploader — drag-drop zone with preview</li>
+<li>MultiStepForm — progress bar + step navigation</li>
+<li>DataTable — sortable, filterable table for dashboards</li>
+<li>Chart — line/bar charts (Chart.js)</li>
+<li>FileUploader — CSV/XML upload with progress</li>
+<li>RichTextEditor — for descriptions &amp; CMS</li>
+<li>MapEmbed — location display</li>
+<li>ContactButtons — phone/whatsapp/message cluster</li>
+<li>PriceDisplay — formatted with currency + negotiable tag</li>
+<li>VehicleSpecsTable — grouped specifications</li>
+<li>CategoryMegaMenu — header category dropdown</li>
+<li>MobileNav — slide-out navigation drawer</li>
+<li>CookieConsent — GDPR banner</li>
+<li>SEOHead — dynamic meta tags component</li>
+<li>CompareTable — side-by-side comparison</li>
+</ol>
+<h3 id="layout-components">Layout Components:</h3>
+<ol>
+<li>AppHeader — top bar + main nav + mobile menu</li>
+<li>AppFooter — 5-column footer</li>
+<li>DefaultLayout — header + content + footer</li>
+<li>AuthLayout — centered card</li>
+<li>SellerLayout — sidebar + topbar + content</li>
+<li>AdminLayout — sidebar + topbar + content</li>
+</ol>
+<h3 id="page-specific-components">Page-Specific Components:</h3>
+<ol>
+<li>HeroSearch — homepage hero with search</li>
+<li>CategoryGrid — homepage category icons</li>
+<li>FeaturedListings — carousel</li>
+<li>StatsSection — numbers bar</li>
+<li>PopularBrands — brand logos</li>
+<li>TrustSection — "Why MenonTrucks"</li>
+<li>DealerCTA — seller registration banner</li>
+</ol>
+<hr />
+<h2 id="11-elasticsearch-implementation">11. Elasticsearch Implementation</h2>
+<h3 id="index-configuration">Index Configuration:</h3>
+<ul>
+<li>Index name: <code>listings</code> (via alias)</li>
+<li>Shards: 3 primary, 1 replica each</li>
+<li>Document size: 2-4KB average</li>
+<li>Capacity: 150K+ documents well under shard limits</li>
+</ul>
+<h3 id="field-mappings">Field Mappings:</h3>
+<ul>
+<li><code>title</code> — text (analyzed) + keyword (exact)</li>
+<li><code>description</code> — text (analyzed)</li>
+<li><code>brandName</code> — text + keyword</li>
+<li><code>modelName</code> — text + keyword</li>
+<li><code>categorySlug</code> — keyword</li>
+<li><code>price</code> — float</li>
+<li><code>year</code> — integer</li>
+<li><code>mileageKm</code> — integer</li>
+<li><code>condition</code> — keyword</li>
+<li><code>fuelType</code> — keyword</li>
+<li><code>transmission</code> — keyword</li>
+<li><code>countryCode</code> — keyword</li>
+<li><code>city</code> — keyword</li>
+<li><code>location</code> — geo_point (lat/lng)</li>
+<li><code>status</code> — keyword</li>
+<li><code>createdAt</code> — date</li>
+<li><code>isFeatured</code> — boolean</li>
+</ul>
+<h3 id="analyzers">Analyzers:</h3>
+<ul>
+<li><code>synonym_analyzer</code> — truck=lorry=hgv, merc=mercedes-benz</li>
+<li><code>autocomplete_analyzer</code> — edge_ngram (2-15 chars)</li>
+<li>Language-specific analyzers for multi-language search</li>
+</ul>
+<h3 id="search-features">Search Features:</h3>
+<ul>
+<li>Full-text keyword search across all listing fields</li>
+<li>Filters: Category, Brand, Price Range, Year, Condition (New/Used), Location, Fuel, Transmission, Emission</li>
+<li>Sorting: Relevance, Newest, Price (Low-High / High-Low), Year</li>
+<li>Pagination with accurate result counts</li>
+<li>Search suggestions and autocomplete</li>
+<li>Dynamic filter options that update based on current search context</li>
+</ul>
+<h3 id="aggregations">Aggregations:</h3>
+<ul>
+<li>Brand counts (e.g., "Scania (42)", "Volvo (38)")</li>
+<li>Category counts</li>
+<li>Fuel type counts</li>
+<li>Condition counts</li>
+<li>Price ranges (0-5K, 5K-15K, 15K-30K, 30K-50K, 50K-100K, 100K+)</li>
+<li>Year ranges</li>
+<li>Country counts</li>
+</ul>
+<h3 id="data-sync">Data Sync:</h3>
+<ul>
+<li>Real-time index sync on listing create/update/delete</li>
+<li>Bulk re-indexing command for migrations</li>
+<li>Index alias swap for zero-downtime reindex</li>
+</ul>
+<h3 id="zero-downtime-reindex">Zero-Downtime Reindex:</h3>
+<ol>
+<li>All queries point to alias (<code>listings</code>), never directly to index</li>
+<li>New index created with updated config (<code>listings_v2</code>)</li>
+<li>Data reindexed in background</li>
+<li>Alias atomically swapped</li>
+<li>Old index deleted after verification</li>
+</ol>
+<hr />
+<h2 id="12-bullmq-queue-jobs">12. BullMQ Queue Jobs</h2>
+<table>
+<thead>
+<tr>
+<th>Job</th>
+<th>Trigger</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ProcessListingImages</td>
+<td>Image upload</td>
+<td>Resize, WebP convert, generate thumbnails, upload to S3</td>
+</tr>
+<tr>
+<td>IndexListingInES</td>
+<td>Listing approved</td>
+<td>Index/update document in Elasticsearch</td>
+</tr>
+<tr>
+<td>RemoveListingFromES</td>
+<td>Listing deleted/expired</td>
+<td>Remove from Elasticsearch</td>
+</tr>
+<tr>
+<td>SendEmailNotification</td>
+<td>Various events</td>
+<td>Send emails (welcome, reset, alerts)</td>
+</tr>
+<tr>
+<td>ProcessBulkImport</td>
+<td>CSV/XML upload</td>
+<td>Parse file, validate rows, create listings</td>
+</tr>
+<tr>
+<td>SendSavedSearchAlerts</td>
+<td>Daily/weekly cron</td>
+<td>Match new listings to saved searches, send emails</td>
+</tr>
+<tr>
+<td>ProcessExpiredListings</td>
+<td>Daily cron</td>
+<td>Mark expired listings, notify sellers</td>
+</tr>
+<tr>
+<td>GenerateAnalyticsReport</td>
+<td>Weekly cron</td>
+<td>Aggregate analytics data</td>
+</tr>
+<tr>
+<td>SyncElasticsearchIndex</td>
+<td>Manual/migration</td>
+<td>Full bulk reindex</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="13-image-processing-pipeline">13. Image Processing Pipeline</h2>
+<h3 id="upload-flow">Upload Flow:</h3>
+<ol>
+<li>Client validates: max 20 images, 10MB each, jpg/png/webp/heic</li>
+<li>Upload to Express API → store temp</li>
+<li>Dispatch <code>ProcessListingImages</code> BullMQ job</li>
+<li>Job generates variants:</li>
+<li>Original (max 2400px width)</li>
+<li>Large (1200px)</li>
+<li>Medium (600px)</li>
+<li>Thumbnail (300x225, cropped)</li>
+<li>WebP version of each size</li>
+<li>Upload all variants to S3/R2: <code>listings/{id}/{size}_{position}.{ext}</code></li>
+<li>Create listing_images record with all URLs</li>
+<li>Frontend uses <code>&lt;picture&gt;</code> with WebP + JPEG fallback</li>
+<li>CDN (Cloudflare) caches and serves images globally</li>
+<li>Lazy loading on all listing images</li>
+</ol>
+<hr />
+<h1 id="development-phases-task-list">DEVELOPMENT PHASES &amp; TASK LIST</h1>
+<p>Organized into <strong>7 development phases</strong> across <strong>3 milestones</strong> as per SRS.</p>
+<hr />
+<h2 id="milestone-1-foundation-core-setup-marketplace-weeks-1-4">MILESTONE 1: Foundation, Core Setup &amp; Marketplace (Weeks 1-4)</h2>
+<h3 id="phase-1-foundation-core-setup">PHASE 1: Foundation &amp; Core Setup</h3>
+<p><strong>Duration: ~5 days | Priority: CRITICAL</strong></p>
+<h4 id="task-11-monorepo-project-structure">Task 1.1: Monorepo &amp; Project Structure</h4>
+<ul>
+<li>[ ] Initialize Turborepo monorepo</li>
+<li>[ ] Create directory structure:<br />
+<code>menontrucks/
+  ├── apps/
+  │   ├── web/          (Next.js 14 frontend)
+  │   └── api/          (Express.js backend)
+  ├── packages/
+  │   ├── shared/       (shared types, utils)
+  │   ├── eslint-config/
+  │   └── tsconfig/
+  ├── docker/
+  │   ├── nginx/
+  │   ├── node/
+  │   └── postgres/
+  ├── docker-compose.yml
+  ├── turbo.json
+  ├── package.json
+  └── .env.example</code></li>
+<li>[ ] Configure Turborepo pipeline (dev, build, lint, test)</li>
+<li>[ ] Create shared TypeScript config</li>
+<li>[ ] Create shared ESLint config</li>
+<li>[ ] Write <code>.gitignore</code></li>
+<li>[ ] Write <code>.env.example</code> with all environment variables</li>
+</ul>
+<h4 id="task-12-docker-infrastructure">Task 1.2: Docker Infrastructure</h4>
+<ul>
+<li>[ ] Write <code>docker-compose.yml</code> with services:</li>
+<li>nginx (1.25-alpine, reverse proxy, port 80)</li>
+<li>api (Node 20, port 5001)</li>
+<li>web (Node 20, port 3001)</li>
+<li>postgres (16-alpine, port 5432)</li>
+<li>redis (7-alpine, port 6379)</li>
+<li>elasticsearch (8.12.0, port 9200)</li>
+<li>minio (S3-compatible, port 9000/9001)</li>
+<li>mailpit (email testing, port 8025)</li>
+<li>bullmq-worker (queue processing)</li>
+<li>scheduler (cron jobs)</li>
+<li>[ ] Write Dockerfiles for api and web services</li>
+<li>[ ] Write nginx reverse proxy config (/api → 5001, /* → 3001)</li>
+<li>[ ] Write Makefile (up, down, restart, fresh, migrate, seed, logs, shell)</li>
+<li>[ ] <strong>Verify</strong>: <code>docker compose up -d</code> starts all services</li>
+</ul>
+<h4 id="task-13-backend-expressjs-setup">Task 1.3: Backend (Express.js) Setup</h4>
+<ul>
+<li>[ ] Initialize Express.js + TypeScript project in <code>apps/api/</code></li>
+<li>[ ] Install dependencies: express, typescript, prisma, @prisma/client, zod, jsonwebtoken, bcryptjs, helmet, cors, express-rate-limit, multer, @aws-sdk/client-s3, bullmq, ioredis, @elastic/elasticsearch, stripe, nodemailer</li>
+<li>[ ] Configure TypeScript (strict mode, paths)</li>
+<li>[ ] Create Express app structure:<br />
+<code>apps/api/src/
+  ├── config/        (database, redis, elasticsearch, s3, stripe)
+  ├── middleware/     (auth, validation, rateLimit, errorHandler)
+  ├── routes/        (auth, listings, search, seller, admin, etc.)
+  ├── controllers/   (all API controllers)
+  ├── services/      (business logic layer)
+  ├── validators/    (Zod schemas)
+  ├── types/         (TypeScript interfaces)
+  ├── utils/         (helpers)
+  ├── jobs/          (BullMQ job handlers)
+  ├── events/        (event emitters)
+  └── server.ts      (entry point)</code></li>
+<li>[ ] Set up helmet.js security middleware</li>
+<li>[ ] Set up CORS configuration</li>
+<li>[ ] Set up rate limiting</li>
+<li>[ ] Set up error handling middleware</li>
+<li>[ ] Set up request logging</li>
+<li>[ ] <strong>Verify</strong>: API responds on port 5001</li>
+</ul>
+<h4 id="task-14-database-schema-prisma">Task 1.4: Database Schema (Prisma)</h4>
+<ul>
+<li>[ ] Write <code>prisma/schema.prisma</code> with ALL 29 tables (see Section 5)</li>
+<li>[ ] Define all enums: UserRole, ListingStatus, VehicleCondition, FuelType, TransmissionType, EmissionClass, ContainerSize, SubscriptionStatus, ImportStatus, EmailFrequency, AdPlacement, PaymentType, PaymentStatus</li>
+<li>[ ] Define all relations and cascade rules</li>
+<li>[ ] Add all database indexes (see Section 5)</li>
+<li>[ ] Run <code>prisma migrate dev</code> — all migrations pass</li>
+<li>[ ] Run <code>prisma generate</code> — client generated</li>
+<li>[ ] <strong>Verify</strong>: <code>prisma migrate reset</code> works cleanly</li>
+</ul>
+<h4 id="task-15-authentication-system">Task 1.5: Authentication System</h4>
+<ul>
+<li>[ ] JWT service: generateAccessToken (15min), generateRefreshToken (7d), verifyToken</li>
+<li>[ ] Password service: hash (bcrypt), compare</li>
+<li>[ ] Auth middleware: extractToken → verify → attach user to request</li>
+<li>[ ] Role middleware: ensureRole(SELLER), ensureRole(ADMIN)</li>
+<li>[ ] Auth controller:</li>
+<li>POST /auth/register — create user, hash password, generate tokens</li>
+<li>POST /auth/login — validate credentials, generate tokens, update lastLoginAt</li>
+<li>POST /auth/logout — invalidate refresh token</li>
+<li>POST /auth/refresh — refresh access token</li>
+<li>GET /auth/me — return current user</li>
+<li>PUT /auth/me — update profile</li>
+<li>POST /auth/forgot-password — send reset email</li>
+<li>POST /auth/reset-password — reset with token</li>
+<li>PUT /auth/change-password — change password</li>
+<li>[ ] Zod validation schemas for all auth endpoints</li>
+<li>[ ] Email service: send verification, reset, welcome emails</li>
+<li>[ ] <strong>Verify</strong>: Full auth flow works end-to-end</li>
+</ul>
+<h4 id="task-16-frontend-nextjs-14-setup">Task 1.6: Frontend (Next.js 14) Setup</h4>
+<ul>
+<li>[ ] Initialize Next.js 14 with App Router in <code>apps/web/</code></li>
+<li>[ ] Install dependencies: tailwindcss, shadcn/ui, next-intl (i18n), zustand (state), swr (data fetching), chart.js, react-chartjs-2, react-hot-toast, lucide-react (icons), embla-carousel-react, date-fns</li>
+<li>[ ] Configure TailwindCSS with brand colors:<br />
+<code>primary: #1E3A5F (Deep Blue)
+  accent: #F59E0B (Orange)
+  background: #F5F6F7</code></li>
+<li>[ ] Set up Shadcn/UI component library</li>
+<li>[ ] Configure next-intl for i18n (start with EN, structure for 10+)</li>
+<li>[ ] Set up API client with JWT token injection + refresh interceptor</li>
+<li>[ ] Set up auth context/store (zustand)</li>
+<li>[ ] Create auth middleware (client-side route protection)</li>
+<li>[ ] Create layouts: default, auth, seller, admin</li>
+<li>[ ] <strong>Verify</strong>: Frontend loads on port 3001 with correct styles</li>
+</ul>
+<h4 id="task-17-auth-pages-frontend">Task 1.7: Auth Pages (Frontend)</h4>
+<ul>
+<li>[ ] Login page — email + password + "Forgot password?" link</li>
+<li>[ ] Register page — name, email, password, confirm, role selector (Buyer/Seller cards), terms checkbox</li>
+<li>[ ] Forgot Password page — email input</li>
+<li>[ ] Reset Password page — new password form</li>
+<li>[ ] Auth layout — centered card, logo, language switcher</li>
+<li>[ ] <strong>Verify</strong>: Register → Login → Logout flow works</li>
+</ul>
+<hr />
+<h3 id="phase-2-core-marketplace">PHASE 2: Core Marketplace</h3>
+<p><strong>Duration: ~8 days | Priority: CRITICAL</strong></p>
+<h4 id="task-21-category-system">Task 2.1: Category System</h4>
+<ul>
+<li>[ ] Category controller: getTree, getBySlug, getWithFilters</li>
+<li>[ ] Category seed data: ALL 44+ categories with hierarchical structure</li>
+<li>[ ] Translatable names (JSON) — English to start, structure ready for 10+ languages</li>
+<li>[ ] Category API: <code>GET /api/categories</code>, <code>GET /api/categories/:slug</code></li>
+<li>[ ] <strong>Verify</strong>: Category tree loads with correct hierarchy and counts</li>
+</ul>
+<h4 id="task-22-brand-model-database">Task 2.2: Brand &amp; Model Database</h4>
+<ul>
+<li>[ ] Brand seed data: 30+ brands with 200+ models</li>
+<li>[ ] Brand-category pivot relationships</li>
+<li>[ ] Brands by category:</li>
+<li>Trucks/Trailers: Mercedes-Benz, Volvo, Scania, MAN, DAF, Iveco, Renault, Schmitz Cargobull, Krone, Kogel</li>
+<li>Equipment: Caterpillar, Komatsu, JCB, Liebherr, John Deere, Case, Hitachi, Kubota, Bobcat</li>
+<li>Vans: Mercedes, VW, Ford, Renault, Fiat, Opel, Citroen, Peugeot, Toyota</li>
+<li>[ ] Brand API: <code>GET /api/brands</code>, <code>GET /api/brands/:id/models</code></li>
+<li>[ ] <strong>Verify</strong>: Brands load with correct category links</li>
+</ul>
+<h4 id="task-23-listing-crud-backend">Task 2.3: Listing CRUD (Backend)</h4>
+<ul>
+<li>[ ] Listing controller (public):</li>
+<li>GET /api/listings — paginated, filterable</li>
+<li>GET /api/listings/:slug — full detail with relations</li>
+<li>GET /api/listings/:slug/related — 6 related listings</li>
+<li>[ ] Seller listing controller (auth required):</li>
+<li>GET /api/seller/listings — own listings</li>
+<li>POST /api/seller/listings — create (draft)</li>
+<li>PUT /api/seller/listings/:id — update (owner check)</li>
+<li>DELETE /api/seller/listings/:id — soft delete</li>
+<li>POST /api/seller/listings/:id/publish — submit for review</li>
+<li>POST /api/seller/listings/:id/mark-sold — mark sold</li>
+<li>POST /api/seller/listings/:id/renew — extend expiry</li>
+<li>POST /api/seller/listings/:id/duplicate — clone</li>
+<li>[ ] Listing authorization: owner check, status transitions</li>
+<li>[ ] Zod schemas: StoreListingSchema, UpdateListingSchema, SearchParamsSchema</li>
+<li>[ ] View count tracking (IP-based rate limiting, 1 per hour per IP)</li>
+<li>[ ] <strong>Verify</strong>: Full CRUD lifecycle works</li>
+</ul>
+<h4 id="task-24-image-upload-processing">Task 2.4: Image Upload &amp; Processing</h4>
+<ul>
+<li>[ ] Image upload endpoint: POST /api/seller/listings/:id/images</li>
+<li>[ ] Multer config: max 20 images, 10MB each, jpg/png/webp/heic</li>
+<li>[ ] S3 client configuration (MinIO local, AWS S3 prod)</li>
+<li>[ ] BullMQ job: ProcessListingImages</li>
+<li>Resize: original (2400px), large (1200px), medium (600px), thumbnail (300x225 crop)</li>
+<li>WebP conversion for each size</li>
+<li>Upload to S3: <code>listings/{id}/{size}_{position}.{ext}</code></li>
+<li>[ ] Image delete + reorder endpoints</li>
+<li>[ ] <strong>Verify</strong>: Upload → process → S3 → URLs stored in DB</li>
+</ul>
+<h4 id="task-25-listing-detail-page-frontend">Task 2.5: Listing Detail Page (Frontend)</h4>
+<ul>
+<li>[ ] Two-column layout (60% left / 40% right sticky)</li>
+<li>[ ] Image Gallery component — main image + thumbnails + fullscreen lightbox + mobile swipe</li>
+<li>[ ] Quick Specs bar — year, mileage, fuel, transmission, power as pills</li>
+<li>[ ] Description section — with "Read more" toggle</li>
+<li>[ ] Specifications Table — grouped, alternating rows, non-null values only</li>
+<li>[ ] Location section — city, region, country display</li>
+<li>[ ] Related Listings — 4 cards below</li>
+<li>[ ] Price Card (sticky right) — price in orange, VAT note, negotiable tag</li>
+<li>[ ] Seller Card — logo, name, verified badge, member since, response time</li>
+<li>[ ] Contact Buttons — "Show Phone" (click to reveal), WhatsApp (wa.me link), "Send Message" (opens form)</li>
+<li>[ ] Actions — favorite toggle, share, print</li>
+<li>[ ] SSR with dynamic meta tags (title, description, Open Graph, JSON-LD Vehicle schema)</li>
+<li>[ ] <strong>Verify</strong>: Page renders with all sections, SEO tags present</li>
+</ul>
+<h4 id="task-26-listing-card-component">Task 2.6: Listing Card Component</h4>
+<ul>
+<li>[ ] ListingCard — image (4:3), title (2 lines), price (orange), specs row, location, seller name</li>
+<li>[ ] Featured badge (orange, top-left)</li>
+<li>[ ] Condition badge (New=green, Used=gray, top-right)</li>
+<li>[ ] Favorite heart icon on hover</li>
+<li>[ ] ListingCardSkeleton — loading state</li>
+<li>[ ] ListingCardHorizontal — list view variant</li>
+<li>[ ] <strong>Verify</strong>: Card displays correctly with real data</li>
+</ul>
+<h4 id="task-27-seller-profile-page-dashboard-basic">Task 2.7: Seller Profile Page &amp; Dashboard (Basic)</h4>
+<ul>
+<li>[ ] Seller public profile page (<code>/sellers/[slug]</code>):</li>
+<li>Banner + logo + company info</li>
+<li>Active listings grid</li>
+<li>About tab (description, address)</li>
+<li>Contact buttons</li>
+<li>[ ] Seller profile API: GET /api/sellers/:slug, PUT /api/seller/profile</li>
+<li>[ ] Seller dashboard (basic):</li>
+<li>Stats cards: Active Listings, Total Views, Total Favorites, Messages</li>
+<li>Recent messages list</li>
+<li>Quick actions: Add Listing, View Messages</li>
+<li>[ ] <strong>Verify</strong>: Profile page and dashboard load with data</li>
+</ul>
+<h4 id="task-28-contact-options">Task 2.8: Contact Options</h4>
+<ul>
+<li>[ ] Contact seller form (creates message thread)</li>
+<li>[ ] Phone contact button (click to reveal, masked initially)</li>
+<li>[ ] WhatsApp button (opens wa.me link)</li>
+<li>[ ] Contact tracking (increment contactCount on listing)</li>
+<li>[ ] <strong>Verify</strong>: All 3 contact methods work</li>
+</ul>
+<h4 id="task-29-seed-data-demo-listings">Task 2.9: Seed Data (Demo Listings)</h4>
+<ul>
+<li>[ ] Location seeder: 40+ cities (NL, DE, UK, BE, FR)</li>
+<li>[ ] User seeder: 1 admin + 5 sellers (with profiles) + 5 buyers</li>
+<li>[ ] Listing seeder: 500 demo listings</li>
+<li>150 Trucks, 100 Trailers, 80 Vans, 70 Equipment, 50 Parts, 30 Cars, 20 Containers</li>
+<li>Realistic titles, prices, specs per category</li>
+<li>2-5 placeholder images each</li>
+<li>[ ] Subscription plan seeder: Free, Basic (€29/mo), Premium (€79/mo)</li>
+<li>[ ] <strong>Verify</strong>: <code>make seed</code> populates 500 listings with all relations</li>
+</ul>
+<h4 id="task-210-header-footer-main-layout">Task 2.10: Header, Footer &amp; Main Layout</h4>
+<ul>
+<li>[ ] AppHeader:</li>
+<li>Top bar: language switcher, "Sell your vehicle" link</li>
+<li>Main bar: logo, nav (Transport, Equipment, Vans, Cars, Containers, Parts), search icon, favorites, login/register</li>
+<li>Logged in: avatar dropdown (Dashboard, Favorites, Messages, Profile, Logout)</li>
+<li>Mobile: hamburger → slide-out drawer</li>
+<li>[ ] AppFooter:</li>
+<li>Deep blue background (#1E3A5F)</li>
+<li>5 columns: company info, transport links, equipment links, company links, support links</li>
+<li>Bottom bar: copyright, payment icons, language selector</li>
+<li>[ ] Default layout: Header + content + Footer</li>
+<li>[ ] Cookie consent banner (GDPR)</li>
+<li>[ ] <strong>Verify</strong>: Layout renders responsively on all breakpoints</li>
+</ul>
+<h4 id="task-211-homepage">Task 2.11: Homepage</h4>
+<ul>
+<li>[ ] Hero section: navy gradient, H1, subtitle, search bar (category + keyword + location + SEARCH button)</li>
+<li>[ ] Category grid: 7 main categories with icons + listing counts</li>
+<li>[ ] Featured listings carousel (horizontal scroll, 4 visible)</li>
+<li>[ ] Stats bar: "150,000+ Listings" | "5,000+ Dealers" | "20+ Countries" | "Since 2024"</li>
+<li>[ ] Recent listings grid (12 cards)</li>
+<li>[ ] Popular brands section (logos)</li>
+<li>[ ] Trust section: "Verified Dealers", "Secure Messaging", "Vehicle History"</li>
+<li>[ ] Dealer CTA: "List your vehicles today" with register button</li>
+<li>[ ] <strong>Verify</strong>: Homepage loads with all sections, responsive</li>
+</ul>
+<hr />
+<h2 id="milestone-2-search-user-features-admin-panel-weeks-5-6">MILESTONE 2: Search, User Features &amp; Admin Panel (Weeks 5-6)</h2>
+<h3 id="phase-3-search-discovery">PHASE 3: Search &amp; Discovery</h3>
+<p><strong>Duration: ~5 days | Priority: CRITICAL</strong></p>
+<h4 id="task-31-elasticsearch-setup-indexing">Task 3.1: Elasticsearch Setup &amp; Indexing</h4>
+<ul>
+<li>[ ] Elasticsearch service:</li>
+<li>createIndex() — 3 shards, 1 replica, custom analyzers, field mappings</li>
+<li>deleteIndex()</li>
+<li>indexListing(listing) — index single document</li>
+<li>removeListing(id) — remove from index</li>
+<li>bulkIndex(listings) — batch indexing</li>
+<li>[ ] Synonym analyzer: truck=lorry=hgv, merc=mercedes-benz, etc.</li>
+<li>[ ] Autocomplete analyzer: edge_ngram (2-15 chars)</li>
+<li>[ ] BullMQ jobs: IndexListingInES, RemoveListingFromES</li>
+<li>[ ] Prisma middleware: auto-sync on listing create/update/delete</li>
+<li>[ ] CLI command: full reindex with --fresh option</li>
+<li>[ ] <strong>Verify</strong>: All 500 seed listings indexed, queries return results</li>
+</ul>
+<h4 id="task-32-search-api">Task 3.2: Search API</h4>
+<ul>
+<li>[ ] Search service (business layer):</li>
+<li>Parse request params → Elasticsearch bool query</li>
+<li>Must: keyword search (title, description, brand, model)</li>
+<li>Filter: category, brand, price range, year range, condition, fuel, transmission, country, emission, mileage range</li>
+<li>Sort: relevance, newest, price asc/desc, year</li>
+<li>Pagination with total count</li>
+<li>Aggregations (brand counts, category counts, fuel counts, condition counts, price ranges, year ranges, country counts)</li>
+<li>[ ] Search controller:</li>
+<li>GET /api/search — full search with aggregations</li>
+<li>GET /api/search/suggestions — autocomplete (max 8)</li>
+<li>[ ] <strong>Verify</strong>: Search returns correct results with all filters and aggregations</li>
+</ul>
+<h4 id="task-33-search-results-page-frontend">Task 3.3: Search Results Page (Frontend)</h4>
+<ul>
+<li>[ ] Desktop: filter sidebar (280px left) + results grid (right)</li>
+<li>[ ] Mobile: floating "Filters" button → slide-out Sheet/Drawer</li>
+<li>[ ] Filter sidebar sections (each collapsible):</li>
+<li>Category tree with counts</li>
+<li>Brand (searchable list with checkboxes + counts)</li>
+<li>Model (dependent on brand)</li>
+<li>Price range (min/max inputs)</li>
+<li>Year range (min/max)</li>
+<li>Condition (checkboxes: New, Used, Refurbished)</li>
+<li>Fuel type (checkboxes with counts)</li>
+<li>Transmission (checkboxes)</li>
+<li>Country (dropdown with flags)</li>
+<li>Emission class (dropdown)</li>
+<li>Mileage range (min/max)</li>
+<li>[ ] Results area:</li>
+<li>Count: "2,345 vehicles found"</li>
+<li>View toggle: grid / list</li>
+<li>Sort dropdown</li>
+<li>Active filter chips (removable)</li>
+<li>Results grid (1-3 columns responsive)</li>
+<li>Empty state with suggestions</li>
+<li>Pagination</li>
+<li>[ ] URL sync: filters stored in query params, shareable URLs</li>
+<li>[ ] Debounced search (300ms)</li>
+<li>[ ] <strong>Verify</strong>: Filters work, aggregation counts update, URL syncs</li>
+</ul>
+<h4 id="task-34-category-landing-pages">Task 3.4: Category Landing Pages</h4>
+<ul>
+<li>[ ] <code>/[category]</code> page — category header, subcategory chips, top brands, filter + results</li>
+<li>[ ] <code>/[category]/[subcategory]</code> — scoped to subcategory</li>
+<li>[ ] Category mega-menu in header navigation</li>
+<li>[ ] SSR with dynamic SEO meta tags</li>
+<li>[ ] <strong>Verify</strong>: Category pages load with correct listings and filters</li>
+</ul>
+<hr />
+<h3 id="phase-4-user-features">PHASE 4: User Features</h3>
+<p><strong>Duration: ~5 days | Priority: HIGH</strong></p>
+<h4 id="task-41-seller-dashboard-complete">Task 4.1: Seller Dashboard (Complete)</h4>
+<ul>
+<li>[ ] Dashboard layout: fixed left sidebar (deep blue) + top bar + content</li>
+<li>[ ] Dashboard home: stats cards, views chart (Chart.js, 30 days), recent messages, quick actions</li>
+<li>[ ] Listings management: status tabs (All/Draft/Pending/Active/Sold/Expired), table with actions (edit/duplicate/delete/mark-sold), search, pagination</li>
+<li>[ ] Create listing (multi-step form):</li>
+<li>Step 1: Category selection (visual cards)</li>
+<li>Step 2: Basic info (title, brand, model, condition, price, currency, negotiable)</li>
+<li>Step 3: Vehicle details (year, mileage, fuel, transmission, power, emission, color, VIN + category-specific fields)</li>
+<li>Step 4: Description (textarea with character count)</li>
+<li>Step 5: Images (drag-drop, preview, reorder, max 20)</li>
+<li>Step 6: Location &amp; contact (country, city, phone, email, whatsapp)</li>
+<li>Step 7: Review &amp; submit (summary, edit links)</li>
+<li>"Save as Draft" on every step</li>
+<li>[ ] Edit listing: pre-populated multi-step form</li>
+<li>[ ] Seller analytics: date range, views/favorites/contacts charts, top listings</li>
+<li>[ ] <strong>Verify</strong>: Full seller workflow: create → upload images → publish → view stats</li>
+</ul>
+<h4 id="task-42-favorites-comparison">Task 4.2: Favorites &amp; Comparison</h4>
+<ul>
+<li>[ ] Favorites backend: POST/DELETE /api/favorites/:listingId</li>
+<li>[ ] Favorites page: grid of saved listings, empty state</li>
+<li>[ ] Heart toggle on ListingCard (optimistic UI)</li>
+<li>[ ] Comparison tool: add to compare (max 4), side-by-side spec table</li>
+<li>[ ] Compare page: sticky header with listing titles, highlight differences</li>
+<li>[ ] <strong>Verify</strong>: Add/remove favorites, comparison works with 2-4 listings</li>
+</ul>
+<h4 id="task-43-saved-searches-email-alerts">Task 4.3: Saved Searches &amp; Email Alerts</h4>
+<ul>
+<li>[ ] Saved search CRUD: POST/GET/PUT/DELETE /api/saved-searches</li>
+<li>[ ] "Save this search" button on search results page</li>
+<li>[ ] Saved searches page: list with name, filters summary, frequency selector, delete</li>
+<li>[ ] BullMQ cron job: match new listings to saved searches, send email alerts (daily/weekly)</li>
+<li>[ ] Email template with matching listings</li>
+<li>[ ] <strong>Verify</strong>: Save search, receive email alert when matching listing appears</li>
+</ul>
+<h4 id="task-44-messaging-system">Task 4.4: Messaging System</h4>
+<ul>
+<li>[ ] Message controller: threads, send, markRead, archive</li>
+<li>[ ] "Send Message" from listing detail creates thread (buyer + seller + listing)</li>
+<li>[ ] Messages page: two-column layout</li>
+<li>Thread list (left): avatar, name, listing title, last message, unread badge, time</li>
+<li>Conversation (right): message bubbles (sent=blue, received=gray), timestamps, reply input</li>
+<li>[ ] Unread count badge on header nav</li>
+<li>[ ] Mobile: toggle between list and conversation</li>
+<li>[ ] <strong>Verify</strong>: Send message → appears in other party's inbox</li>
+</ul>
+<h4 id="task-45-contact-options-complete">Task 4.5: Contact Options (Complete)</h4>
+<ul>
+<li>[ ] Phone button: click to reveal (masked initially)</li>
+<li>[ ] WhatsApp button: opens wa.me link with pre-filled message</li>
+<li>[ ] Contact form: creates message thread</li>
+<li>[ ] Contact tracking: increment contactCount</li>
+<li>[ ] <strong>Verify</strong>: All contact methods functional</li>
+</ul>
+<hr />
+<h3 id="phase-5-admin-panel">PHASE 5: Admin Panel</h3>
+<p><strong>Duration: ~4 days | Priority: HIGH</strong></p>
+<h4 id="task-51-admin-dashboard">Task 5.1: Admin Dashboard</h4>
+<ul>
+<li>[ ] Admin layout: dark deep blue sidebar + content area</li>
+<li>[ ] Dashboard stats: Total Listings, Pending Review, Total Users, Total Sellers, Monthly Revenue</li>
+<li>[ ] Charts: new listings/day (30d), new registrations/day (30d)</li>
+<li>[ ] Pending listings quick-approve queue</li>
+<li>[ ] <strong>Verify</strong>: Dashboard loads with real data</li>
+</ul>
+<h4 id="task-52-listing-moderation">Task 5.2: Listing Moderation</h4>
+<ul>
+<li>[ ] Status tabs with counts: All, Pending Review, Active, Rejected, Expired</li>
+<li>[ ] Table: image, title, seller, category, price, status, date, actions</li>
+<li>[ ] Approve (green button) — changes status to ACTIVE, indexes in Elasticsearch</li>
+<li>[ ] Reject (red button) — requires reason, notifies seller</li>
+<li>[ ] Bulk approve/reject</li>
+<li>[ ] <strong>Verify</strong>: Approve/reject workflow works end-to-end</li>
+</ul>
+<h4 id="task-53-user-management">Task 5.3: User Management</h4>
+<ul>
+<li>[ ] User table: avatar, name, email, role badge, listings count, status, joined, last login</li>
+<li>[ ] Search by name/email, filter by role/status</li>
+<li>[ ] Actions: change role, activate, suspend/ban</li>
+<li>[ ] User detail panel: full info, listings, messages</li>
+<li>[ ] <strong>Verify</strong>: Suspend user → their listings hidden, reactivate → restored</li>
+</ul>
+<h4 id="task-54-category-brand-management">Task 5.4: Category &amp; Brand Management</h4>
+<ul>
+<li>[ ] Category tree view with drag-to-reorder</li>
+<li>[ ] Add/edit modal: name (multi-language), slug, parent, icon, description, SEO fields</li>
+<li>[ ] Toggle active/inactive</li>
+<li>[ ] Brand table: name, logo, model count</li>
+<li>[ ] Add/edit brand + manage models</li>
+<li>[ ] <strong>Verify</strong>: CRUD operations work, changes reflected on frontend</li>
+</ul>
+<h4 id="task-55-admin-analytics-reports">Task 5.5: Admin Analytics &amp; Reports</h4>
+<ul>
+<li>[ ] Date range selector</li>
+<li>[ ] Listing stats: by category, by status, by country</li>
+<li>[ ] User stats: registrations, active users, role breakdown</li>
+<li>[ ] Search analytics: top search queries, zero-result queries</li>
+<li>[ ] <strong>Verify</strong>: Charts display with real data</li>
+</ul>
+<hr />
+<h2 id="milestone-3-monetization-optimization-launch-weeks-7-8">MILESTONE 3: Monetization, Optimization &amp; Launch (Weeks 7-8)</h2>
+<h3 id="phase-6-monetization">PHASE 6: Monetization</h3>
+<p><strong>Duration: ~4 days | Priority: HIGH</strong></p>
+<h4 id="task-61-subscription-plans">Task 6.1: Subscription Plans</h4>
+<ul>
+<li>[ ] Plan definitions:<br />
+  | Plan | Monthly | Yearly | Max Listings | Max Images |<br />
+  |------|---------|--------|-------------|------------|<br />
+  | Free | €0 | €0 | 5 | 5 |<br />
+  | Basic | €29 | €290 | 25 | 10 |<br />
+  | Premium | €79 | €790 | 100 | 20 |</li>
+<li>[ ] Subscription controller: plans, subscribe, changePlan, cancel, resume</li>
+<li>[ ] Stripe integration: create checkout session, handle webhooks</li>
+<li>[ ] Listing limit enforcement based on active plan</li>
+<li>[ ] <strong>Verify</strong>: Subscribe → Stripe checkout → webhook → plan active → limits enforced</li>
+</ul>
+<h4 id="task-62-featured-listings">Task 6.2: Featured Listings</h4>
+<ul>
+<li>[ ] Featured listing controller: purchase featured placement</li>
+<li>[ ] Placements: homepage carousel, category page top, search results highlight</li>
+<li>[ ] Duration: 7/14/30 days with pricing</li>
+<li>[ ] Stripe payment for featured listing purchase</li>
+<li>[ ] Featured badge on listing cards</li>
+<li>[ ] <strong>Verify</strong>: Purchase featured → appears in carousel → expires correctly</li>
+</ul>
+<h4 id="task-63-pricing-page">Task 6.3: Pricing Page</h4>
+<ul>
+<li>[ ] Plan comparison table</li>
+<li>[ ] Feature checklist per plan</li>
+<li>[ ] Subscribe/upgrade buttons</li>
+<li>[ ] Billing history in seller dashboard</li>
+<li>[ ] <strong>Verify</strong>: Page renders, subscribe button redirects to Stripe</li>
+</ul>
+<h4 id="task-64-payment-records">Task 6.4: Payment Records</h4>
+<ul>
+<li>[ ] Store all transactions in payments table</li>
+<li>[ ] Stripe webhook handler: payment succeeded, failed, subscription updated, cancelled</li>
+<li>[ ] Admin revenue view</li>
+<li>[ ] <strong>Verify</strong>: Payments tracked, webhook events processed</li>
+</ul>
+<hr />
+<h3 id="phase-7-optimization-launch">PHASE 7: Optimization &amp; Launch</h3>
+<p><strong>Duration: ~6 days | Priority: HIGH</strong></p>
+<h4 id="task-71-multi-language-support-i18n">Task 7.1: Multi-Language Support (i18n)</h4>
+<ul>
+<li>[ ] next-intl configuration for 10+ languages</li>
+<li>[ ] Language switcher component in header</li>
+<li>[ ] Start with English (complete), structure for: Dutch, German, French, Spanish, Italian, Portuguese, Polish, Turkish, Arabic</li>
+<li>[ ] All UI strings externalized to translation files</li>
+<li>[ ] Category and brand names translatable (JSON fields)</li>
+<li>[ ] <strong>Verify</strong>: Language switcher works, all strings translated for EN</li>
+</ul>
+<h4 id="task-72-multi-currency-support">Task 7.2: Multi-Currency Support</h4>
+<ul>
+<li>[ ] Currency display component</li>
+<li>[ ] Support: EUR, GBP, USD (expandable)</li>
+<li>[ ] Currency selector in UI</li>
+<li>[ ] Price stored in original currency, display in user's preferred</li>
+<li>[ ] <strong>Verify</strong>: Prices display correctly in different currencies</li>
+</ul>
+<h4 id="task-73-dealer-bulk-upload">Task 7.3: Dealer Bulk Upload</h4>
+<ul>
+<li>[ ] CSV/XML import endpoint: POST /api/seller/bulk-import</li>
+<li>[ ] File validation and parsing</li>
+<li>[ ] BullMQ job: ProcessBulkImport — parse rows, validate, create listings</li>
+<li>[ ] Progress tracking: total/processed/error counts</li>
+<li>[ ] Import status page in seller dashboard</li>
+<li>[ ] Error report download</li>
+<li>[ ] <strong>Verify</strong>: Upload CSV with 50 listings → all created correctly</li>
+</ul>
+<h4 id="task-74-seo-optimization">Task 7.4: SEO Optimization</h4>
+<ul>
+<li>[ ] SSR for all public pages (Next.js App Router)</li>
+<li>[ ] Dynamic meta tags: title, description, Open Graph, Twitter Cards</li>
+<li>[ ] JSON-LD structured data:</li>
+<li>Organization (homepage)</li>
+<li>Vehicle (listing detail)</li>
+<li>BreadcrumbList (all pages)</li>
+<li>FAQPage (FAQ page)</li>
+<li>[ ] Canonical URLs on all pages</li>
+<li>[ ] Auto-generated sitemap.xml (all active listings, categories, sellers)</li>
+<li>[ ] robots.txt</li>
+<li>[ ] hreflang tags for language alternates</li>
+<li>[ ] Image alt texts from listing data</li>
+<li>[ ] Clean SEO-friendly URLs: <code>/trucks/mercedes-actros-2024-12345</code></li>
+<li>[ ] <strong>Verify</strong>: Google structured data test passes, Lighthouse SEO &gt; 90</li>
+</ul>
+<h4 id="task-75-performance-optimization">Task 7.5: Performance Optimization</h4>
+<ul>
+<li>[ ] Redis caching (TTLs per endpoint as defined in Section 7)</li>
+<li>[ ] Cache invalidation via Prisma middleware hooks</li>
+<li>[ ] Cache key normalization (sorted params, hashed)</li>
+<li>[ ] Next.js ISR for category pages</li>
+<li>[ ] Image optimization: WebP, lazy loading, srcset responsive</li>
+<li>[ ] CDN configuration (Cloudflare)</li>
+<li>[ ] Database query optimization (no N+1, proper includes)</li>
+<li>[ ] API response compression (gzip)</li>
+<li>[ ] <strong>Verify</strong>: Pages load under 3 seconds, Lighthouse Performance &gt; 90</li>
+</ul>
+<h4 id="task-76-email-notification-system">Task 7.6: Email Notification System</h4>
+<ul>
+<li>[ ] Email templates: welcome, verification, password reset, listing approved/rejected, new message, saved search alert, subscription expiring</li>
+<li>[ ] Email service with queue (BullMQ)</li>
+<li>[ ] Notification center: bell icon, dropdown, full page</li>
+<li>[ ] <strong>Verify</strong>: All email types send correctly</li>
+</ul>
+<h4 id="task-77-security-audit-hardening">Task 7.7: Security Audit &amp; Hardening</h4>
+<ul>
+<li>[ ] Input validation review (all Zod schemas)</li>
+<li>[ ] SQL injection test (Prisma parameterized)</li>
+<li>[ ] XSS protection test (helmet.js)</li>
+<li>[ ] CSRF token validation</li>
+<li>[ ] Rate limiting on all sensitive endpoints</li>
+<li>[ ] File upload sanitization</li>
+<li>[ ] Environment variable audit (no hardcoded secrets)</li>
+<li>[ ] HTTPS enforcement</li>
+<li>[ ] <strong>Verify</strong>: No vulnerabilities found</li>
+</ul>
+<h4 id="task-78-static-pages-final-polish">Task 7.8: Static Pages &amp; Final Polish</h4>
+<ul>
+<li>[ ] About page — company story, values</li>
+<li>[ ] Contact page — form (name, email, subject, message) + company address</li>
+<li>[ ] Terms of Service page</li>
+<li>[ ] Privacy Policy page (GDPR compliant)</li>
+<li>[ ] FAQ page — accordion sections</li>
+<li>[ ] How It Works page — buyer and seller guides</li>
+<li>[ ] 404 page design</li>
+<li>[ ] 500 error page design</li>
+<li>[ ] Cookie consent banner</li>
+<li>[ ] Loading states on all pages</li>
+<li>[ ] Empty states for no results</li>
+<li>[ ] Mobile responsive audit (375px, 768px, 1920px)</li>
+<li>[ ] <strong>Verify</strong>: All pages render, responsive, no broken states</li>
+</ul>
+<h4 id="task-79-testing">Task 7.9: Testing</h4>
+<ul>
+<li>[ ] Unit tests for core services (auth, listing CRUD, search)</li>
+<li>[ ] API integration tests for all endpoints</li>
+<li>[ ] E2E tests for critical flows:</li>
+<li>Register → Login → Create Listing → Publish</li>
+<li>Search → Filter → View Detail → Contact Seller</li>
+<li>Admin: Approve/Reject listing</li>
+<li>Subscribe → Stripe checkout → Plan active</li>
+<li>[ ] <strong>Verify</strong>: All tests pass</li>
+</ul>
+<h4 id="task-710-production-deployment">Task 7.10: Production Deployment</h4>
+<ul>
+<li>[ ] Docker production configuration</li>
+<li>[ ] Environment variables for production</li>
+<li>[ ] Database migration on production</li>
+<li>[ ] Elasticsearch index creation</li>
+<li>[ ] SSL/HTTPS setup</li>
+<li>[ ] Cloudflare CDN configuration</li>
+<li>[ ] Monitoring setup (error tracking)</li>
+<li>[ ] Deployment documentation</li>
+<li>[ ] <strong>Verify</strong>: Platform live and functional on production URL</li>
+</ul>
+<hr />
+<h2 id="14-milestones-budget">14. Milestones &amp; Budget</h2>
+<table>
+<thead>
+<tr>
+<th>Milestone</th>
+<th>Timeline</th>
+<th>Cost</th>
+<th>Deliverable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>M1</strong>: Foundation, Core Setup &amp; Marketplace</td>
+<td>Weeks 1-4</td>
+<td>€700</td>
+<td>Working marketplace with auth, categories, listing CRUD, image upload, seller dashboard, contact options on staging</td>
+</tr>
+<tr>
+<td><strong>M2</strong>: Search, User Features &amp; Admin Panel</td>
+<td>Weeks 5-6</td>
+<td>€1,000</td>
+<td>Elasticsearch search, filters, dashboards, admin panel, messaging on staging</td>
+</tr>
+<tr>
+<td><strong>M3</strong>: Monetization, Optimization &amp; Launch</td>
+<td>Weeks 7-8</td>
+<td>€700</td>
+<td>Monetization, i18n, optimization, full platform on production</td>
+</tr>
+<tr>
+<td><strong>TOTAL</strong></td>
+<td><strong>8 Weeks (60 Days)</strong></td>
+<td><strong>€2,400</strong></td>
+<td>Complete platform</td>
+</tr>
+</tbody>
+</table>
+<h3 id="payment-policy">Payment Policy:</h3>
+<ul>
+<li>Payment requested ONLY after milestone deliverable is live on staging</li>
+<li>Client verifies, tests, and confirms before payment</li>
+<li>Each milestone delivers a complete, working set of features</li>
+</ul>
+<hr />
+<h2 id="15-uat-acceptance-criteria">15. UAT Acceptance Criteria</h2>
+<h3 id="marketplace-categories">Marketplace &amp; Categories:</h3>
+<ul>
+<li>[ ] All 44+ categories and subcategories functional</li>
+<li>[ ] Category pages display listings with correct filters</li>
+<li>[ ] SEO-friendly URLs for all pages</li>
+<li>[ ] Location-based browsing functional</li>
+</ul>
+<h3 id="search-filters">Search &amp; Filters:</h3>
+<ul>
+<li>[ ] Elasticsearch keyword search returning relevant results</li>
+<li>[ ] All filters working: Category, Brand, Price, Year, Condition, Location</li>
+<li>[ ] Sorting: Newest, Price (Low/High), Year</li>
+<li>[ ] Search suggestions and autocomplete</li>
+<li>[ ] Saved searches with email alerts</li>
+</ul>
+<h3 id="listings">Listings:</h3>
+<ul>
+<li>[ ] Listing CRUD working end-to-end</li>
+<li>[ ] Multi-image upload with optimization (WebP, thumbnails)</li>
+<li>[ ] Listing detail page: Title, Price, Specs, Seller Info, Location, Gallery, Related</li>
+</ul>
+<h3 id="buyer-features">Buyer Features:</h3>
+<ul>
+<li>[ ] Contact seller form (messaging)</li>
+<li>[ ] Phone contact button</li>
+<li>[ ] WhatsApp contact button</li>
+<li>[ ] Favorites working</li>
+<li>[ ] Saved searches with alerts</li>
+</ul>
+<h3 id="seller-features">Seller Features:</h3>
+<ul>
+<li>[ ] Registration and login</li>
+<li>[ ] Seller dashboard with stats</li>
+<li>[ ] Listing management (create, edit, delete)</li>
+<li>[ ] Seller profile page</li>
+<li>[ ] Messages from buyers visible</li>
+</ul>
+<h3 id="admin-panel">Admin Panel:</h3>
+<ul>
+<li>[ ] Approve/remove listings</li>
+<li>[ ] Manage categories and filters</li>
+<li>[ ] Manage users (suspend, activate)</li>
+<li>[ ] Analytics dashboard</li>
+</ul>
+<h3 id="monetization_1">Monetization:</h3>
+<ul>
+<li>[ ] Subscription plans (Free, Basic, Premium)</li>
+<li>[ ] Stripe payment processing</li>
+<li>[ ] Featured listings functional</li>
+</ul>
+<h3 id="i18n-currency">i18n &amp; Currency:</h3>
+<ul>
+<li>[ ] Multi-language support with switcher</li>
+<li>[ ] Multi-currency display</li>
+</ul>
+<h3 id="technical">Technical:</h3>
+<ul>
+<li>[ ] Full responsive: Desktop (1920px), Tablet (768px), Mobile (375px)</li>
+<li>[ ] SSR and SEO verified (meta tags, sitemap, schema markup)</li>
+<li>[ ] Pages load under 3 seconds</li>
+<li>[ ] All security measures implemented</li>
+<li>[ ] Docker deployment running</li>
+<li>[ ] 150,000+ listing architecture verified</li>
+</ul>
+<hr />
+<h2 id="16-deliverables">16. Deliverables</h2>
+<ul>
+<li>[ ] Fully functional multi-vendor marketplace website</li>
+<li>[ ] Admin dashboard with analytics and moderation</li>
+<li>[ ] Seller dashboard with listing management</li>
+<li>[ ] Complete source code (TypeScript, clean architecture)</li>
+<li>[ ] Database schema and setup scripts (Prisma migrations)</li>
+<li>[ ] Docker deployment configuration</li>
+<li>[ ] Elasticsearch indexing and search configuration</li>
+<li>[ ] API documentation</li>
+<li>[ ] User guide documentation</li>
+<li>[ ] Deployment support</li>
+</ul>
+<hr />
+<h2 id="17-team-requirements">17. Team Requirements</h2>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Full-Stack Lead</td>
+<td>Architecture, backend development, code reviews</td>
+</tr>
+<tr>
+<td>Frontend Developer</td>
+<td>Next.js, React components, UI implementation</td>
+</tr>
+<tr>
+<td>Backend Developer</td>
+<td>Node.js APIs, Elasticsearch integration</td>
+</tr>
+<tr>
+<td>UI/UX Designer</td>
+<td>Design system, wireframes, usability</td>
+</tr>
+<tr>
+<td>DevOps Engineer</td>
+<td>Infrastructure, CI/CD, monitoring</td>
+</tr>
+<tr>
+<td>QA Engineer</td>
+<td>Testing, quality assurance</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="total-estimated">TOTAL ESTIMATED:</h1>
+<ul>
+<li><strong>Files</strong>: ~250+</li>
+<li><strong>Code</strong>: ~30,000+ lines</li>
+<li><strong>Tables</strong>: 29</li>
+<li><strong>API Endpoints</strong>: 70+</li>
+<li><strong>Frontend Pages</strong>: 35+</li>
+<li><strong>Components</strong>: 60+</li>
+<li><strong>Timeline</strong>: 8 weeks (60 days)</li>
+<li><strong>Budget</strong>: €2,400</li>
+</ul>
+<footer style="margin-top:60px; padding-top:20px; border-top:2px solid #E5E7EB; color:#6B7280; font-size:12px; text-align:center;">
+  MenonTrucks Development Plan v2.0 — Aligned with SRS by Redstone Catalyst — Generated 14 Feb 2026
+</footer>
+</body>
+</html>

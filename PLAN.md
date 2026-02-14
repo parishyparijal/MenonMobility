@@ -1,563 +1,86 @@
-# MenonTrucks - Ultra-Detailed Implementation Plan (35 Phases)
+# MenonTrucks - Complete Development Plan & Task List
 
-## Context
-Building a **full-fledged multi-vendor vehicle marketplace** called **MenonTrucks** for client **Menon Mobility**. Reference: [TrucksNL.com](https://www.trucksnl.com/) but significantly MORE feature-rich. The platform supports dealers and individuals listing ALL types of vehicles (trucks, trailers, equipment, vans, cars, containers, parts). Target: 150K+ listings, European market (NL/DE/UK).
+## Document Info
+- **Version**: 2.0 (Aligned with SRS v1.0 by Redstone Catalyst)
+- **Client**: Menon Mobility (Romeo)
+- **Date**: 14 February 2026
+- **Reference**: TrucksNL.com (www.trucks.nl) — Europe's largest commercial vehicle marketplace
 
-**What makes this BETTER than TrucksNL:**
-- Dealer verification system with buyer reviews & trust scores
-- Built-in finance calculator & insurance quotes
-- Vehicle history reports (VIN check, inspection, damage history)
-- Full real-time: live chat, instant push notifications, real-time updates
-- 3 languages: English, Dutch, German (i18n from day 1)
-- Mixed monetization: subscriptions + featured listings + banner ads
-- Modern PWA-ready responsive design
+---
+
+## 1. Project Overview
+
+**MenonTrucks** is a multi-vendor vehicle marketplace platform built from scratch — NOT a modified template. Custom-architected for 150,000+ listings, Europe-first launch with global extensibility.
+
+### What We're Building:
+- Full marketplace for trucks, trailers, equipment, vans, cars, containers, parts
+- Multi-vendor (sellers + buyers + admin)
 - 44+ vehicle categories (matching TrucksNL coverage)
+- Elasticsearch-powered search with filters & aggregations
+- Seller & Admin dashboards
+- Monetization: subscriptions + featured listings + paid packages
+- Multi-language (10+ languages, i18n from day 1)
+- Multi-currency support
+- Dealer bulk upload (CSV/XML)
+- Favorites & vehicle comparison tool
+- Buyer-seller messaging
+- Mobile-first responsive design
+- SSR for SEO optimization
 
 ---
 
-## Tech Stack
-| Layer | Technology |
-|-------|-----------|
-| Frontend | **Nuxt 3** (Vue 3) with SSR |
-| Backend | **Laravel 11** API (PHP 8.3) |
-| Database | **PostgreSQL 16** |
-| Search | **Elasticsearch 8** |
-| Cache/Queue | **Redis 7** |
-| Real-time | **Laravel Reverb** (WebSockets) + **Pusher protocol** |
-| Storage | **S3-compatible** (MinIO local, AWS S3 prod) |
-| Styling | **Tailwind CSS 3** |
-| Auth | **Laravel Sanctum** (token-based) |
-| Payments | **Stripe** (Laravel Cashier) |
-| i18n | **@nuxtjs/i18n** (EN/NL/DE) |
-| Infrastructure | **Docker** + **Nginx** reverse proxy |
-| CDN | **Cloudflare** |
-| Monitoring | **Sentry** + **Laravel Telescope** |
+## 2. Technology Stack (Per SRS)
 
-## Brand Colors
-- Navy Blue: `#1E2B47` (primary)
-- Orange: `#FF6B35` (accent/CTA)
-- Orange Light: `#FF8C5E` (hover states)
-- Orange Lighter: `#FFF3ED` (backgrounds)
-- Gray scale: `#F8F9FA` to `#1A1A2E`
+| Component | Technology |
+|-----------|-----------|
+| **Frontend** | Next.js 14 (App Router) + React 18 + TypeScript |
+| **Styling** | TailwindCSS + Shadcn/UI |
+| **Backend** | Node.js + Express.js + TypeScript |
+| **Database** | PostgreSQL + Prisma ORM |
+| **Search Engine** | Elasticsearch / OpenSearch |
+| **Cache / Sessions** | Redis |
+| **Queue System** | BullMQ (Redis-based) |
+| **Image Storage** | AWS S3 / Cloudflare R2 (S3-compatible) |
+| **CDN** | Cloudflare |
+| **Authentication** | JWT + NextAuth |
+| **Payments** | Stripe Integration |
+| **Deployment** | Docker + Docker Compose |
+| **Monorepo** | Turborepo |
+| **Validation** | Zod schema validation |
+| **Security** | helmet.js, CSRF tokens, rate limiting |
+| **Frontend Port** | 3001 |
+| **Backend Port** | 5001 |
 
 ---
 
-# THE 35 PHASES
+## 3. Design & Color Palette (Per SRS)
+
+| Element | Color | Hex Code |
+|---------|-------|----------|
+| Primary Brand | Deep Blue | `#1E3A5F` |
+| Accent / CTA | Orange | `#F59E0B` |
+| Background | Light Grey | `#F5F6F7` |
+| Background Alt | White | `#FFFFFF` |
+| Primary Text | Dark Grey | `#222222` |
+| Secondary Text | Grey | `#6B7280` |
+| Borders | Light Border | `#E5E7EB` |
+
+### Design Principles:
+- Mobile-first responsive (Desktop, Tablet, Mobile)
+- Fast loading (target under 3 seconds)
+- Clean UI/UX with focus on usability
+- Modern, professional marketplace aesthetic
+- Clear and easy seller contact options
+- Intuitive search and filter experience
 
 ---
 
-## PHASE 1: Project Setup & Docker Infrastructure
-**Priority: CRITICAL | Estimated: 2 days**
+## 4. Vehicle Categories (44+)
 
-Everything starts here. Without Docker, nothing runs.
-
-### Tasks:
-1. Create monorepo directory structure:
-   ```
-   menontrucks/
-   ├── docker/          (nginx, php, node configs)
-   ├── backend/         (Laravel 11)
-   ├── frontend/        (Nuxt 3)
-   ├── docker-compose.yml
-   ├── Makefile
-   └── .env.example
-   ```
-2. Write `docker-compose.yml` with 10 services:
-   - nginx (1.25-alpine, port 80) — reverse proxy
-   - php (8.3-FPM custom) — Laravel API
-   - node (20-alpine custom) — Nuxt dev server
-   - postgres (16-alpine, port 5432) — database
-   - redis (7-alpine, port 6379) — cache/queue/sessions
-   - elasticsearch (8.12.0, port 9200) — search engine
-   - minio (port 9000/9001) — S3-compatible storage
-   - mailpit (port 8025) — email testing
-   - queue-worker — background jobs
-   - scheduler — cron tasks
-3. Write `docker/php/Dockerfile` (PHP 8.3-FPM + extensions: pdo_pgsql, redis, gd, imagick, pcntl, zip, exif, intl, bcmath)
-4. Write `docker/node/Dockerfile` (Node 20 + npm)
-5. Write `docker/nginx/default.conf` (reverse proxy: /api→php, everything else→node, gzip, 50M upload)
-6. Write `Makefile` (up, down, restart, fresh, migrate, seed, shell, logs, test, install)
-7. Write `.env.example` with all service environment variables
-8. Write `.gitignore` (node_modules, vendor, .env, .nuxt, storage logs)
-
-### Verification:
-- `docker compose build` succeeds without errors
-- `docker compose up -d` starts all 10 services
-- `curl localhost` returns nginx response
-
-### Files:
-- `docker-compose.yml`
-- `docker/php/Dockerfile`
-- `docker/node/Dockerfile`
-- `docker/nginx/default.conf`
-- `Makefile`
-- `.env.example`
-- `.gitignore`
-
----
-
-## PHASE 2: Laravel 11 Backend Initialization
-**Priority: CRITICAL | Estimated: 1 day**
-
-Set up Laravel with all required packages and configuration.
-
-### Tasks:
-1. `composer.json` with dependencies:
-   - laravel/framework, laravel/sanctum, laravel/cashier
-   - intervention/image (v3), elasticsearch/elasticsearch
-   - league/flysystem-aws-s3-v3, predis/predis
-   - spatie/laravel-sluggable, spatie/laravel-translatable
-   - laravel/reverb (WebSockets)
-2. `bootstrap/app.php` — Laravel 11 bootstrap with API routing, middleware aliases
-3. Config files:
-   - `config/app.php` — timezone, locale, providers
-   - `config/database.php` — PostgreSQL default, Redis
-   - `config/filesystems.php` — local, public, s3 disks
-   - `config/sanctum.php` — 7-day token expiry
-   - `config/elasticsearch.php` — host, index settings
-   - `config/broadcasting.php` — Reverb/Pusher config
-4. `routes/api.php` — empty but structured with route groups
-5. `public/index.php` + `artisan` — standard entry points
-6. `backend/.env.example`
-7. `app/Providers/AppServiceProvider.php` — singleton bindings
-
-### Verification:
-- `php artisan --version` returns Laravel 11
-- `php artisan route:list` shows no errors
-
-### Files: 10 files in `backend/`
-
----
-
-## PHASE 3: Nuxt 3 Frontend Initialization
-**Priority: CRITICAL | Estimated: 1 day**
-
-Set up Nuxt 3 with all modules and Tailwind configuration.
-
-### Tasks:
-1. `package.json` with dependencies:
-   - nuxt (^3.14), @nuxtjs/tailwindcss, @pinia/nuxt, @nuxtjs/i18n
-   - @vueuse/nuxt, vue-toastification, swiper, chart.js, vue-chartjs
-   - socket.io-client (for real-time)
-2. `nuxt.config.ts`:
-   - SSR enabled globally
-   - Runtime config (apiBase, wsUrl)
-   - Modules: tailwindcss, pinia, i18n, vueuse
-   - Route rules: /seller/*, /admin/* → ssr:false (SPA mode)
-   - SEO defaults (title, meta description)
-3. `tailwind.config.ts`:
-   - Brand colors: navy, orange, orange-light, orange-lighter
-   - Font: Inter
-   - Container settings, custom spacing
-4. `app/app.vue` — root component with NuxtLayout + Suspense
-5. `tsconfig.json`
-6. i18n config:
-   - `i18n/locales/en.json` — English translations
-   - `i18n/locales/nl.json` — Dutch translations
-   - `i18n/locales/de.json` — German translations
-   - Cover: navigation, buttons, forms, categories, error messages
-
-### Verification:
-- `npm run dev` starts dev server on port 3000
-- Homepage renders with correct Tailwind styles
-- Language switcher works between EN/NL/DE
-
-### Files: 8+ files in `frontend/`
-
----
-
-## PHASE 4: Database Schema — Core Tables (Migrations)
-**Priority: CRITICAL | Estimated: 2 days**
-
-All database tables. This is the data foundation.
-
-### Tables (25+ tables):
-
-**User & Auth:**
-1. `users` — id, name, email, password, role (buyer/seller/admin), phone, whatsapp, avatar_url, locale (en/nl/de), is_active, email_verified_at, last_login_at, timestamps, soft_deletes
-2. `personal_access_tokens` — Sanctum tokens
-3. `password_reset_tokens` — password resets
-
-**Seller:**
-4. `seller_profiles` — user_id, company_name, slug, description, website, address, city, region, country_code, lat/lng, logo_url, banner_url, is_verified, verified_at, response_rate, avg_response_time, rating, review_count, timestamps
-5. `seller_reviews` — buyer_id, seller_id, listing_id, rating (1-5), title, body, is_verified_purchase, seller_response, responded_at, timestamps
-
-**Catalog:**
-6. `categories` — id, parent_id, name (JSON translatable), slug, description (JSON), icon, image_url, sort_order, listing_count, is_active, meta_title, meta_description, timestamps
-7. `brands` — id, name, slug, logo_url, is_active
-8. `brand_category` — pivot table
-9. `brand_models` — id, brand_id, name, slug, is_active
-
-**Listings:**
-10. `listings` — 50+ columns:
-    - Core: title, slug, description, price, price_currency (EUR/GBP), price_on_request, price_negotiable
-    - Condition: new/used/refurbished
-    - Status: draft → pending_review → active → sold/expired/rejected/archived
-    - Vehicle: year, mileage_km, operating_hours, fuel_type, transmission, power_hp, power_kw, color, vin
-    - Truck-specific: gvw_kg, payload_kg, axle_count, cab_type, emission_class, wheelbase_mm, suspension_type
-    - Container-specific: container_size (20ft/40ft), container_type
-    - Location: country_code, region, city, postal_code, lat, lng
-    - Contact: contact_phone, contact_email, contact_whatsapp, hide_phone
-    - Stats: view_count, favorite_count, contact_count, image_count
-    - Featured: is_featured, featured_until, featured_placement
-    - Dates: published_at, expires_at, sold_at, rejected_reason
-    - SEO: meta_title, meta_description
-    - timestamps, soft_deletes
-11. `listing_images` — listing_id, position, original_url, large_url, medium_url, thumbnail_url, webp_url, alt_text, file_size, dimensions
-12. `specification_keys` — category_id, name (translatable), slug, unit, data_type, sort_order, is_filterable
-13. `listing_specifications` — listing_id, spec_key_id, value
-
-**Vehicle History:**
-14. `vehicle_inspections` — listing_id, inspector_name, inspection_date, overall_rating, report_url, notes, is_verified
-15. `vehicle_history_reports` — listing_id, vin, report_provider, accident_count, owner_count, service_records_count, report_data (JSONB), report_url
-
-**Location:**
-16. `locations` — country_code, country_name, region, city, lat, lng, postal_code
-
-**User Interactions:**
-17. `favorites` — user_id, listing_id (unique pair)
-18. `saved_searches` — user_id, name, filters (JSONB), email_frequency (never/daily/weekly), last_notified_at
-19. `recently_viewed` — user_id, listing_id, viewed_at
-20. `listing_comparisons` — user_id, listing_ids (JSONB array, max 4)
-
-**Messaging & Real-time:**
-21. `message_threads` — listing_id, buyer_id, seller_id, last_message_at, is_archived_buyer, is_archived_seller
-22. `messages` — thread_id, sender_id, body, attachments (JSONB), is_read, read_at, timestamps
-23. `notifications` — user_id, type, title, body, data (JSONB), is_read, read_at, timestamps
-
-**Monetization:**
-24. `subscription_plans` — name, slug, description, price_monthly, price_yearly, max_listings, max_images, features (JSONB), stripe_monthly_id, stripe_yearly_id, sort_order
-25. `user_subscriptions` — user_id, plan_id, stripe_sub_id, status, period_start, period_end, cancelled_at
-26. `featured_listings` — listing_id, placement (homepage/category/search), starts_at, ends_at, price_paid, stripe_payment_id
-27. `banner_ads` — title, image_url, target_url, placement, categories (JSONB), countries (JSONB), impressions, clicks, starts_at, ends_at, is_active
-
-**Finance:**
-28. `finance_inquiries` — user_id, listing_id, amount, term_months, down_payment, status, contact_phone, contact_email
-
-**CMS/Content:**
-29. `pages` — slug, title (translatable), body (translatable), is_published, sort_order
-30. `faqs` — category, question (translatable), answer (translatable), sort_order
-
-### Verification:
-- `php artisan migrate` runs all migrations without errors
-- `php artisan migrate:rollback` works cleanly
-- All foreign keys and indexes are correct
-
-### Files: 30 migration files in `database/migrations/`
-
----
-
-## PHASE 5: Eloquent Models & Relationships
-**Priority: CRITICAL | Estimated: 2 days**
-
-Every model with complete relationships, casts, scopes, and accessors.
-
-### Models (25+):
-1. **User** — HasApiTokens, roles, relationships (listings, favorites, threads, subscription, reviews_given, reviews_received, notifications, recently_viewed)
-2. **SellerProfile** — sluggable, translatable description, belongsTo user, reviews, verification
-3. **SellerReview** — belongsTo buyer/seller/listing, rating validation
-4. **Category** — self-referencing tree, translatable name/description, hasMany listings
-5. **Brand** — sluggable, belongsToMany categories, hasMany models
-6. **BrandModel** — belongsTo brand
-7. **Location** — hasMany listings
-8. **Listing** — THE main model, 15+ relationships, 10+ scopes, sluggable, enum casts for status/condition/fuel/transmission/emission
-9. **ListingImage** — belongsTo listing, position ordering
-10. **SpecificationKey** — translatable, belongsTo category
-11. **ListingSpecification** — belongsTo listing + specKey
-12. **VehicleInspection** — belongsTo listing
-13. **VehicleHistoryReport** — belongsTo listing
-14. **Favorite** — belongsTo user + listing
-15. **SavedSearch** — belongsTo user, JSONB cast
-16. **RecentlyViewed** — belongsTo user + listing
-17. **MessageThread** — belongsTo listing/buyer/seller, hasMany messages
-18. **Message** — belongsTo thread/sender
-19. **Notification** — belongsTo user, morphable
-20. **SubscriptionPlan** — features JSON
-21. **UserSubscription** — belongsTo user + plan
-22. **FeaturedListing** — belongsTo listing
-23. **BannerAd** — placements, click tracking
-24. **FinanceInquiry** — belongsTo user + listing
-25. **Page** — translatable CMS content
-26. **Faq** — translatable
-
-### Enums (PHP 8.1 backed):
-- ListingStatus (draft, pending_review, active, sold, expired, rejected, archived)
-- UserRole (buyer, seller, admin)
-- VehicleCondition (new, used, refurbished)
-- FuelType (diesel, petrol, electric, hybrid, lpg, cng, hydrogen)
-- TransmissionType (manual, automatic, semi_automatic)
-- EmissionClass (euro1-euro6, euro6d)
-- ContainerSize (20ft, 40ft, 45ft)
-
-### Files: 26 model files + 7 enum files
-
----
-
-## PHASE 6: Enums, Form Requests & Validation
-**Priority: HIGH | Estimated: 1 day**
-
-All request validation classes with proper rules.
-
-### Form Requests (15+):
-1. RegisterRequest — name, email (unique), password (confirmed, min:8), role
-2. LoginRequest — email, password
-3. ForgotPasswordRequest — email (exists)
-4. ResetPasswordRequest — token, email, password
-5. StoreListingRequest — title, category_id, description, price rules, all vehicle fields with conditional validation per category
-6. UpdateListingRequest — same but all 'sometimes'
-7. SearchRequest — q, filters, sort, pagination with validation
-8. StoreMessageRequest — listing_id (exists), body (max:5000)
-9. SavedSearchRequest — name, filters (array), email_frequency
-10. UpdateSellerProfileRequest — company_name, description, logo, all address fields
-11. UploadImagesRequest — images array (max 20, each max 10MB, mimes: jpg/png/webp/heic)
-12. RejectListingRequest — reason (required, max:1000)
-13. StoreReviewRequest — rating (1-5), title, body
-14. FinanceInquiryRequest — amount, term, contact info
-15. ContactFormRequest — name, email, subject, message
-
-### Files: 15 files in `app/Http/Requests/`
-
----
-
-## PHASE 7: API Resources & Response Formatting
-**Priority: HIGH | Estimated: 1 day**
-
-JSON API resources for consistent response structure.
-
-### Resources (12+):
-1. UserResource — id, name, email, role, avatar, created_at, conditional seller_profile
-2. ListingResource — all fields + nested images, category, brand, seller, conditional specs, is_favorited
-3. ListingCardResource — lighter version for list views (id, title, slug, price, image, location, year, mileage)
-4. ListingImageResource — id, position, all URL sizes
-5. CategoryResource — id, name (localized), slug, icon, listing_count, children
-6. BrandResource — id, name, slug, logo, conditional models
-7. SellerProfileResource — company, slug, location, logo, is_verified, rating, review_count
-8. SellerReviewResource — rating, title, body, buyer name, date, seller_response
-9. MessageThreadResource — listing basic, other party, last message, unread count
-10. MessageResource — sender_id, body, attachments, is_read, timestamps
-11. NotificationResource — type, title, body, data, is_read, created_at
-12. SearchResultResource — listing data + relevance score + highlights
-
-### Files: 12 files in `app/Http/Resources/`
-
----
-
-## PHASE 8: Authentication System (Backend)
-**Priority: CRITICAL | Estimated: 1 day**
-
-Complete auth API with Sanctum tokens.
-
-### Controllers & Logic:
-1. **AuthController**:
-   - `register()` — create user, assign role, create Sanctum token, send verification email
-   - `login()` — validate credentials, check is_active, create token, update last_login_at
-   - `logout()` — revoke current token
-   - `user()` — return auth user with seller_profile
-   - `forgotPassword()` — send reset link
-   - `resetPassword()` — reset password, revoke all tokens
-   - `verifyEmail()` — email verification
-   - `updateProfile()` — update name, phone, avatar, locale
-   - `changePassword()` — validate old password, update
-   - `deleteAccount()` — soft delete with confirmation
-
-2. **Middleware**:
-   - `EnsureRole` — check user role (admin bypasses all)
-   - `SetLocale` — set app locale from user preference or Accept-Language header
-
-### Routes:
-```
-POST   /auth/register
-POST   /auth/login
-POST   /auth/logout
-GET    /auth/user
-PUT    /auth/user
-POST   /auth/forgot-password
-POST   /auth/reset-password
-POST   /auth/verify-email
-PUT    /auth/change-password
-DELETE /auth/account
-```
-
-### Files: 3 files (AuthController, EnsureRole middleware, SetLocale middleware)
-
----
-
-## PHASE 9: Authentication System (Frontend)
-**Priority: CRITICAL | Estimated: 2 days**
-
-Complete auth flow in Nuxt.
-
-### Tasks:
-1. `plugins/api.ts` — $api helper with auth token injection, 401 interceptor
-2. `composables/useAuth.ts` — login, register, logout, fetchUser, token management in httpOnly cookie
-3. `middleware/auth.ts` — redirect unauthenticated to /login
-4. `middleware/guest.ts` — redirect authenticated to /
-5. `middleware/seller.ts` — check seller/admin role
-6. `middleware/admin.ts` — check admin role
-
-### Pages:
-7. `pages/login.vue` — email + password form, "Forgot password?" link, social login buttons placeholder, error handling, i18n
-8. `pages/register.vue` — name, email, password, confirm password, role selector (Buyer card / Seller card), terms checkbox, i18n
-9. `pages/forgot-password.vue` — email input, send reset link
-10. `pages/reset-password.vue` — new password form with token from URL
-
-### Layout:
-11. `layouts/auth.vue` — centered card layout, MenonTrucks logo, language switcher
-
-### Verification:
-- Register new user → get token → redirected to dashboard
-- Login → token stored → user loaded
-- Protected routes redirect to login
-- Logout clears token
-- Language preference persists
-
-### Files: 11 files
-
----
-
-## PHASE 10: Design System & Theme Components
-**Priority: CRITICAL | Estimated: 2 days**
-
-All reusable UI components — the design system.
-
-### Common Components:
-1. **AppButton.vue** — variants (primary/secondary/outline/danger/ghost), sizes (sm/md/lg), loading state, icon support, disabled state
-2. **AppInput.vue** — label, placeholder, error message, icon, types (text/email/password/number/tel), v-model
-3. **AppSelect.vue** — dropdown with search, multi-select option, custom option rendering
-4. **AppTextarea.vue** — label, error, character count, auto-resize
-5. **AppCheckbox.vue** — label, v-model, indeterminate state
-6. **AppRadio.vue** — radio group with options
-7. **AppToggle.vue** — on/off switch
-8. **AppBadge.vue** — variants (success/warning/danger/info/default), sizes
-9. **StatusBadge.vue** — listing status specific colors
-10. **AppModal.vue** — overlay, sizes (sm/md/lg/xl), close on escape/overlay, teleported
-11. **AppDrawer.vue** — slide-in from left/right, for mobile menus and filters
-12. **AppToast.vue** — success/error/info notifications
-13. **AppDropdown.vue** — trigger + menu, click outside to close
-14. **AppTabs.vue** — tab navigation component
-15. **AppAccordion.vue** — expandable sections
-16. **AppTooltip.vue** — hover tooltip
-17. **AppAvatar.vue** — user avatar with fallback initials
-18. **AppPagination.vue** — page numbers, prev/next, "Showing X-Y of Z"
-19. **AppBreadcrumb.vue** — path trail with links
-20. **AppEmptyState.vue** — icon, title, description, action button
-21. **AppSkeleton.vue** — loading skeleton (line/circle/rect variants)
-22. **AppConfirmDialog.vue** — "Are you sure?" confirmation modal
-23. **LanguageSwitcher.vue** — EN/NL/DE flag dropdown
-24. **CurrencyDisplay.vue** — formatted price with currency symbol
-25. **StarRating.vue** — 1-5 star display/input component
-
-### Files: 25 component files in `components/common/`
-
----
-
-## PHASE 11: Main Layout — Header, Footer, Navigation
-**Priority: CRITICAL | Estimated: 2 days**
-
-The main website shell that wraps all public pages.
-
-### Header (AppHeader.vue):
-- **Top bar** (optional): language switcher, "Sell your vehicle" link, phone number
-- **Main bar**:
-  - Left: MenonTrucks logo (linked to home)
-  - Center: Main nav links — Transport, Equipment, Vans, Cars, Containers, Parts
-  - Right: Search icon, Favorites (heart with count), Login/Register buttons
-  - When logged in: user avatar dropdown (Dashboard, Favorites, Messages, Profile, Logout)
-  - Seller badge: "Seller Dashboard" link if seller role
-  - Admin badge: "Admin Panel" link if admin role
-- **Mobile**: Hamburger → full-screen slide drawer with all nav + auth
-
-### Footer (AppFooter.vue):
-- Navy background (#1E2B47)
-- 5 columns:
-  1. Logo + company description + social icons
-  2. Transport: Trucks, Trailers, Tractor Units, Semi Trailers
-  3. Equipment: Construction, Agricultural, Forklifts, Material Handling
-  4. Company: About, Contact, Careers, Blog, Press
-  5. Support: Help Center, Terms, Privacy, Advertise, Sitemap
-- Bottom bar: copyright, payment method icons, language selector
-- Responsive: stacks to 2 columns tablet, 1 mobile
-
-### Default Layout (layouts/default.vue):
-- Header + slot + Footer
-- Cookie consent banner at bottom
-
-### Files: 3 files (AppHeader, AppFooter, default layout)
-
----
-
-## PHASE 12: Homepage — Hero, Categories, Featured
-**Priority: HIGH | Estimated: 2 days**
-
-The main landing page — first impression for visitors.
-
-### Sections (top to bottom):
-1. **Hero Section**:
-   - Full-width navy gradient background with subtle pattern
-   - H1: "Europe's Leading Commercial Vehicle Marketplace" (translated)
-   - Subtitle: "Search over 150,000 trucks, trailers, and equipment from verified dealers"
-   - Search bar: Category dropdown + keyword input + location dropdown + orange SEARCH button
-   - Quick links below: "Popular: Mercedes Actros • Volvo FH • Used Trucks NL • DAF XF"
-
-2. **Category Icons Grid** (6-8 main categories):
-   - Trucks, Trailers, Construction Equipment, Vans & LCVs, Cars, Containers, Parts
-   - Each: icon + name + listing count, clickable to category page
-   - Responsive: 4 columns desktop, 3 tablet, 2 mobile
-
-3. **Featured Listings Carousel**:
-   - "Featured Listings" heading + "View All" link
-   - Horizontal scroll with arrows, 4 visible at a time
-   - Uses ListingCard component
-
-4. **Stats Bar**:
-   - 4 stats: "150,000+ Listings" | "5,000+ Verified Dealers" | "20+ Countries" | "Since 2024"
-   - Navy background, white text, icon for each
-
-5. **Recent Listings Grid**:
-   - "Recently Added" heading + "View All" link
-   - 4x3 grid (12 listings)
-   - Uses ListingCard component
-
-6. **Popular Brands Section**:
-   - Brand logos in a grid/carousel: Mercedes, Volvo, Scania, MAN, DAF, Caterpillar, etc.
-   - Clickable to brand search results
-
-7. **Why MenonTrucks? (Trust section)**:
-   - 3 feature cards:
-     - "Verified Dealers" — badge icon, description
-     - "Secure Messaging" — chat icon, description
-     - "Vehicle History" — document icon, description
-
-8. **Dealer CTA Banner**:
-   - "Are you a dealer? List your vehicles today"
-   - Orange gradient background, "Register as Seller" button
-
-9. **Recent Blog/News** (placeholder for future):
-   - 3 article cards
-
-### Components:
-- `components/home/HeroSearch.vue`
-- `components/home/CategoryGrid.vue`
-- `components/home/FeaturedListings.vue`
-- `components/home/StatsSection.vue`
-- `components/home/PopularBrands.vue`
-- `components/home/TrustSection.vue`
-- `components/home/DealerCTA.vue`
-
-### Files: 8 files (1 page + 7 components)
-
----
-
-## PHASE 13: Vehicle Category System (44 Categories)
-**Priority: HIGH | Estimated: 1 day**
-
-Full category tree matching and exceeding TrucksNL.
-
-### Category Tree:
 ```
 TRANSPORT
 ├── Trucks
-│   ├── Tractor Units
+│   ├── Tractor Units (Heavy Duty, Mega, Torpedo)
 │   ├── Box Trucks
 │   ├── Flatbed Trucks
 │   ├── Tipper Trucks
@@ -568,25 +91,28 @@ TRANSPORT
 │   ├── Garbage Trucks
 │   ├── Curtainsider Trucks
 │   └── Other Trucks
-├── Trailers
-│   ├── Semi Trailers
+├── Semi Trailers
+│   ├── Lowloaders
+│   ├── Flatbeds
 │   ├── Curtainsider Trailers
-│   ├── Flatbed Trailers
 │   ├── Refrigerated Trailers
 │   ├── Tank Trailers
 │   ├── Tipper Trailers
 │   ├── Container Chassis
-│   ├── Lowboy Trailers
 │   ├── Walking Floor
-│   └── Other Trailers
+│   └── Other Semi Trailers
 ├── Full Trailers
+│   ├── Closed Box
+│   ├── Drop Side
+│   ├── Tilt
+│   └── Other Full Trailers
 
 EQUIPMENT
 ├── Construction Machinery
 │   ├── Excavators
+│   ├── Cranes
 │   ├── Wheel Loaders
 │   ├── Bulldozers
-│   ├── Cranes
 │   ├── Concrete Mixers
 │   ├── Compactors
 │   └── Other Construction
@@ -599,16 +125,18 @@ EQUIPMENT
 │   ├── Forklifts
 │   ├── Reach Stackers
 │   ├── Telehandlers
+│   ├── Warehouse Equipment
 │   └── Other Material Handling
 ├── Forestry & Groundcare
 
-VANS & LCVs
+VANS / LCV / BUSES
 ├── Panel Vans
 ├── Box Vans
 ├── Refrigerated Vans
 ├── Pickup Trucks
 ├── Chassis Cabs
 ├── Minibuses
+├── Buses
 
 CARS
 ├── Passenger Cars
@@ -625,7 +153,7 @@ CONTAINERS
 ├── Accommodation Containers
 ├── Environmental Containers
 
-PARTS & COMPONENTS
+PARTS & ACCESSORIES
 ├── Truck Parts
 │   ├── Engines
 │   ├── Transmissions
@@ -634,482 +162,1218 @@ PARTS & COMPONENTS
 │   ├── Body Parts
 │   ├── Electrical & Electronics
 │   └── Hydraulics
-├── Van/LCV Parts
+├── Van / LCV Parts
+├── Equipment Parts
 ├── Tyres & Wheels
 ```
 
-### Backend:
-- CategoryController with tree loading, category-specific filter options
-- Category seeder with all 44+ categories, translatable names (EN/NL/DE)
+---
 
-### Frontend:
-- Category dropdown in mega-menu style for header
-- Category landing pages with subcategory chips
+## 5. Database Architecture (PostgreSQL + Prisma)
 
-### Files: 2 files (seeder + controller updates)
+### Core Tables:
+
+| # | Table | Description |
+|---|-------|-------------|
+| 1 | `users` | Buyers, sellers, admins — id, name, email, passwordHash, role (BUYER/SELLER/ADMIN), phone, whatsapp, avatarUrl, locale, isActive, emailVerifiedAt, lastLoginAt, createdAt, updatedAt, deletedAt |
+| 2 | `refresh_tokens` | JWT refresh tokens — userId, token, expiresAt, createdAt |
+| 3 | `password_reset_tokens` | Password reset flow — email, token, expiresAt |
+| 4 | `seller_profiles` | Seller company info — userId, companyName, slug, description, website, address, city, region, countryCode, lat, lng, logoUrl, bannerUrl, isVerified, verifiedAt, responseRate, avgResponseTime, rating, reviewCount, createdAt, updatedAt |
+| 5 | `seller_reviews` | Buyer reviews on sellers — buyerId, sellerId, listingId, rating (1-5), title, body, isVerifiedPurchase, sellerResponse, respondedAt, createdAt |
+| 6 | `categories` | Hierarchical categories — id, parentId, name (JSON i18n), slug, description (JSON i18n), icon, imageUrl, sortOrder, listingCount, isActive, metaTitle, metaDescription, createdAt, updatedAt |
+| 7 | `brands` | Vehicle brands — id, name, slug, logoUrl, isActive |
+| 8 | `brand_categories` | Brand-category pivot — brandId, categoryId |
+| 9 | `brand_models` | Brand models — id, brandId, name, slug, isActive |
+| 10 | `listings` | THE main table (50+ columns) — see detail below |
+| 11 | `listing_images` | Listing photos — listingId, position, originalUrl, largeUrl, mediumUrl, thumbnailUrl, webpUrl, altText, fileSize, width, height |
+| 12 | `specification_keys` | Dynamic specs per category — categoryId, name (JSON i18n), slug, unit, dataType, sortOrder, isFilterable |
+| 13 | `listing_specifications` | Spec values — listingId, specKeyId, value |
+| 14 | `locations` | Location reference — countryCode, countryName, region, city, lat, lng, postalCode |
+| 15 | `favorites` | Saved listings — userId, listingId (unique pair), createdAt |
+| 16 | `saved_searches` | Search alerts — userId, name, filters (JSONB), emailFrequency (NEVER/DAILY/WEEKLY), lastNotifiedAt, createdAt |
+| 17 | `recently_viewed` | View history — userId, listingId, viewedAt |
+| 18 | `listing_comparisons` | Compare tool — userId, listingIds (JSONB array, max 4) |
+| 19 | `message_threads` | Conversations — listingId, buyerId, sellerId, lastMessageAt, isArchivedBuyer, isArchivedSeller |
+| 20 | `messages` | Chat messages — threadId, senderId, body, attachments (JSONB), isRead, readAt, createdAt |
+| 21 | `notifications` | User notifications — userId, type, title, body, data (JSONB), isRead, readAt, createdAt |
+| 22 | `subscription_plans` | Plan definitions — name, slug, description, priceMonthly, priceYearly, maxListings, maxImages, features (JSONB), stripeMonthlyPriceId, stripeYearlyPriceId, sortOrder |
+| 23 | `user_subscriptions` | Active subscriptions — userId, planId, stripeSubscriptionId, status, periodStart, periodEnd, cancelledAt |
+| 24 | `featured_listings` | Promoted listings — listingId, placement (HOMEPAGE/CATEGORY/SEARCH), startsAt, endsAt, pricePaid, stripePaymentId |
+| 25 | `payments` | Transaction records — userId, stripePaymentIntentId, amount, currency, status, type (SUBSCRIPTION/FEATURED/LISTING), metadata (JSONB), createdAt |
+| 26 | `banner_ads` | Advertising — title, imageUrl, targetUrl, placement, categories (JSONB), countries (JSONB), impressions, clicks, startsAt, endsAt, isActive |
+| 27 | `pages` | CMS content — slug, title (JSON i18n), body (JSON i18n), isPublished, sortOrder |
+| 28 | `faqs` | FAQ entries — category, question (JSON i18n), answer (JSON i18n), sortOrder |
+| 29 | `bulk_imports` | CSV/XML imports — userId, fileName, fileUrl, status (PENDING/PROCESSING/COMPLETED/FAILED), totalRows, processedRows, errorRows, errors (JSONB), createdAt |
+
+### Listings Table Detail (50+ columns):
+- **Core**: title, slug, description, price, priceCurrency (EUR/GBP/USD), priceOnRequest, priceNegotiable
+- **Condition**: NEW / USED / REFURBISHED
+- **Status**: DRAFT → PENDING_REVIEW → ACTIVE → SOLD / EXPIRED / REJECTED / ARCHIVED
+- **Vehicle**: year, mileageKm, operatingHours, fuelType, transmission, powerHp, powerKw, color, vin
+- **Truck-specific**: gvwKg, payloadKg, axleCount, cabType, emissionClass, wheelbaseMm, suspensionType
+- **Container-specific**: containerSize (20FT/40FT/45FT), containerType
+- **Location**: countryCode, region, city, postalCode, lat, lng
+- **Contact**: contactPhone, contactEmail, contactWhatsapp, hidePhone
+- **Stats**: viewCount, favoriteCount, contactCount, imageCount
+- **Featured**: isFeatured, featuredUntil, featuredPlacement
+- **Dates**: publishedAt, expiresAt, soldAt, rejectedReason
+- **SEO**: metaTitle, metaDescription
+- **Timestamps**: createdAt, updatedAt, deletedAt (soft delete)
+
+### Key Database Indexes:
+- Composite index on `categoryId + status` (fast category browsing)
+- Index on `sellerId` (dashboard queries)
+- Index on `brandId + modelId` (search optimization)
+- Index on `price` (filter performance)
+- Index on `createdAt` (sorting performance)
+- Index on `countryCode + status` (location browsing)
+- Index on `slug` (unique, URL lookups)
 
 ---
 
-## PHASE 14: Brand & Model Database
-**Priority: HIGH | Estimated: 1 day**
+## 6. Security Measures
 
-Complete brand database with models, linked to categories.
-
-### Brands (30+):
-**Trucks/Trailers**: Mercedes-Benz, Volvo, Scania, MAN, DAF, Iveco, Renault Trucks, Kenworth, Peterbilt, Freightliner, Mack, International, Isuzu, Hino, FUSO, Schmitz Cargobull, Krone, Kogel
-**Equipment**: Caterpillar, Komatsu, JCB, Liebherr, Volvo CE, John Deere, Case, Hitachi, Kubota, Bobcat
-**Vans**: Mercedes, VW, Ford, Renault, Fiat, Iveco, MAN, Opel/Vauxhall, Citroen, Peugeot, Toyota
-**Cars**: All major car brands
-
-Each brand with 5-15 models, linked to relevant categories via pivot table.
-
-### Files: 1 seeder file (BrandSeeder)
-
----
-
-## PHASE 15: Listing CRUD API (Backend)
-**Priority: CRITICAL | Estimated: 2 days**
-
-Complete listing management API.
-
-### Public Endpoints:
-- `GET /listings` — paginated, filterable (category, brand, price range, year, condition, country, fuel, transmission)
-- `GET /listings/{slug}` — full detail with relations, view count increment (IP rate-limited)
-- `GET /listings/{slug}/related` — 6 related listings (same category + brand)
-
-### Seller Endpoints:
-- `GET /seller/listings` — own listings with stats
-- `POST /seller/listings` — create (saved as draft)
-- `PUT /seller/listings/{id}` — update (owner check)
-- `DELETE /seller/listings/{id}` — soft delete
-- `POST /seller/listings/{id}/publish` — change to pending_review
-- `POST /seller/listings/{id}/mark-sold` — change to sold
-- `POST /seller/listings/{id}/renew` — extend expiry
-- `POST /seller/listings/{id}/duplicate` — clone listing
-
-### Image Endpoints:
-- `POST /seller/listings/{id}/images` — upload (max 20)
-- `DELETE /seller/listings/{id}/images/{imageId}` — delete
-- `PUT /seller/listings/{id}/images/reorder` — update positions
-
-### Controllers:
-- ListingController (public)
-- SellerListingController (seller)
-- ListingPolicy (authorization)
-
-### Files: 5 files (2 controllers, 1 policy, 2 requests)
+| Measure | Implementation |
+|---------|---------------|
+| Authentication | JWT with refresh tokens (NextAuth) |
+| Rate Limiting | Per IP and per user (express-rate-limit) |
+| Input Validation | Zod schema validation on all endpoints |
+| SQL Injection | Prevention via Prisma ORM (parameterized queries) |
+| XSS Protection | helmet.js middleware |
+| CSRF Protection | CSRF token validation |
+| Image Upload | File type validation, size limits, sanitization |
+| HTTPS | Enforced everywhere |
+| Secrets | Environment variables only, no hardcoded secrets |
+| Headers | Security headers via helmet.js |
 
 ---
 
-## PHASE 16: Image Processing Pipeline
-**Priority: HIGH | Estimated: 1 day**
+## 7. Scalability & Performance Architecture
 
-Upload → Process → Store → Serve pipeline.
+### Database Performance:
+- PostgreSQL with **PgBouncer** connection pooling
+- Write-heavy operations handled through optimized batch transactions
+- Prisma ORM with composite and partial indexes
+- At scale: **read replicas** so read traffic never competes with writes
 
-### Flow:
+### Elasticsearch Strategy:
+- 3 primary shards, 1 replica each (sized for 150K+ listings)
+- Index **aliases** for zero-downtime reindexing
+- **Lifecycle policies** for automatic index management
+- Bulk re-indexing capability for data migrations
+
+### Three-Layer Caching:
+
+| Layer | Technology | What It Caches |
+|-------|-----------|----------------|
+| Layer 1 | Redis | API response caching — search results, category data, popular listings |
+| Layer 2 | Cloudflare CDN | Static assets, images, WebP thumbnails |
+| Layer 3 | Next.js ISR | Category and listing pages that don't change frequently |
+
+### Redis Cache Configuration:
+
+| Endpoint | Description | TTL |
+|----------|-------------|-----|
+| GET /categories | Category tree | 5 min |
+| GET /categories/:id/listings | Category listings | 5 min |
+| GET /search | Search results | 2 min |
+| GET /search/aggregations | Filter facet counts | 5 min |
+| GET /listings/:id | Listing detail | 10 min |
+| GET /sellers/:id | Seller profile | 15 min |
+| GET /homepage/featured | Featured listings | 5 min |
+
+### Cache Invalidation:
+- Event-driven invalidation via Prisma middleware hooks
+- Pattern-based deletion for related keys
+- Normalized cache keys (sorted params, hashed)
+- LRU eviction policy with max key limit
+- Target: 70%+ cache hit rate
+
+### Horizontal Scaling:
+- Stateless architecture (JWT = no server-side sessions)
+- Docker containers replicated behind load balancer
+- Redis shared across all instances
+- Elasticsearch as separate cluster
+- BullMQ workers scale independently
+
+---
+
+## 8. API Endpoints (70+)
+
+### Authentication:
+```
+POST   /api/auth/register          — Create account (buyer/seller)
+POST   /api/auth/login             — Login, get JWT tokens
+POST   /api/auth/logout            — Invalidate refresh token
+POST   /api/auth/refresh           — Refresh access token
+GET    /api/auth/me                — Get current user
+PUT    /api/auth/me                — Update profile
+POST   /api/auth/forgot-password   — Send reset email
+POST   /api/auth/reset-password    — Reset with token
+POST   /api/auth/verify-email      — Email verification
+PUT    /api/auth/change-password   — Change password
+DELETE /api/auth/account           — Soft delete account
+```
+
+### Public Listings:
+```
+GET    /api/listings               — Paginated, filterable
+GET    /api/listings/:slug         — Full detail + view count
+GET    /api/listings/:slug/related — 6 related listings
+```
+
+### Search:
+```
+GET    /api/search                 — Elasticsearch search with filters & aggregations
+GET    /api/search/suggestions     — Autocomplete (max 8)
+GET    /api/search/aggregations    — Filter counts
+```
+
+### Categories & Brands:
+```
+GET    /api/categories             — Full category tree
+GET    /api/categories/:slug       — Category with subcategories
+GET    /api/brands                 — All brands
+GET    /api/brands/:id/models      — Models for brand
+```
+
+### Seller Endpoints (auth required, seller role):
+```
+GET    /api/seller/dashboard       — Stats overview
+GET    /api/seller/listings        — Own listings with stats
+POST   /api/seller/listings        — Create listing (draft)
+PUT    /api/seller/listings/:id    — Update listing
+DELETE /api/seller/listings/:id    — Soft delete
+POST   /api/seller/listings/:id/publish    — Submit for review
+POST   /api/seller/listings/:id/mark-sold  — Mark as sold
+POST   /api/seller/listings/:id/renew      — Extend expiry
+POST   /api/seller/listings/:id/duplicate  — Clone listing
+POST   /api/seller/listings/:id/images     — Upload images (max 20)
+DELETE /api/seller/listings/:id/images/:imageId — Delete image
+PUT    /api/seller/listings/:id/images/reorder  — Reorder images
+GET    /api/seller/profile         — Get seller profile
+PUT    /api/seller/profile         — Update seller profile
+GET    /api/seller/messages        — Message threads
+GET    /api/seller/analytics       — Performance data
+POST   /api/seller/bulk-import     — CSV/XML upload
+GET    /api/seller/bulk-import/:id — Import status
+```
+
+### Buyer Endpoints (auth required):
+```
+GET    /api/favorites              — User's favorites
+POST   /api/favorites/:listingId   — Add favorite
+DELETE /api/favorites/:listingId   — Remove favorite
+GET    /api/saved-searches         — Saved searches
+POST   /api/saved-searches         — Create saved search
+PUT    /api/saved-searches/:id     — Update frequency
+DELETE /api/saved-searches/:id     — Delete
+GET    /api/comparisons            — Compare list
+POST   /api/comparisons            — Add to compare
+DELETE /api/comparisons/:listingId — Remove from compare
+GET    /api/recently-viewed        — View history
+```
+
+### Messaging:
+```
+GET    /api/messages/threads       — All threads
+GET    /api/messages/threads/:id   — Thread messages (paginated)
+POST   /api/messages               — Send message (creates thread if first)
+PUT    /api/messages/threads/:id/read    — Mark thread as read
+PUT    /api/messages/threads/:id/archive — Archive thread
+GET    /api/messages/unread-count  — Unread message count
+```
+
+### Notifications:
+```
+GET    /api/notifications          — All notifications
+PUT    /api/notifications/:id/read — Mark as read
+PUT    /api/notifications/read-all — Mark all as read
+GET    /api/notifications/unread-count — Unread count
+```
+
+### Sellers (Public):
+```
+GET    /api/sellers/:slug          — Public seller profile
+GET    /api/sellers/:slug/listings — Seller's active listings
+GET    /api/sellers/:slug/reviews  — Seller reviews
+POST   /api/sellers/:slug/reviews  — Submit review (auth required)
+```
+
+### Monetization:
+```
+GET    /api/subscriptions/plans    — Available plans
+POST   /api/subscriptions          — Subscribe to plan
+PUT    /api/subscriptions          — Change plan
+DELETE /api/subscriptions          — Cancel subscription
+GET    /api/subscriptions/billing  — Billing history
+POST   /api/featured-listings      — Purchase featured placement
+POST   /api/stripe/webhooks        — Stripe webhook handler
+```
+
+### Admin Endpoints (auth required, admin role):
+```
+GET    /api/admin/dashboard        — Admin stats
+GET    /api/admin/listings         — All listings (filterable by status)
+PUT    /api/admin/listings/:id/approve  — Approve listing
+PUT    /api/admin/listings/:id/reject   — Reject with reason
+DELETE /api/admin/listings/:id     — Hard delete
+GET    /api/admin/users            — All users
+PUT    /api/admin/users/:id        — Update user (role, status)
+PUT    /api/admin/users/:id/suspend     — Suspend user
+PUT    /api/admin/users/:id/activate    — Activate user
+GET    /api/admin/categories       — Category management
+POST   /api/admin/categories       — Create category
+PUT    /api/admin/categories/:id   — Update category
+DELETE /api/admin/categories/:id   — Delete category
+GET    /api/admin/brands           — Brand management
+POST   /api/admin/brands           — Create brand
+PUT    /api/admin/brands/:id       — Update brand
+GET    /api/admin/analytics        — Platform analytics
+GET    /api/admin/reports          — Reports & statistics
+PUT    /api/admin/settings         — Platform settings
+```
+
+### Static / Contact:
+```
+GET    /api/pages/:slug            — CMS page content
+GET    /api/faqs                   — FAQ list
+POST   /api/contact                — Contact form submission
+```
+
+---
+
+## 9. Frontend Pages (35+)
+
+### Public Pages:
+| Page | Route | SSR | Description |
+|------|-------|-----|-------------|
+| Homepage | `/` | Yes | Hero search, categories, featured, stats, brands |
+| Search Results | `/search` | Yes | Filters + results grid + aggregations |
+| Category Page | `/[category]` | Yes | Category listings with subcategory chips |
+| Subcategory Page | `/[category]/[subcategory]` | Yes | Filtered by subcategory |
+| Listing Detail | `/listings/[slug]` | Yes | Full listing with gallery, specs, contact |
+| Seller Profile | `/sellers/[slug]` | Yes | Public seller page with listings & reviews |
+| Pricing | `/pricing` | Yes | Subscription plan comparison |
+| About | `/about` | Yes | Company story |
+| Contact | `/contact` | Yes | Contact form |
+| Terms | `/terms` | Yes | Terms of Service |
+| Privacy | `/privacy` | Yes | Privacy Policy (GDPR) |
+| FAQ | `/faq` | Yes | FAQ accordion |
+| How It Works | `/how-it-works` | Yes | Step-by-step guide |
+
+### Auth Pages (SSR disabled):
+| Page | Route | Description |
+|------|-------|-------------|
+| Login | `/login` | Email + password |
+| Register | `/register` | Buyer/Seller registration |
+| Forgot Password | `/forgot-password` | Email input |
+| Reset Password | `/reset-password` | New password with token |
+
+### Buyer Pages (auth required):
+| Page | Route | Description |
+|------|-------|-------------|
+| Favorites | `/favorites` | Saved listings |
+| Saved Searches | `/saved-searches` | Alert management |
+| Compare | `/compare` | Side-by-side comparison (max 4) |
+| Recently Viewed | `/recently-viewed` | View history |
+| Messages | `/messages` | Inbox with conversations |
+| Notifications | `/notifications` | All notifications |
+
+### Seller Dashboard (auth + seller role):
+| Page | Route | Description |
+|------|-------|-------------|
+| Dashboard | `/seller` | Stats, charts, quick actions |
+| My Listings | `/seller/listings` | Manage all listings |
+| Create Listing | `/seller/listings/new` | Multi-step listing form |
+| Edit Listing | `/seller/listings/[id]` | Edit existing listing |
+| Messages | `/seller/messages` | Buyer conversations |
+| Reviews | `/seller/reviews` | Reviews received |
+| Profile | `/seller/profile` | Company profile editor |
+| Subscription | `/seller/subscription` | Plan management |
+| Analytics | `/seller/analytics` | Performance charts |
+| Bulk Import | `/seller/import` | CSV/XML upload |
+
+### Admin Panel (auth + admin role):
+| Page | Route | Description |
+|------|-------|-------------|
+| Dashboard | `/admin` | Platform stats & charts |
+| Listings | `/admin/listings` | Moderation queue |
+| Users | `/admin/users` | User management |
+| Categories | `/admin/categories` | Category tree CRUD |
+| Brands | `/admin/brands` | Brand management |
+| Reviews | `/admin/reviews` | Review moderation |
+| Ads | `/admin/ads` | Banner ad management |
+| Pages | `/admin/pages` | CMS editor |
+| Analytics | `/admin/analytics` | Platform analytics |
+| Settings | `/admin/settings` | Platform configuration |
+
+---
+
+## 10. Frontend Components (60+)
+
+### UI Components (Shadcn/UI based):
+1. Button — primary/secondary/outline/danger/ghost variants, loading state
+2. Input — label, error, icon, all types
+3. Select — searchable dropdown, multi-select
+4. Textarea — auto-resize, character count
+5. Checkbox — label, indeterminate
+6. RadioGroup — options with descriptions
+7. Switch — toggle on/off
+8. Badge — status variants
+9. Dialog / Modal — sizes, close on escape
+10. Sheet / Drawer — slide-in panels for mobile
+11. Toast — success/error/info notifications
+12. DropdownMenu — trigger + items
+13. Tabs — tab navigation
+14. Accordion — expandable sections
+15. Tooltip — hover info
+16. Avatar — image with fallback initials
+17. Pagination — page numbers, prev/next
+18. Breadcrumb — path trail
+19. Skeleton — loading placeholders
+20. AlertDialog — confirmation modal
+21. Command — search/command palette
+22. Popover — floating content
+
+### Custom Components:
+23. LanguageSwitcher — flag dropdown (10+ languages)
+24. CurrencyDisplay — formatted price with currency
+25. StarRating — 1-5 star display/input
+26. StatusBadge — listing status colors
+27. EmptyState — icon + title + description + action
+28. ListingCard — vertical card (image, title, price, specs, location)
+29. ListingCardSkeleton — loading state
+30. ListingCardHorizontal — list view variant
+31. SearchBar — keyword input with autocomplete
+32. FilterPanel — collapsible filter sections
+33. ActiveFilters — removable filter chips
+34. SortSelect — sort dropdown
+35. ImageGallery — main image + thumbnails + lightbox
+36. ImageUploader — drag-drop zone with preview
+37. MultiStepForm — progress bar + step navigation
+38. DataTable — sortable, filterable table for dashboards
+39. Chart — line/bar charts (Chart.js)
+40. FileUploader — CSV/XML upload with progress
+41. RichTextEditor — for descriptions & CMS
+42. MapEmbed — location display
+43. ContactButtons — phone/whatsapp/message cluster
+44. PriceDisplay — formatted with currency + negotiable tag
+45. VehicleSpecsTable — grouped specifications
+46. CategoryMegaMenu — header category dropdown
+47. MobileNav — slide-out navigation drawer
+48. CookieConsent — GDPR banner
+49. SEOHead — dynamic meta tags component
+50. CompareTable — side-by-side comparison
+
+### Layout Components:
+51. AppHeader — top bar + main nav + mobile menu
+52. AppFooter — 5-column footer
+53. DefaultLayout — header + content + footer
+54. AuthLayout — centered card
+55. SellerLayout — sidebar + topbar + content
+56. AdminLayout — sidebar + topbar + content
+
+### Page-Specific Components:
+57. HeroSearch — homepage hero with search
+58. CategoryGrid — homepage category icons
+59. FeaturedListings — carousel
+60. StatsSection — numbers bar
+61. PopularBrands — brand logos
+62. TrustSection — "Why MenonTrucks"
+63. DealerCTA — seller registration banner
+
+---
+
+## 11. Elasticsearch Implementation
+
+### Index Configuration:
+- Index name: `listings` (via alias)
+- Shards: 3 primary, 1 replica each
+- Document size: 2-4KB average
+- Capacity: 150K+ documents well under shard limits
+
+### Field Mappings:
+- `title` — text (analyzed) + keyword (exact)
+- `description` — text (analyzed)
+- `brandName` — text + keyword
+- `modelName` — text + keyword
+- `categorySlug` — keyword
+- `price` — float
+- `year` — integer
+- `mileageKm` — integer
+- `condition` — keyword
+- `fuelType` — keyword
+- `transmission` — keyword
+- `countryCode` — keyword
+- `city` — keyword
+- `location` — geo_point (lat/lng)
+- `status` — keyword
+- `createdAt` — date
+- `isFeatured` — boolean
+
+### Analyzers:
+- `synonym_analyzer` — truck=lorry=hgv, merc=mercedes-benz
+- `autocomplete_analyzer` — edge_ngram (2-15 chars)
+- Language-specific analyzers for multi-language search
+
+### Search Features:
+- Full-text keyword search across all listing fields
+- Filters: Category, Brand, Price Range, Year, Condition (New/Used), Location, Fuel, Transmission, Emission
+- Sorting: Relevance, Newest, Price (Low-High / High-Low), Year
+- Pagination with accurate result counts
+- Search suggestions and autocomplete
+- Dynamic filter options that update based on current search context
+
+### Aggregations:
+- Brand counts (e.g., "Scania (42)", "Volvo (38)")
+- Category counts
+- Fuel type counts
+- Condition counts
+- Price ranges (0-5K, 5K-15K, 15K-30K, 30K-50K, 50K-100K, 100K+)
+- Year ranges
+- Country counts
+
+### Data Sync:
+- Real-time index sync on listing create/update/delete
+- Bulk re-indexing command for migrations
+- Index alias swap for zero-downtime reindex
+
+### Zero-Downtime Reindex:
+1. All queries point to alias (`listings`), never directly to index
+2. New index created with updated config (`listings_v2`)
+3. Data reindexed in background
+4. Alias atomically swapped
+5. Old index deleted after verification
+
+---
+
+## 12. BullMQ Queue Jobs
+
+| Job | Trigger | Description |
+|-----|---------|-------------|
+| ProcessListingImages | Image upload | Resize, WebP convert, generate thumbnails, upload to S3 |
+| IndexListingInES | Listing approved | Index/update document in Elasticsearch |
+| RemoveListingFromES | Listing deleted/expired | Remove from Elasticsearch |
+| SendEmailNotification | Various events | Send emails (welcome, reset, alerts) |
+| ProcessBulkImport | CSV/XML upload | Parse file, validate rows, create listings |
+| SendSavedSearchAlerts | Daily/weekly cron | Match new listings to saved searches, send emails |
+| ProcessExpiredListings | Daily cron | Mark expired listings, notify sellers |
+| GenerateAnalyticsReport | Weekly cron | Aggregate analytics data |
+| SyncElasticsearchIndex | Manual/migration | Full bulk reindex |
+
+---
+
+## 13. Image Processing Pipeline
+
+### Upload Flow:
 1. Client validates: max 20 images, 10MB each, jpg/png/webp/heic
-2. Upload to Laravel → store temp in S3
-3. Dispatch `ProcessListingImages` job (queue)
-4. Job uses Intervention Image v3 to generate:
+2. Upload to Express API → store temp
+3. Dispatch `ProcessListingImages` BullMQ job
+4. Job generates variants:
    - Original (max 2400px width)
    - Large (1200px)
    - Medium (600px)
    - Thumbnail (300x225, cropped)
    - WebP version of each size
-5. Store all variants in S3: `listings/{id}/{size}_{position}.{ext}`
-6. Create ListingImage record with all URLs
+5. Upload all variants to S3/R2: `listings/{id}/{size}_{position}.{ext}`
+6. Create listing_images record with all URLs
 7. Frontend uses `<picture>` with WebP + JPEG fallback
-
-### Services:
-- ImageProcessingService — resize, crop, WebP convert, S3 upload
-- ProcessListingImages job — queue-based processing
-
-### Files: 2 files (service + job)
+8. CDN (Cloudflare) caches and serves images globally
+9. Lazy loading on all listing images
 
 ---
 
-## PHASE 17: Database Seeders (Demo Data)
-**Priority: HIGH | Estimated: 1 day**
+# DEVELOPMENT PHASES & TASK LIST
 
-Realistic demo data for development and testing.
-
-### Seeders:
-1. **CategorySeeder** — 44+ categories with translations (EN/NL/DE)
-2. **BrandSeeder** — 30+ brands with 200+ models, category pivots
-3. **LocationSeeder** — 40+ cities across NL, DE, UK, BE, FR
-4. **UserSeeder** — 1 admin + 5 sellers (with profiles) + 5 buyers
-5. **ListingSeeder** — 500 demo listings:
-   - 150 Trucks (various subcategories, realistic titles/prices)
-   - 100 Trailers
-   - 80 Vans
-   - 70 Equipment
-   - 50 Parts
-   - 30 Cars
-   - 20 Containers
-   - Each with 2-5 placeholder images, realistic specs
-6. **SubscriptionPlanSeeder** — Free, Basic (EUR29/mo), Pro (EUR79/mo), Enterprise (EUR199/mo)
-7. **ListingFactory** — for test data generation
-
-### Files: 8 files in `database/seeders/` + 1 factory
+Organized into **7 development phases** across **3 milestones** as per SRS.
 
 ---
 
-## PHASE 18: Listing Card Component
-**Priority: HIGH | Estimated: 1 day**
+## MILESTONE 1: Foundation, Core Setup & Marketplace (Weeks 1-4)
 
-The most reused component — appears everywhere.
+### PHASE 1: Foundation & Core Setup
+**Duration: ~5 days | Priority: CRITICAL**
 
-### ListingCard.vue:
-- Image with aspect-ratio 4:3, lazy loading, hover zoom
-- "Featured" badge (orange) top-left if featured
-- Condition badge (New=green, Used=gray) top-right
-- Heart icon (favorite toggle) on image hover
-- Below image:
-  - Title (2 lines max, truncate)
-  - Price (large, orange, formatted with EUR symbol) or "Price on request"
-  - "Negotiable" tag if applicable
-  - Key specs row: Year | Mileage (formatted) | Fuel type
-  - Location: pin icon + city, country flag
-  - Seller name + verified badge
-- Entire card links to listing detail page
-- Skeleton loading variant
+#### Task 1.1: Monorepo & Project Structure
+- [ ] Initialize Turborepo monorepo
+- [ ] Create directory structure:
+  ```
+  menontrucks/
+  ├── apps/
+  │   ├── web/          (Next.js 14 frontend)
+  │   └── api/          (Express.js backend)
+  ├── packages/
+  │   ├── shared/       (shared types, utils)
+  │   ├── eslint-config/
+  │   └── tsconfig/
+  ├── docker/
+  │   ├── nginx/
+  │   ├── node/
+  │   └── postgres/
+  ├── docker-compose.yml
+  ├── turbo.json
+  ├── package.json
+  └── .env.example
+  ```
+- [ ] Configure Turborepo pipeline (dev, build, lint, test)
+- [ ] Create shared TypeScript config
+- [ ] Create shared ESLint config
+- [ ] Write `.gitignore`
+- [ ] Write `.env.example` with all environment variables
 
-### ListingCardSkeleton.vue:
-- Matching dimensions with pulse animation
+#### Task 1.2: Docker Infrastructure
+- [ ] Write `docker-compose.yml` with services:
+  - nginx (1.25-alpine, reverse proxy, port 80)
+  - api (Node 20, port 5001)
+  - web (Node 20, port 3001)
+  - postgres (16-alpine, port 5432)
+  - redis (7-alpine, port 6379)
+  - elasticsearch (8.12.0, port 9200)
+  - minio (S3-compatible, port 9000/9001)
+  - mailpit (email testing, port 8025)
+  - bullmq-worker (queue processing)
+  - scheduler (cron jobs)
+- [ ] Write Dockerfiles for api and web services
+- [ ] Write nginx reverse proxy config (/api → 5001, /* → 3001)
+- [ ] Write Makefile (up, down, restart, fresh, migrate, seed, logs, shell)
+- [ ] **Verify**: `docker compose up -d` starts all services
 
-### ListingCardHorizontal.vue:
-- Horizontal variant for list view (image left, info right)
+#### Task 1.3: Backend (Express.js) Setup
+- [ ] Initialize Express.js + TypeScript project in `apps/api/`
+- [ ] Install dependencies: express, typescript, prisma, @prisma/client, zod, jsonwebtoken, bcryptjs, helmet, cors, express-rate-limit, multer, @aws-sdk/client-s3, bullmq, ioredis, @elastic/elasticsearch, stripe, nodemailer
+- [ ] Configure TypeScript (strict mode, paths)
+- [ ] Create Express app structure:
+  ```
+  apps/api/src/
+  ├── config/        (database, redis, elasticsearch, s3, stripe)
+  ├── middleware/     (auth, validation, rateLimit, errorHandler)
+  ├── routes/        (auth, listings, search, seller, admin, etc.)
+  ├── controllers/   (all API controllers)
+  ├── services/      (business logic layer)
+  ├── validators/    (Zod schemas)
+  ├── types/         (TypeScript interfaces)
+  ├── utils/         (helpers)
+  ├── jobs/          (BullMQ job handlers)
+  ├── events/        (event emitters)
+  └── server.ts      (entry point)
+  ```
+- [ ] Set up helmet.js security middleware
+- [ ] Set up CORS configuration
+- [ ] Set up rate limiting
+- [ ] Set up error handling middleware
+- [ ] Set up request logging
+- [ ] **Verify**: API responds on port 5001
 
-### Files: 3 component files
+#### Task 1.4: Database Schema (Prisma)
+- [ ] Write `prisma/schema.prisma` with ALL 29 tables (see Section 5)
+- [ ] Define all enums: UserRole, ListingStatus, VehicleCondition, FuelType, TransmissionType, EmissionClass, ContainerSize, SubscriptionStatus, ImportStatus, EmailFrequency, AdPlacement, PaymentType, PaymentStatus
+- [ ] Define all relations and cascade rules
+- [ ] Add all database indexes (see Section 5)
+- [ ] Run `prisma migrate dev` — all migrations pass
+- [ ] Run `prisma generate` — client generated
+- [ ] **Verify**: `prisma migrate reset` works cleanly
 
----
+#### Task 1.5: Authentication System
+- [ ] JWT service: generateAccessToken (15min), generateRefreshToken (7d), verifyToken
+- [ ] Password service: hash (bcrypt), compare
+- [ ] Auth middleware: extractToken → verify → attach user to request
+- [ ] Role middleware: ensureRole(SELLER), ensureRole(ADMIN)
+- [ ] Auth controller:
+  - POST /auth/register — create user, hash password, generate tokens
+  - POST /auth/login — validate credentials, generate tokens, update lastLoginAt
+  - POST /auth/logout — invalidate refresh token
+  - POST /auth/refresh — refresh access token
+  - GET /auth/me — return current user
+  - PUT /auth/me — update profile
+  - POST /auth/forgot-password — send reset email
+  - POST /auth/reset-password — reset with token
+  - PUT /auth/change-password — change password
+- [ ] Zod validation schemas for all auth endpoints
+- [ ] Email service: send verification, reset, welcome emails
+- [ ] **Verify**: Full auth flow works end-to-end
 
-## PHASE 19: Category Landing Pages
-**Priority: HIGH | Estimated: 2 days**
+#### Task 1.6: Frontend (Next.js 14) Setup
+- [ ] Initialize Next.js 14 with App Router in `apps/web/`
+- [ ] Install dependencies: tailwindcss, shadcn/ui, next-intl (i18n), zustand (state), swr (data fetching), chart.js, react-chartjs-2, react-hot-toast, lucide-react (icons), embla-carousel-react, date-fns
+- [ ] Configure TailwindCSS with brand colors:
+  ```
+  primary: #1E3A5F (Deep Blue)
+  accent: #F59E0B (Orange)
+  background: #F5F6F7
+  ```
+- [ ] Set up Shadcn/UI component library
+- [ ] Configure next-intl for i18n (start with EN, structure for 10+)
+- [ ] Set up API client with JWT token injection + refresh interceptor
+- [ ] Set up auth context/store (zustand)
+- [ ] Create auth middleware (client-side route protection)
+- [ ] Create layouts: default, auth, seller, admin
+- [ ] **Verify**: Frontend loads on port 3001 with correct styles
 
-When user clicks "Trucks" or "Trailers" — this is what they see.
-
-### /trucks (or /trailers, /equipment, etc.):
-- **Category Header**: name, description, listing count, breadcrumb
-- **Subcategory Chips**: clickable subcategory pills (Tractor Units, Box Trucks, etc.)
-- **Top brands in this category**: brand logos with counts
-- **Filter sidebar + Results grid** (same layout as search page)
-- SSR for SEO with useAsyncData
-
-### /trucks/tractor-units (subcategory):
-- Same layout but scoped to subcategory
-- Different subcategory highlighted
-
-### Pages:
-- `pages/[category]/index.vue` — handles both parent and child categories
-- Dynamic meta tags for SEO
-
-### Files: 1 page + 1 component (CategoryHeader)
-
----
-
-## PHASE 20: Listing Detail Page
-**Priority: CRITICAL | Estimated: 3 days**
-
-The most important page — where buyers decide to contact.
-
-### Layout (two columns):
-**Left Column (60%)**:
-1. **Image Gallery**: Main image + thumbnails, fullscreen lightbox, swipe on mobile
-2. **Quick Specs Bar**: Key specs in pills
-3. **Description**: Full text with "Read more" toggle
-4. **Specifications Table**: Grouped, alternating rows
-5. **Vehicle History** (if available): Inspection report, VIN check, service records
-6. **Location Map**: Static map + city/region/country
-7. **Related Listings**: 4 cards
-
-**Right Column (40%, sticky)**:
-1. **Price Card**: Price in orange, VAT note
-2. **Seller Card**: Logo, name, verified badge, rating, response time
-3. **Contact Buttons**: Phone, WhatsApp, Message, Request Quote
-4. **Actions**: Favorite, Share, Compare, Print, Report
-5. **Finance Calculator**: Loan calculator with monthly payment
-
-### Components:
-- `ListingGallery.vue`
-- `ListingSpecs.vue`
-- `ListingContactCard.vue`
-- `ListingVehicleHistory.vue`
-- `ListingFinanceCalculator.vue`
-- `ListingShareMenu.vue`
-- `ListingBreadcrumb.vue`
-- `ListingRelated.vue`
-
-### Files: 1 page + 8 components
-
----
-
-## PHASE 21: Elasticsearch Setup & Search API
-**Priority: CRITICAL | Estimated: 2 days**
-
-The search engine that powers the marketplace.
-
-### Elasticsearch Index:
-- Index: `listings`
-- 3 shards, 1 replica
-- Custom analyzers: synonym, autocomplete, language (NL/DE)
-- Mapping: title, description, brand_name, model_name (text+keyword), all filter fields (keyword), price/year/mileage (numeric), location (geo_point)
-
-### ElasticsearchService:
-- `createIndex()` / `deleteIndex()`
-- `indexListing(Listing)` / `removeListing(int)`
-- `search(params)` — bool query with must/filter/aggregations/sort/pagination
-- `suggest(query)` — autocomplete suggestions
-- `bulkIndex(Collection)` — batch indexing
-
-### Aggregations: brands, categories, fuel_types, conditions, price_ranges, year_ranges, countries
-
-### Sync: Jobs for index/remove, artisan command for full reindex
-
-### Files: 4 files (2 services + 1 command + 1 controller)
-
----
-
-## PHASE 22: Search Results Page (Frontend)
-**Priority: CRITICAL | Estimated: 3 days**
-
-The most complex frontend page.
-
-### Layout:
-- Desktop: Filter sidebar (280px) + Results grid
-- Mobile: Floating "Filters" button → slide-out drawer
-
-### Filters: Category tree, Brand (searchable), Model, Price/Year/Mileage ranges, Condition, Fuel, Transmission, Country, Emission
-
-### Results: Count, Grid/List toggle, Sort dropdown, Active filter chips, Pagination
-
-### Files: 1 page + 5 components + 1 composable
+#### Task 1.7: Auth Pages (Frontend)
+- [ ] Login page — email + password + "Forgot password?" link
+- [ ] Register page — name, email, password, confirm, role selector (Buyer/Seller cards), terms checkbox
+- [ ] Forgot Password page — email input
+- [ ] Reset Password page — new password form
+- [ ] Auth layout — centered card, logo, language switcher
+- [ ] **Verify**: Register → Login → Logout flow works
 
 ---
 
-## PHASE 23: Favorites & Recently Viewed
-**Priority: MEDIUM | Estimated: 1 day**
+### PHASE 2: Core Marketplace
+**Duration: ~8 days | Priority: CRITICAL**
 
-### Favorites: Backend CRUD + frontend composable + page
-### Recently Viewed: Middleware tracking + page
-### Comparison Tool: Side-by-side spec comparison (max 4)
+#### Task 2.1: Category System
+- [ ] Category controller: getTree, getBySlug, getWithFilters
+- [ ] Category seed data: ALL 44+ categories with hierarchical structure
+- [ ] Translatable names (JSON) — English to start, structure ready for 10+ languages
+- [ ] Category API: `GET /api/categories`, `GET /api/categories/:slug`
+- [ ] **Verify**: Category tree loads with correct hierarchy and counts
 
-### Files: 3 pages + 1 composable + 2 controllers
+#### Task 2.2: Brand & Model Database
+- [ ] Brand seed data: 30+ brands with 200+ models
+- [ ] Brand-category pivot relationships
+- [ ] Brands by category:
+  - Trucks/Trailers: Mercedes-Benz, Volvo, Scania, MAN, DAF, Iveco, Renault, Schmitz Cargobull, Krone, Kogel
+  - Equipment: Caterpillar, Komatsu, JCB, Liebherr, John Deere, Case, Hitachi, Kubota, Bobcat
+  - Vans: Mercedes, VW, Ford, Renault, Fiat, Opel, Citroen, Peugeot, Toyota
+- [ ] Brand API: `GET /api/brands`, `GET /api/brands/:id/models`
+- [ ] **Verify**: Brands load with correct category links
 
----
+#### Task 2.3: Listing CRUD (Backend)
+- [ ] Listing controller (public):
+  - GET /api/listings — paginated, filterable
+  - GET /api/listings/:slug — full detail with relations
+  - GET /api/listings/:slug/related — 6 related listings
+- [ ] Seller listing controller (auth required):
+  - GET /api/seller/listings — own listings
+  - POST /api/seller/listings — create (draft)
+  - PUT /api/seller/listings/:id — update (owner check)
+  - DELETE /api/seller/listings/:id — soft delete
+  - POST /api/seller/listings/:id/publish — submit for review
+  - POST /api/seller/listings/:id/mark-sold — mark sold
+  - POST /api/seller/listings/:id/renew — extend expiry
+  - POST /api/seller/listings/:id/duplicate — clone
+- [ ] Listing authorization: owner check, status transitions
+- [ ] Zod schemas: StoreListingSchema, UpdateListingSchema, SearchParamsSchema
+- [ ] View count tracking (IP-based rate limiting, 1 per hour per IP)
+- [ ] **Verify**: Full CRUD lifecycle works
 
-## PHASE 24: Messaging System (Backend + Real-time)
-**Priority: HIGH | Estimated: 2 days**
+#### Task 2.4: Image Upload & Processing
+- [ ] Image upload endpoint: POST /api/seller/listings/:id/images
+- [ ] Multer config: max 20 images, 10MB each, jpg/png/webp/heic
+- [ ] S3 client configuration (MinIO local, AWS S3 prod)
+- [ ] BullMQ job: ProcessListingImages
+  - Resize: original (2400px), large (1200px), medium (600px), thumbnail (300x225 crop)
+  - WebP conversion for each size
+  - Upload to S3: `listings/{id}/{size}_{position}.{ext}`
+- [ ] Image delete + reorder endpoints
+- [ ] **Verify**: Upload → process → S3 → URLs stored in DB
 
-### Backend: MessageController with threads, send, markRead, archive
-### Real-time: Laravel Reverb WebSockets, private channels
-### Frontend: Two-column messages page, chat bubbles, typing indicator
+#### Task 2.5: Listing Detail Page (Frontend)
+- [ ] Two-column layout (60% left / 40% right sticky)
+- [ ] Image Gallery component — main image + thumbnails + fullscreen lightbox + mobile swipe
+- [ ] Quick Specs bar — year, mileage, fuel, transmission, power as pills
+- [ ] Description section — with "Read more" toggle
+- [ ] Specifications Table — grouped, alternating rows, non-null values only
+- [ ] Location section — city, region, country display
+- [ ] Related Listings — 4 cards below
+- [ ] Price Card (sticky right) — price in orange, VAT note, negotiable tag
+- [ ] Seller Card — logo, name, verified badge, member since, response time
+- [ ] Contact Buttons — "Show Phone" (click to reveal), WhatsApp (wa.me link), "Send Message" (opens form)
+- [ ] Actions — favorite toggle, share, print
+- [ ] SSR with dynamic meta tags (title, description, Open Graph, JSON-LD Vehicle schema)
+- [ ] **Verify**: Page renders with all sections, SEO tags present
 
-### Files: 1 controller + 1 event + 1 page + 1 composable
+#### Task 2.6: Listing Card Component
+- [ ] ListingCard — image (4:3), title (2 lines), price (orange), specs row, location, seller name
+- [ ] Featured badge (orange, top-left)
+- [ ] Condition badge (New=green, Used=gray, top-right)
+- [ ] Favorite heart icon on hover
+- [ ] ListingCardSkeleton — loading state
+- [ ] ListingCardHorizontal — list view variant
+- [ ] **Verify**: Card displays correctly with real data
 
----
+#### Task 2.7: Seller Profile Page & Dashboard (Basic)
+- [ ] Seller public profile page (`/sellers/[slug]`):
+  - Banner + logo + company info
+  - Active listings grid
+  - About tab (description, address)
+  - Contact buttons
+- [ ] Seller profile API: GET /api/sellers/:slug, PUT /api/seller/profile
+- [ ] Seller dashboard (basic):
+  - Stats cards: Active Listings, Total Views, Total Favorites, Messages
+  - Recent messages list
+  - Quick actions: Add Listing, View Messages
+- [ ] **Verify**: Profile page and dashboard load with data
 
-## PHASE 25: Notification System
-**Priority: MEDIUM | Estimated: 1 day**
+#### Task 2.8: Contact Options
+- [ ] Contact seller form (creates message thread)
+- [ ] Phone contact button (click to reveal, masked initially)
+- [ ] WhatsApp button (opens wa.me link)
+- [ ] Contact tracking (increment contactCount on listing)
+- [ ] **Verify**: All 3 contact methods work
 
-### Types: New message, listing approved/rejected, new review, saved search alert, subscription expiring
-### Backend: NotificationController, Reverb broadcast
-### Frontend: Bell icon with badge, dropdown, full page, toast popup
+#### Task 2.9: Seed Data (Demo Listings)
+- [ ] Location seeder: 40+ cities (NL, DE, UK, BE, FR)
+- [ ] User seeder: 1 admin + 5 sellers (with profiles) + 5 buyers
+- [ ] Listing seeder: 500 demo listings
+  - 150 Trucks, 100 Trailers, 80 Vans, 70 Equipment, 50 Parts, 30 Cars, 20 Containers
+  - Realistic titles, prices, specs per category
+  - 2-5 placeholder images each
+- [ ] Subscription plan seeder: Free, Basic (€29/mo), Premium (€79/mo)
+- [ ] **Verify**: `make seed` populates 500 listings with all relations
 
-### Files: 1 controller + 1 page + 2 components
+#### Task 2.10: Header, Footer & Main Layout
+- [ ] AppHeader:
+  - Top bar: language switcher, "Sell your vehicle" link
+  - Main bar: logo, nav (Transport, Equipment, Vans, Cars, Containers, Parts), search icon, favorites, login/register
+  - Logged in: avatar dropdown (Dashboard, Favorites, Messages, Profile, Logout)
+  - Mobile: hamburger → slide-out drawer
+- [ ] AppFooter:
+  - Deep blue background (#1E3A5F)
+  - 5 columns: company info, transport links, equipment links, company links, support links
+  - Bottom bar: copyright, payment icons, language selector
+- [ ] Default layout: Header + content + Footer
+- [ ] Cookie consent banner (GDPR)
+- [ ] **Verify**: Layout renders responsively on all breakpoints
 
----
-
-## PHASE 26: Seller Dashboard
-**Priority: HIGH | Estimated: 3 days**
-
-### Layout: Fixed left sidebar (navy) + top bar + content
-### Pages:
-1. Dashboard — stats cards, views chart, recent messages
-2. Manage Listings — status tabs, table, bulk actions
-3. Create Listing — 7-step multi-step form
-4. Edit Listing — pre-populated form
-5. Messages — (shared with Phase 24)
-6. Reviews — received reviews with respond option
-7. Company Profile — logo, banner, description, address
-8. Subscription — current plan, usage, upgrade/downgrade
-9. Analytics — charts, top listings, date range
-
-### Files: 1 layout + 9 pages + sub-components
-
----
-
-## PHASE 27: Seller Public Profile Page
-**Priority: MEDIUM | Estimated: 1 day**
-
-### `/sellers/{slug}`:
-- Header banner, profile card, contact bar
-- Tabs: Listings, About, Reviews
-- Stats: total listings, views, years active
-
-### Files: 1 page + 1 component
-
----
-
-## PHASE 28: Seller Reviews & Trust System
-**Priority: MEDIUM | Estimated: 2 days**
-
-### Backend: SellerReviewController, one review per buyer per seller
-### Trust Score: Verified identity, response rate, rating, account age, completed listings
-### Frontend: Star rating input, review form, review list
-
-### Files: 1 controller + 1 request + 2 components
-
----
-
-## PHASE 29: Admin Panel
-**Priority: HIGH | Estimated: 3 days**
-
-### Layout: Dark navy sidebar with admin nav
-### Pages:
-1. Dashboard — stats, charts, pending queue
-2. Listing Moderation — approve/reject with reason
-3. User Management — roles, activate/ban/impersonate
-4. Categories — tree view, drag-to-reorder, CRUD
-5. Brands — CRUD with models
-6. Review Moderation
-7. Banner Ads — CRUD with performance stats
-8. CMS Pages — rich text editor, multi-language
-9. Analytics — listings, users, revenue, search queries
-10. Settings — site config, commission rates, maintenance mode
-
-### Files: 1 layout + 10 pages + admin components
-
----
-
-## PHASE 30: Monetization — Subscriptions & Featured Listings
-**Priority: HIGH | Estimated: 2 days**
-
-### Plans: Free, Basic (EUR29.99/mo), Professional (EUR79.99/mo), Enterprise (EUR199.99/mo)
-### Backend: Laravel Cashier + Stripe, webhooks, listing limits
-### Featured: Placements (homepage/category/search), 7/14/30 day durations
-### Frontend: Pricing page, subscription management, "Boost listing" button
-
-### Files: 2 controllers + 1 page + 2 components
-
----
-
-## PHASE 31: Vehicle History & Inspection Reports
-**Priority: MEDIUM | Estimated: 2 days**
-
-### Vehicle History: VIN check, accident/owner/service data
-### Inspections: Inspector details, A-F rating, PDF upload, checklist
-### Frontend: VehicleHistoryCard, InspectionBadge components
-
-### Files: 2 controllers + 2 components + 2 models
-
----
-
-## PHASE 32: Finance Calculator & Insurance
-**Priority: MEDIUM | Estimated: 1 day**
-
-### Calculator: Price, down payment, term, interest rate → monthly payment
-### Insurance: Quote request form (placeholder for API integration)
-
-### Files: 1 component + 1 controller + 1 model
-
----
-
-## PHASE 33: Saved Searches & Email Alerts
-**Priority: MEDIUM | Estimated: 1 day**
-
-### Backend: CRUD + scheduled command for daily/weekly email alerts
-### Frontend: "Save this search" button, saved searches page
-
-### Files: 1 controller + 1 command + 1 job + 1 page
+#### Task 2.11: Homepage
+- [ ] Hero section: navy gradient, H1, subtitle, search bar (category + keyword + location + SEARCH button)
+- [ ] Category grid: 7 main categories with icons + listing counts
+- [ ] Featured listings carousel (horizontal scroll, 4 visible)
+- [ ] Stats bar: "150,000+ Listings" | "5,000+ Dealers" | "20+ Countries" | "Since 2024"
+- [ ] Recent listings grid (12 cards)
+- [ ] Popular brands section (logos)
+- [ ] Trust section: "Verified Dealers", "Secure Messaging", "Vehicle History"
+- [ ] Dealer CTA: "List your vehicles today" with register button
+- [ ] **Verify**: Homepage loads with all sections, responsive
 
 ---
 
-## PHASE 34: SEO & Performance Optimization
-**Priority: HIGH | Estimated: 2 days**
+## MILESTONE 2: Search, User Features & Admin Panel (Weeks 5-6)
 
-### SEO: SSR, meta tags, JSON-LD, canonical URLs, sitemap.xml, robots.txt, hreflang
-### Performance: Redis caching, eager loading, WebP images, API caching, database indexes
+### PHASE 3: Search & Discovery
+**Duration: ~5 days | Priority: CRITICAL**
 
-### Files: Sitemap command, meta composable, robots.txt, various optimizations
+#### Task 3.1: Elasticsearch Setup & Indexing
+- [ ] Elasticsearch service:
+  - createIndex() — 3 shards, 1 replica, custom analyzers, field mappings
+  - deleteIndex()
+  - indexListing(listing) — index single document
+  - removeListing(id) — remove from index
+  - bulkIndex(listings) — batch indexing
+- [ ] Synonym analyzer: truck=lorry=hgv, merc=mercedes-benz, etc.
+- [ ] Autocomplete analyzer: edge_ngram (2-15 chars)
+- [ ] BullMQ jobs: IndexListingInES, RemoveListingFromES
+- [ ] Prisma middleware: auto-sync on listing create/update/delete
+- [ ] CLI command: full reindex with --fresh option
+- [ ] **Verify**: All 500 seed listings indexed, queries return results
 
----
+#### Task 3.2: Search API
+- [ ] Search service (business layer):
+  - Parse request params → Elasticsearch bool query
+  - Must: keyword search (title, description, brand, model)
+  - Filter: category, brand, price range, year range, condition, fuel, transmission, country, emission, mileage range
+  - Sort: relevance, newest, price asc/desc, year
+  - Pagination with total count
+  - Aggregations (brand counts, category counts, fuel counts, condition counts, price ranges, year ranges, country counts)
+- [ ] Search controller:
+  - GET /api/search — full search with aggregations
+  - GET /api/search/suggestions — autocomplete (max 8)
+- [ ] **Verify**: Search returns correct results with all filters and aggregations
 
-## PHASE 35: Static Pages, Contact Form & Final Polish
-**Priority: MEDIUM | Estimated: 2 days**
+#### Task 3.3: Search Results Page (Frontend)
+- [ ] Desktop: filter sidebar (280px left) + results grid (right)
+- [ ] Mobile: floating "Filters" button → slide-out Sheet/Drawer
+- [ ] Filter sidebar sections (each collapsible):
+  - Category tree with counts
+  - Brand (searchable list with checkboxes + counts)
+  - Model (dependent on brand)
+  - Price range (min/max inputs)
+  - Year range (min/max)
+  - Condition (checkboxes: New, Used, Refurbished)
+  - Fuel type (checkboxes with counts)
+  - Transmission (checkboxes)
+  - Country (dropdown with flags)
+  - Emission class (dropdown)
+  - Mileage range (min/max)
+- [ ] Results area:
+  - Count: "2,345 vehicles found"
+  - View toggle: grid / list
+  - Sort dropdown
+  - Active filter chips (removable)
+  - Results grid (1-3 columns responsive)
+  - Empty state with suggestions
+  - Pagination
+- [ ] URL sync: filters stored in query params, shareable URLs
+- [ ] Debounced search (300ms)
+- [ ] **Verify**: Filters work, aggregation counts update, URL syncs
 
-### Pages: About, Contact, Terms, Privacy, FAQ, Pricing, How It Works
-### Backend: ContactController with rate limiting
-### Polish: Cookie consent, 404/500 pages, loading states, responsive audit
-
-### Files: 7 pages + 1 controller + error pages
-
----
-
-# EXECUTION ORDER SUMMARY
-
-| # | Phase | Priority | Dependencies |
-|---|-------|----------|-------------|
-| 1 | Docker Infrastructure | CRITICAL | None |
-| 2 | Laravel Backend Init | CRITICAL | Phase 1 |
-| 3 | Nuxt Frontend Init | CRITICAL | Phase 1 |
-| 4 | Database Migrations | CRITICAL | Phase 2 |
-| 5 | Eloquent Models | CRITICAL | Phase 4 |
-| 6 | Requests & Validation | HIGH | Phase 5 |
-| 7 | API Resources | HIGH | Phase 5 |
-| 8 | Auth Backend | CRITICAL | Phase 5,6 |
-| 9 | Auth Frontend | CRITICAL | Phase 3,8 |
-| 10 | Design System Components | CRITICAL | Phase 3 |
-| 11 | Layout (Header/Footer) | CRITICAL | Phase 10 |
-| 12 | Homepage | HIGH | Phase 11 |
-| 13 | Category System | HIGH | Phase 5 |
-| 14 | Brand Database | HIGH | Phase 13 |
-| 15 | Listing CRUD API | CRITICAL | Phase 5,6 |
-| 16 | Image Pipeline | HIGH | Phase 15 |
-| 17 | Database Seeders | HIGH | Phase 5,13,14 |
-| 18 | Listing Card Component | HIGH | Phase 10 |
-| 19 | Category Landing Pages | HIGH | Phase 13,18 |
-| 20 | Listing Detail Page | CRITICAL | Phase 15,18 |
-| 21 | Elasticsearch Setup | CRITICAL | Phase 15 |
-| 22 | Search Results Page | CRITICAL | Phase 21,18 |
-| 23 | Favorites & Compare | MEDIUM | Phase 9,18 |
-| 24 | Messaging System | HIGH | Phase 8,9 |
-| 25 | Notifications | MEDIUM | Phase 24 |
-| 26 | Seller Dashboard | HIGH | Phase 15,16 |
-| 27 | Seller Public Profile | MEDIUM | Phase 26 |
-| 28 | Reviews & Trust | MEDIUM | Phase 27 |
-| 29 | Admin Panel | HIGH | Phase 15,8 |
-| 30 | Monetization (Stripe) | HIGH | Phase 26 |
-| 31 | Vehicle History | MEDIUM | Phase 20 |
-| 32 | Finance Calculator | MEDIUM | Phase 20 |
-| 33 | Saved Searches | MEDIUM | Phase 22 |
-| 34 | SEO & Performance | HIGH | Phase 20,22 |
-| 35 | Static Pages & Polish | MEDIUM | Phase 11 |
-
----
-
-# TOTAL ESTIMATED FILES: ~250+
-# TOTAL ESTIMATED CODE: ~30,000+ lines
-# TOTAL TABLES: 30
-# TOTAL API ENDPOINTS: 70+
-# TOTAL FRONTEND PAGES: 35+
-# TOTAL COMPONENTS: 60+
+#### Task 3.4: Category Landing Pages
+- [ ] `/[category]` page — category header, subcategory chips, top brands, filter + results
+- [ ] `/[category]/[subcategory]` — scoped to subcategory
+- [ ] Category mega-menu in header navigation
+- [ ] SSR with dynamic SEO meta tags
+- [ ] **Verify**: Category pages load with correct listings and filters
 
 ---
 
-## Verification Checklist
-After all phases complete:
-- [ ] `docker compose up` starts all services
-- [ ] `make fresh` migrates, seeds 500 listings, indexes in Elasticsearch
-- [ ] Homepage loads with featured listings, categories, stats
-- [ ] Search returns results with working filters and aggregations
-- [ ] Auth flow: register → login → logout → forgot password
-- [ ] Seller can: create listing (7 steps) → upload images → publish → mark sold
-- [ ] Buyer can: search → view detail → contact seller → add favorite → compare
-- [ ] Real-time: send message → other party sees it instantly
-- [ ] Admin can: approve/reject listings → manage users → manage categories
-- [ ] Subscription flow: view plans → subscribe via Stripe → listing limit enforced
-- [ ] 3 languages work: EN/NL/DE with switcher
-- [ ] Mobile responsive on all pages
-- [ ] Lighthouse score > 90 for public pages
-- [ ] All 44 categories populated with correct hierarchy
+### PHASE 4: User Features
+**Duration: ~5 days | Priority: HIGH**
+
+#### Task 4.1: Seller Dashboard (Complete)
+- [ ] Dashboard layout: fixed left sidebar (deep blue) + top bar + content
+- [ ] Dashboard home: stats cards, views chart (Chart.js, 30 days), recent messages, quick actions
+- [ ] Listings management: status tabs (All/Draft/Pending/Active/Sold/Expired), table with actions (edit/duplicate/delete/mark-sold), search, pagination
+- [ ] Create listing (multi-step form):
+  - Step 1: Category selection (visual cards)
+  - Step 2: Basic info (title, brand, model, condition, price, currency, negotiable)
+  - Step 3: Vehicle details (year, mileage, fuel, transmission, power, emission, color, VIN + category-specific fields)
+  - Step 4: Description (textarea with character count)
+  - Step 5: Images (drag-drop, preview, reorder, max 20)
+  - Step 6: Location & contact (country, city, phone, email, whatsapp)
+  - Step 7: Review & submit (summary, edit links)
+  - "Save as Draft" on every step
+- [ ] Edit listing: pre-populated multi-step form
+- [ ] Seller analytics: date range, views/favorites/contacts charts, top listings
+- [ ] **Verify**: Full seller workflow: create → upload images → publish → view stats
+
+#### Task 4.2: Favorites & Comparison
+- [ ] Favorites backend: POST/DELETE /api/favorites/:listingId
+- [ ] Favorites page: grid of saved listings, empty state
+- [ ] Heart toggle on ListingCard (optimistic UI)
+- [ ] Comparison tool: add to compare (max 4), side-by-side spec table
+- [ ] Compare page: sticky header with listing titles, highlight differences
+- [ ] **Verify**: Add/remove favorites, comparison works with 2-4 listings
+
+#### Task 4.3: Saved Searches & Email Alerts
+- [ ] Saved search CRUD: POST/GET/PUT/DELETE /api/saved-searches
+- [ ] "Save this search" button on search results page
+- [ ] Saved searches page: list with name, filters summary, frequency selector, delete
+- [ ] BullMQ cron job: match new listings to saved searches, send email alerts (daily/weekly)
+- [ ] Email template with matching listings
+- [ ] **Verify**: Save search, receive email alert when matching listing appears
+
+#### Task 4.4: Messaging System
+- [ ] Message controller: threads, send, markRead, archive
+- [ ] "Send Message" from listing detail creates thread (buyer + seller + listing)
+- [ ] Messages page: two-column layout
+  - Thread list (left): avatar, name, listing title, last message, unread badge, time
+  - Conversation (right): message bubbles (sent=blue, received=gray), timestamps, reply input
+- [ ] Unread count badge on header nav
+- [ ] Mobile: toggle between list and conversation
+- [ ] **Verify**: Send message → appears in other party's inbox
+
+#### Task 4.5: Contact Options (Complete)
+- [ ] Phone button: click to reveal (masked initially)
+- [ ] WhatsApp button: opens wa.me link with pre-filled message
+- [ ] Contact form: creates message thread
+- [ ] Contact tracking: increment contactCount
+- [ ] **Verify**: All contact methods functional
+
+---
+
+### PHASE 5: Admin Panel
+**Duration: ~4 days | Priority: HIGH**
+
+#### Task 5.1: Admin Dashboard
+- [ ] Admin layout: dark deep blue sidebar + content area
+- [ ] Dashboard stats: Total Listings, Pending Review, Total Users, Total Sellers, Monthly Revenue
+- [ ] Charts: new listings/day (30d), new registrations/day (30d)
+- [ ] Pending listings quick-approve queue
+- [ ] **Verify**: Dashboard loads with real data
+
+#### Task 5.2: Listing Moderation
+- [ ] Status tabs with counts: All, Pending Review, Active, Rejected, Expired
+- [ ] Table: image, title, seller, category, price, status, date, actions
+- [ ] Approve (green button) — changes status to ACTIVE, indexes in Elasticsearch
+- [ ] Reject (red button) — requires reason, notifies seller
+- [ ] Bulk approve/reject
+- [ ] **Verify**: Approve/reject workflow works end-to-end
+
+#### Task 5.3: User Management
+- [ ] User table: avatar, name, email, role badge, listings count, status, joined, last login
+- [ ] Search by name/email, filter by role/status
+- [ ] Actions: change role, activate, suspend/ban
+- [ ] User detail panel: full info, listings, messages
+- [ ] **Verify**: Suspend user → their listings hidden, reactivate → restored
+
+#### Task 5.4: Category & Brand Management
+- [ ] Category tree view with drag-to-reorder
+- [ ] Add/edit modal: name (multi-language), slug, parent, icon, description, SEO fields
+- [ ] Toggle active/inactive
+- [ ] Brand table: name, logo, model count
+- [ ] Add/edit brand + manage models
+- [ ] **Verify**: CRUD operations work, changes reflected on frontend
+
+#### Task 5.5: Admin Analytics & Reports
+- [ ] Date range selector
+- [ ] Listing stats: by category, by status, by country
+- [ ] User stats: registrations, active users, role breakdown
+- [ ] Search analytics: top search queries, zero-result queries
+- [ ] **Verify**: Charts display with real data
+
+---
+
+## MILESTONE 3: Monetization, Optimization & Launch (Weeks 7-8)
+
+### PHASE 6: Monetization
+**Duration: ~4 days | Priority: HIGH**
+
+#### Task 6.1: Subscription Plans
+- [ ] Plan definitions:
+  | Plan | Monthly | Yearly | Max Listings | Max Images |
+  |------|---------|--------|-------------|------------|
+  | Free | €0 | €0 | 5 | 5 |
+  | Basic | €29 | €290 | 25 | 10 |
+  | Premium | €79 | €790 | 100 | 20 |
+- [ ] Subscription controller: plans, subscribe, changePlan, cancel, resume
+- [ ] Stripe integration: create checkout session, handle webhooks
+- [ ] Listing limit enforcement based on active plan
+- [ ] **Verify**: Subscribe → Stripe checkout → webhook → plan active → limits enforced
+
+#### Task 6.2: Featured Listings
+- [ ] Featured listing controller: purchase featured placement
+- [ ] Placements: homepage carousel, category page top, search results highlight
+- [ ] Duration: 7/14/30 days with pricing
+- [ ] Stripe payment for featured listing purchase
+- [ ] Featured badge on listing cards
+- [ ] **Verify**: Purchase featured → appears in carousel → expires correctly
+
+#### Task 6.3: Pricing Page
+- [ ] Plan comparison table
+- [ ] Feature checklist per plan
+- [ ] Subscribe/upgrade buttons
+- [ ] Billing history in seller dashboard
+- [ ] **Verify**: Page renders, subscribe button redirects to Stripe
+
+#### Task 6.4: Payment Records
+- [ ] Store all transactions in payments table
+- [ ] Stripe webhook handler: payment succeeded, failed, subscription updated, cancelled
+- [ ] Admin revenue view
+- [ ] **Verify**: Payments tracked, webhook events processed
+
+---
+
+### PHASE 7: Optimization & Launch
+**Duration: ~6 days | Priority: HIGH**
+
+#### Task 7.1: Multi-Language Support (i18n)
+- [ ] next-intl configuration for 10+ languages
+- [ ] Language switcher component in header
+- [ ] Start with English (complete), structure for: Dutch, German, French, Spanish, Italian, Portuguese, Polish, Turkish, Arabic
+- [ ] All UI strings externalized to translation files
+- [ ] Category and brand names translatable (JSON fields)
+- [ ] **Verify**: Language switcher works, all strings translated for EN
+
+#### Task 7.2: Multi-Currency Support
+- [ ] Currency display component
+- [ ] Support: EUR, GBP, USD (expandable)
+- [ ] Currency selector in UI
+- [ ] Price stored in original currency, display in user's preferred
+- [ ] **Verify**: Prices display correctly in different currencies
+
+#### Task 7.3: Dealer Bulk Upload
+- [ ] CSV/XML import endpoint: POST /api/seller/bulk-import
+- [ ] File validation and parsing
+- [ ] BullMQ job: ProcessBulkImport — parse rows, validate, create listings
+- [ ] Progress tracking: total/processed/error counts
+- [ ] Import status page in seller dashboard
+- [ ] Error report download
+- [ ] **Verify**: Upload CSV with 50 listings → all created correctly
+
+#### Task 7.4: SEO Optimization
+- [ ] SSR for all public pages (Next.js App Router)
+- [ ] Dynamic meta tags: title, description, Open Graph, Twitter Cards
+- [ ] JSON-LD structured data:
+  - Organization (homepage)
+  - Vehicle (listing detail)
+  - BreadcrumbList (all pages)
+  - FAQPage (FAQ page)
+- [ ] Canonical URLs on all pages
+- [ ] Auto-generated sitemap.xml (all active listings, categories, sellers)
+- [ ] robots.txt
+- [ ] hreflang tags for language alternates
+- [ ] Image alt texts from listing data
+- [ ] Clean SEO-friendly URLs: `/trucks/mercedes-actros-2024-12345`
+- [ ] **Verify**: Google structured data test passes, Lighthouse SEO > 90
+
+#### Task 7.5: Performance Optimization
+- [ ] Redis caching (TTLs per endpoint as defined in Section 7)
+- [ ] Cache invalidation via Prisma middleware hooks
+- [ ] Cache key normalization (sorted params, hashed)
+- [ ] Next.js ISR for category pages
+- [ ] Image optimization: WebP, lazy loading, srcset responsive
+- [ ] CDN configuration (Cloudflare)
+- [ ] Database query optimization (no N+1, proper includes)
+- [ ] API response compression (gzip)
+- [ ] **Verify**: Pages load under 3 seconds, Lighthouse Performance > 90
+
+#### Task 7.6: Email Notification System
+- [ ] Email templates: welcome, verification, password reset, listing approved/rejected, new message, saved search alert, subscription expiring
+- [ ] Email service with queue (BullMQ)
+- [ ] Notification center: bell icon, dropdown, full page
+- [ ] **Verify**: All email types send correctly
+
+#### Task 7.7: Security Audit & Hardening
+- [ ] Input validation review (all Zod schemas)
+- [ ] SQL injection test (Prisma parameterized)
+- [ ] XSS protection test (helmet.js)
+- [ ] CSRF token validation
+- [ ] Rate limiting on all sensitive endpoints
+- [ ] File upload sanitization
+- [ ] Environment variable audit (no hardcoded secrets)
+- [ ] HTTPS enforcement
+- [ ] **Verify**: No vulnerabilities found
+
+#### Task 7.8: Static Pages & Final Polish
+- [ ] About page — company story, values
+- [ ] Contact page — form (name, email, subject, message) + company address
+- [ ] Terms of Service page
+- [ ] Privacy Policy page (GDPR compliant)
+- [ ] FAQ page — accordion sections
+- [ ] How It Works page — buyer and seller guides
+- [ ] 404 page design
+- [ ] 500 error page design
+- [ ] Cookie consent banner
+- [ ] Loading states on all pages
+- [ ] Empty states for no results
+- [ ] Mobile responsive audit (375px, 768px, 1920px)
+- [ ] **Verify**: All pages render, responsive, no broken states
+
+#### Task 7.9: Testing
+- [ ] Unit tests for core services (auth, listing CRUD, search)
+- [ ] API integration tests for all endpoints
+- [ ] E2E tests for critical flows:
+  - Register → Login → Create Listing → Publish
+  - Search → Filter → View Detail → Contact Seller
+  - Admin: Approve/Reject listing
+  - Subscribe → Stripe checkout → Plan active
+- [ ] **Verify**: All tests pass
+
+#### Task 7.10: Production Deployment
+- [ ] Docker production configuration
+- [ ] Environment variables for production
+- [ ] Database migration on production
+- [ ] Elasticsearch index creation
+- [ ] SSL/HTTPS setup
+- [ ] Cloudflare CDN configuration
+- [ ] Monitoring setup (error tracking)
+- [ ] Deployment documentation
+- [ ] **Verify**: Platform live and functional on production URL
+
+---
+
+## 14. Milestones & Budget
+
+| Milestone | Timeline | Cost | Deliverable |
+|-----------|----------|------|-------------|
+| **M1**: Foundation, Core Setup & Marketplace | Weeks 1-4 | €700 | Working marketplace with auth, categories, listing CRUD, image upload, seller dashboard, contact options on staging |
+| **M2**: Search, User Features & Admin Panel | Weeks 5-6 | €1,000 | Elasticsearch search, filters, dashboards, admin panel, messaging on staging |
+| **M3**: Monetization, Optimization & Launch | Weeks 7-8 | €700 | Monetization, i18n, optimization, full platform on production |
+| **TOTAL** | **8 Weeks (60 Days)** | **€2,400** | Complete platform |
+
+### Payment Policy:
+- Payment requested ONLY after milestone deliverable is live on staging
+- Client verifies, tests, and confirms before payment
+- Each milestone delivers a complete, working set of features
+
+---
+
+## 15. UAT Acceptance Criteria
+
+### Marketplace & Categories:
+- [ ] All 44+ categories and subcategories functional
+- [ ] Category pages display listings with correct filters
+- [ ] SEO-friendly URLs for all pages
+- [ ] Location-based browsing functional
+
+### Search & Filters:
+- [ ] Elasticsearch keyword search returning relevant results
+- [ ] All filters working: Category, Brand, Price, Year, Condition, Location
+- [ ] Sorting: Newest, Price (Low/High), Year
+- [ ] Search suggestions and autocomplete
+- [ ] Saved searches with email alerts
+
+### Listings:
+- [ ] Listing CRUD working end-to-end
+- [ ] Multi-image upload with optimization (WebP, thumbnails)
+- [ ] Listing detail page: Title, Price, Specs, Seller Info, Location, Gallery, Related
+
+### Buyer Features:
+- [ ] Contact seller form (messaging)
+- [ ] Phone contact button
+- [ ] WhatsApp contact button
+- [ ] Favorites working
+- [ ] Saved searches with alerts
+
+### Seller Features:
+- [ ] Registration and login
+- [ ] Seller dashboard with stats
+- [ ] Listing management (create, edit, delete)
+- [ ] Seller profile page
+- [ ] Messages from buyers visible
+
+### Admin Panel:
+- [ ] Approve/remove listings
+- [ ] Manage categories and filters
+- [ ] Manage users (suspend, activate)
+- [ ] Analytics dashboard
+
+### Monetization:
+- [ ] Subscription plans (Free, Basic, Premium)
+- [ ] Stripe payment processing
+- [ ] Featured listings functional
+
+### i18n & Currency:
+- [ ] Multi-language support with switcher
+- [ ] Multi-currency display
+
+### Technical:
+- [ ] Full responsive: Desktop (1920px), Tablet (768px), Mobile (375px)
+- [ ] SSR and SEO verified (meta tags, sitemap, schema markup)
+- [ ] Pages load under 3 seconds
+- [ ] All security measures implemented
+- [ ] Docker deployment running
+- [ ] 150,000+ listing architecture verified
+
+---
+
+## 16. Deliverables
+
+- [ ] Fully functional multi-vendor marketplace website
+- [ ] Admin dashboard with analytics and moderation
+- [ ] Seller dashboard with listing management
+- [ ] Complete source code (TypeScript, clean architecture)
+- [ ] Database schema and setup scripts (Prisma migrations)
+- [ ] Docker deployment configuration
+- [ ] Elasticsearch indexing and search configuration
+- [ ] API documentation
+- [ ] User guide documentation
+- [ ] Deployment support
+
+---
+
+## 17. Team Requirements
+
+| Role | Responsibility |
+|------|---------------|
+| Full-Stack Lead | Architecture, backend development, code reviews |
+| Frontend Developer | Next.js, React components, UI implementation |
+| Backend Developer | Node.js APIs, Elasticsearch integration |
+| UI/UX Designer | Design system, wireframes, usability |
+| DevOps Engineer | Infrastructure, CI/CD, monitoring |
+| QA Engineer | Testing, quality assurance |
+
+---
+
+# TOTAL ESTIMATED:
+- **Files**: ~250+
+- **Code**: ~30,000+ lines
+- **Tables**: 29
+- **API Endpoints**: 70+
+- **Frontend Pages**: 35+
+- **Components**: 60+
+- **Timeline**: 8 weeks (60 days)
+- **Budget**: €2,400
