@@ -125,7 +125,7 @@ export default function SellerProfilePage() {
   return (
     <div className="bg-background min-h-screen">
       {/* Banner Header */}
-      <div className="bg-gradient-to-r from-[#1E3A5F] to-[#0F1F32] text-white">
+      <div className="bg-gradient-to-r from-primary to-primary-950 text-white">
         <div className="container mx-auto px-4 py-10">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
             {/* Logo */}

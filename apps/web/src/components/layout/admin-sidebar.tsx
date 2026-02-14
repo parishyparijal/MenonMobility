@@ -65,7 +65,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 bg-[#1E3A5F] text-white flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-auto',
+          'fixed inset-y-0 left-0 z-50 w-64 bg-primary text-white flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-auto',
           isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -75,9 +75,9 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             <img
               src="/logo.png"
               alt="Menon Mobility"
-              className="h-7 w-auto object-contain brightness-0 invert"
+              className="h-10 w-auto object-contain bg-white rounded-lg px-2 py-1"
             />
-            <span className="text-[10px] uppercase tracking-wider text-red-400 font-semibold bg-red-500/20 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] uppercase tracking-wider text-accent-400 font-semibold bg-accent-500/20 px-1.5 py-0.5 rounded">
               Admin
             </span>
           </Link>
@@ -105,14 +105,14 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                     className={cn(
                       'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                       isActive
-                        ? 'bg-red-500/20 text-white'
+                        ? 'bg-accent-500/20 text-white'
                         : 'text-white/70 hover:text-white hover:bg-white/10'
                     )}
                   >
                     <item.icon className="w-5 h-5 shrink-0" />
                     <span className="flex-1">{item.label}</span>
                     {item.badge !== undefined && item.badge > 0 && (
-                      <Badge className="bg-red-500 text-white border-0 text-[10px] h-5 min-w-[20px] justify-center">
+                      <Badge className="bg-accent text-white border-0 text-[10px] h-5 min-w-[20px] justify-center">
                         {item.badge}
                       </Badge>
                     )}

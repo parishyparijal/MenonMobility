@@ -108,7 +108,7 @@ export default function AdminListingsPage() {
             className={cn(
               'px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors',
               activeTab === tab.key
-                ? 'bg-red-500 text-white'
+                ? 'bg-accent text-white'
                 : 'bg-white text-foreground hover:bg-muted border border-border'
             )}
           >
