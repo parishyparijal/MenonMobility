@@ -6,6 +6,7 @@ import path from "path";
 import fs from "fs";
 import { s3Client, S3_BUCKET } from "@/config/s3";
 import { PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { elasticsearchService } from "@/services/elasticsearch.service";
 
 // ---------------------------------------------------------------------------
 // BullMQ Worker Entry Point
@@ -230,17 +231,27 @@ const searchIndexWorker = createWorker("search-index", async (job: Job) => {
   console.log(`[Search Index Worker] Processing job ${job.id}: ${job.name}`);
 
   switch (job.name) {
-    case "index-listing":
-      console.log(`  -> Indexing listing ${job.data.listingId}`);
+    case "index-listing": {
+      const { listingId } = job.data;
+      console.log(`  -> Indexing listing ${listingId}`);
+      await elasticsearchService.indexListing(listingId);
       break;
+    }
 
-    case "remove-listing":
-      console.log(`  -> Removing listing ${job.data.listingId} from index`);
+    case "remove-listing": {
+      const { listingId } = job.data;
+      console.log(`  -> Removing listing ${listingId} from index`);
+      await elasticsearchService.removeListing(listingId);
       break;
+    }
 
-    case "reindex-all":
-      console.log(`  -> Full reindex started`);
+    case "reindex-all": {
+      const fresh = job.data?.fresh ?? false;
+      console.log(`  -> Full reindex started (fresh: ${fresh})`);
+      const count = await elasticsearchService.reindexAll(fresh);
+      console.log(`  -> Reindex complete: ${count} listings indexed`);
       break;
+    }
 
     default:
       console.log(`  -> Unknown search index job: ${job.name}`);

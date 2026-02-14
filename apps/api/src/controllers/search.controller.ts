@@ -1,11 +1,24 @@
 import { Request, Response, NextFunction } from "express";
 import prisma from "@/config/database";
 import { AppError } from "@/middleware/errorHandler";
+import { elasticsearchService } from "@/services/elasticsearch.service";
+import { pingElasticsearch } from "@/config/elasticsearch";
 
 // ---------------------------------------------------------------------------
 // Search Controller
-// Uses Prisma for full-text search (Elasticsearch integration later)
 // ---------------------------------------------------------------------------
+// Uses Elasticsearch for full-text search with relevance scoring and
+// aggregations. Falls back to Prisma if Elasticsearch is unavailable.
+// ---------------------------------------------------------------------------
+
+let esAvailable: boolean | null = null;
+
+async function isEsAvailable(): Promise<boolean> {
+  if (esAvailable === null) {
+    esAvailable = await pingElasticsearch();
+  }
+  return esAvailable;
+}
 
 export const searchController = {
   /**
@@ -33,13 +46,49 @@ export const searchController = {
         limit,
       } = req.query as any;
 
-      // Build Prisma where clause
+      // Try Elasticsearch first
+      if (await isEsAvailable()) {
+        try {
+          const result = await elasticsearchService.search({
+            q,
+            category,
+            brand,
+            model,
+            condition,
+            fuelType,
+            transmission,
+            emissionClass,
+            countryCode,
+            minPrice,
+            maxPrice,
+            minYear,
+            maxYear,
+            sort,
+            page,
+            limit,
+          });
+
+          return res.json({
+            success: true,
+            data: {
+              listings: result.listings,
+              aggregations: result.aggregations,
+            },
+            pagination: result.pagination,
+          });
+        } catch (esError) {
+          console.error("[Search] Elasticsearch query failed, falling back to Prisma:", esError);
+          // Reset availability so it re-checks next time
+          esAvailable = null;
+        }
+      }
+
+      // Fallback: Prisma-based search
       const where: any = {
         status: "ACTIVE",
         deletedAt: null,
       };
 
-      // Text search on title and description
       if (q) {
         where.OR = [
           { title: { contains: q, mode: "insensitive" } },
@@ -47,66 +96,27 @@ export const searchController = {
         ];
       }
 
-      // Category filter (by slug)
-      if (category) {
-        where.category = { slug: category };
-      }
+      if (category) where.category = { slug: category };
+      if (brand) where.brand = { slug: brand };
+      if (model) where.model = { slug: model };
+      if (condition) where.condition = condition;
+      if (fuelType) where.fuelType = fuelType;
+      if (transmission) where.transmission = transmission;
+      if (emissionClass) where.emissionClass = emissionClass;
+      if (countryCode) where.countryCode = countryCode;
 
-      // Brand filter (by slug)
-      if (brand) {
-        where.brand = { slug: brand };
-      }
-
-      // Model filter (by slug)
-      if (model) {
-        where.model = { slug: model };
-      }
-
-      // Enum filters
-      if (condition) {
-        where.condition = condition;
-      }
-
-      if (fuelType) {
-        where.fuelType = fuelType;
-      }
-
-      if (transmission) {
-        where.transmission = transmission;
-      }
-
-      if (emissionClass) {
-        where.emissionClass = emissionClass;
-      }
-
-      // Country filter
-      if (countryCode) {
-        where.countryCode = countryCode;
-      }
-
-      // Price range
       if (minPrice !== undefined || maxPrice !== undefined) {
         where.price = {};
-        if (minPrice !== undefined) {
-          where.price.gte = minPrice;
-        }
-        if (maxPrice !== undefined) {
-          where.price.lte = maxPrice;
-        }
+        if (minPrice !== undefined) where.price.gte = minPrice;
+        if (maxPrice !== undefined) where.price.lte = maxPrice;
       }
 
-      // Year range
       if (minYear !== undefined || maxYear !== undefined) {
         where.year = {};
-        if (minYear !== undefined) {
-          where.year.gte = minYear;
-        }
-        if (maxYear !== undefined) {
-          where.year.lte = maxYear;
-        }
+        if (minYear !== undefined) where.year.gte = minYear;
+        if (maxYear !== undefined) where.year.lte = maxYear;
       }
 
-      // Build sort order
       let orderBy: any;
       switch (sort) {
         case "price_asc":
@@ -135,10 +145,8 @@ export const searchController = {
 
       const skip = (page - 1) * limit;
 
-      // Execute queries in parallel: listings, total count, and aggregations
       const [listings, total, categoryAgg, brandAgg, conditionAgg, fuelTypeAgg, countryAgg] =
         await Promise.all([
-          // Main listing query
           prisma.listing.findMany({
             where,
             orderBy,
@@ -185,33 +193,27 @@ export const searchController = {
               },
             },
           }),
-          // Total count
           prisma.listing.count({ where }),
-          // Category aggregation
           prisma.listing.groupBy({
             by: ["categoryId"],
             where: { ...where, category: undefined },
             _count: { id: true },
           }),
-          // Brand aggregation
           prisma.listing.groupBy({
             by: ["brandId"],
             where: { ...where, brand: undefined },
             _count: { id: true },
           }),
-          // Condition aggregation
           prisma.listing.groupBy({
             by: ["condition"],
             where,
             _count: { id: true },
           }),
-          // Fuel type aggregation
           prisma.listing.groupBy({
             by: ["fuelType"],
             where,
             _count: { id: true },
           }),
-          // Country aggregation
           prisma.listing.groupBy({
             by: ["countryCode"],
             where: { ...where, countryCode: undefined },
@@ -219,7 +221,6 @@ export const searchController = {
           }),
         ]);
 
-      // Resolve category names for aggregation
       const categoryIds = categoryAgg.map((c) => c.categoryId);
       const categories = categoryIds.length > 0
         ? await prisma.category.findMany({
@@ -227,10 +228,8 @@ export const searchController = {
             select: { id: true, name: true, slug: true },
           })
         : [];
-
       const categoryMap = new Map(categories.map((c) => [c.id, c]));
 
-      // Resolve brand names for aggregation
       const brandIds = brandAgg.filter((b) => b.brandId !== null).map((b) => b.brandId!);
       const brands = brandIds.length > 0
         ? await prisma.brand.findMany({
@@ -238,7 +237,6 @@ export const searchController = {
             select: { id: true, name: true, slug: true },
           })
         : [];
-
       const brandMap = new Map(brands.map((b) => [b.id, b]));
 
       const totalPages = Math.ceil(total / limit);
@@ -300,23 +298,31 @@ export const searchController = {
         throw new AppError("Search query (q) is required", 400);
       }
 
+      // Try Elasticsearch first
+      if (await isEsAvailable()) {
+        try {
+          const results = await elasticsearchService.suggestions(q, 8);
+          return res.json({ success: true, data: results });
+        } catch (esError) {
+          console.error("[Search] ES suggestions failed, falling back to Prisma:", esError);
+          esAvailable = null;
+        }
+      }
+
+      // Fallback: Prisma
       const listings = await prisma.listing.findMany({
         where: {
           status: "ACTIVE",
           deletedAt: null,
           title: { contains: q, mode: "insensitive" },
         },
-        select: {
-          title: true,
-        },
-        take: 50, // fetch extra to deduplicate
+        select: { title: true },
+        take: 50,
         orderBy: { publishedAt: "desc" },
       });
 
-      // Extract unique titles (case-insensitive dedup)
       const seen = new Set<string>();
       const suggestions: string[] = [];
-
       for (const listing of listings) {
         const lower = listing.title.toLowerCase();
         if (!seen.has(lower) && suggestions.length < 8) {
@@ -325,10 +331,7 @@ export const searchController = {
         }
       }
 
-      res.json({
-        success: true,
-        data: suggestions,
-      });
+      res.json({ success: true, data: suggestions });
     } catch (error) {
       next(error);
     }
