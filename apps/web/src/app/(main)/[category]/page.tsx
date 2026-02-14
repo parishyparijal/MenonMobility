@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { ListingCard, type ListingCardData } from '@/components/listings/listing-card';
 import { Pagination } from '@/components/common/pagination';
 import { cn } from '@/lib/utils';
-import { getImagesForListing } from '@/lib/images';
+import { getImagesForListing, CATEGORY_HERO_IMAGES } from '@/lib/images';
 
 const categoryData: Record<string, {
   name: string;
@@ -110,17 +110,29 @@ export default function CategoryPage() {
 
   return (
     <div className="bg-background min-h-screen">
-      {/* Category Header */}
-      <section className="bg-gradient-to-r from-primary to-primary-950 text-white py-10">
-        <div className="container mx-auto px-4">
+      {/* Category Header with Background Image Overlay */}
+      <section className="relative text-white py-16 md:py-20 overflow-hidden">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${CATEGORY_HERO_IMAGES[categorySlug as keyof typeof CATEGORY_HERO_IMAGES] || CATEGORY_HERO_IMAGES.trucks})`,
+          }}
+        />
+        {/* Dark Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/80 to-primary-950/70" />
+        {/* Bottom fade for smooth transition */}
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background to-transparent" />
+
+        <div className="container mx-auto px-4 relative z-10">
           <nav className="flex items-center gap-2 text-sm text-white/60 mb-4">
             <Link href="/" className="hover:text-white transition-colors">Home</Link>
             <span>/</span>
             <span className="text-white">{category.name}</span>
           </nav>
-          <h1 className="text-3xl font-bold mb-2">{category.name}</h1>
-          <p className="text-white/80 max-w-2xl">{category.description}</p>
-          <p className="text-sm text-accent font-medium mt-3">
+          <h1 className="text-3xl md:text-4xl font-bold mb-3">{category.name}</h1>
+          <p className="text-white/85 max-w-2xl text-lg">{category.description}</p>
+          <p className="text-sm text-accent font-semibold mt-4 bg-white/10 backdrop-blur-sm inline-block px-3 py-1 rounded-full">
             {category.listingCount.toLocaleString()} listings available
           </p>
         </div>

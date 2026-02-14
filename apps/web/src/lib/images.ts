@@ -205,10 +205,10 @@ export function getImagesForListing(title: string): string[] {
 // ─── Category hero images ───────────────────────────────────────────────────
 
 export const CATEGORY_HERO_IMAGES = {
-  trucks: img('photo-1616432043562-3671ea2e5242', 1200, 400),
-  trailers: img('photo-1724556271642-e9acaf03ac23', 1200, 400),
-  construction: img('photo-1503708928676-1cb796a0891e', 1200, 400),
-  vans: img('photo-1535655685871-dc8158ff167e', 1200, 400),
+  trucks: img('photo-1616432043562-3671ea2e5242', 1920, 600),
+  trailers: img('photo-1724556271642-e9acaf03ac23', 1920, 600),
+  construction: img('photo-1503708928676-1cb796a0891e', 1920, 600),
+  vans: img('photo-1535655685871-dc8158ff167e', 1920, 600),
 };
 
 // ─── Brand logos (text-based placeholder with icon) ─────────────────────────
