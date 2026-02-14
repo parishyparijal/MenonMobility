@@ -62,6 +62,50 @@ const categoryData: Record<string, {
     topBrands: ['Caterpillar', 'Komatsu', 'Liebherr', 'Volvo CE', 'CASE', 'JCB'],
     listingCount: 18700,
   },
+  vans: {
+    name: 'Vans',
+    description: 'Find cargo vans, delivery vans, and commercial vans from top brands. Sprinters, Transits, Crafters and more.',
+    subcategories: [
+      { name: 'Cargo Vans', slug: 'cargo' },
+      { name: 'Passenger Vans', slug: 'passenger' },
+      { name: 'Box Vans', slug: 'box' },
+      { name: 'Refrigerated Vans', slug: 'refrigerated' },
+    ],
+    topBrands: ['Mercedes-Benz', 'Ford', 'Volkswagen', 'Iveco', 'Renault', 'Peugeot'],
+    listingCount: 12400,
+  },
+  cars: {
+    name: 'Cars',
+    description: 'Browse commercial cars and company vehicles from verified European dealers.',
+    subcategories: [],
+    topBrands: [],
+    listingCount: 8200,
+  },
+  containers: {
+    name: 'Containers',
+    description: 'Shipping containers, storage containers, and specialized containers from trusted sellers across Europe.',
+    subcategories: [
+      { name: 'Shipping Containers', slug: 'shipping' },
+      { name: 'Storage Containers', slug: 'storage' },
+      { name: 'Refrigerated Containers', slug: 'refrigerated' },
+      { name: 'Tank Containers', slug: 'tank' },
+    ],
+    topBrands: ['Maersk', 'CIMC', 'Singamas'],
+    listingCount: 4500,
+  },
+  parts: {
+    name: 'Parts & Accessories',
+    description: 'Truck parts, trailer parts, and commercial vehicle accessories from European suppliers.',
+    subcategories: [
+      { name: 'Engine Parts', slug: 'engine' },
+      { name: 'Brakes & Suspension', slug: 'brakes' },
+      { name: 'Electrical', slug: 'electrical' },
+      { name: 'Body Parts', slug: 'body' },
+      { name: 'Tyres & Wheels', slug: 'tyres' },
+    ],
+    topBrands: ['Bosch', 'Wabco', 'BPW', 'SAF-Holland', 'Continental'],
+    listingCount: 15600,
+  },
 };
 
 const defaultCategory = {

@@ -22,10 +22,16 @@ import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/store/auth';
 import { MobileNav } from './mobile-nav';
 
+interface NavChild {
+  label: string;
+  href: string;
+}
+
 interface NavItem {
   label: string;
   href: string;
-  children?: { label: string; href: string }[];
+  children?: NavChild[];
+  brands?: string[];
 }
 
 const navItems: NavItem[] = [
@@ -34,54 +40,56 @@ const navItems: NavItem[] = [
     href: '/trucks',
     children: [
       { label: 'All Trucks', href: '/trucks' },
-      { label: 'Box Trucks', href: '/trucks?type=box' },
-      { label: 'Flatbed Trucks', href: '/trucks?type=flatbed' },
-      { label: 'Refrigerated Trucks', href: '/trucks?type=refrigerated' },
-      { label: 'Tractor Units', href: '/trucks?type=tractor' },
+      { label: 'Tractor Units', href: '/search?category=trucks&subcategory=tractor-units' },
+      { label: 'Box Trucks', href: '/search?category=trucks&subcategory=box-trucks' },
+      { label: 'Flatbed Trucks', href: '/search?category=trucks&subcategory=flatbed' },
+      { label: 'Refrigerated', href: '/search?category=trucks&subcategory=refrigerated' },
+      { label: 'Tipper Trucks', href: '/search?category=trucks&subcategory=tipper' },
+      { label: 'Tanker Trucks', href: '/search?category=trucks&subcategory=tanker' },
+      { label: 'Curtainside', href: '/search?category=trucks&subcategory=curtainside' },
     ],
+    brands: ['Mercedes-Benz', 'Volvo', 'Scania', 'MAN', 'DAF', 'Iveco', 'Renault'],
   },
   {
     label: 'Trailers',
     href: '/trailers',
     children: [
       { label: 'All Trailers', href: '/trailers' },
-      { label: 'Semi Trailers', href: '/trailers?type=semi' },
-      { label: 'Flatbed Trailers', href: '/trailers?type=flatbed' },
-      { label: 'Refrigerated Trailers', href: '/trailers?type=refrigerated' },
-      { label: 'Curtain Side', href: '/trailers?type=curtain' },
+      { label: 'Semi Trailers', href: '/search?category=trailers&subcategory=semi' },
+      { label: 'Flatbed Trailers', href: '/search?category=trailers&subcategory=flatbed' },
+      { label: 'Refrigerated', href: '/search?category=trailers&subcategory=refrigerated' },
+      { label: 'Curtain Side', href: '/search?category=trailers&subcategory=curtain-side' },
+      { label: 'Low Loaders', href: '/search?category=trailers&subcategory=low-loaders' },
     ],
+    brands: ['Schmitz Cargobull', 'Krone', 'Wielton', 'Lamberet'],
   },
   {
     label: 'Equipment',
-    href: '/equipment',
+    href: '/construction',
     children: [
-      { label: 'All Equipment', href: '/equipment' },
-      { label: 'Construction', href: '/equipment?type=construction' },
-      { label: 'Agricultural', href: '/equipment?type=agricultural' },
-      { label: 'Forklifts', href: '/equipment?type=forklifts' },
+      { label: 'All Equipment', href: '/construction' },
+      { label: 'Excavators', href: '/search?category=construction&subcategory=excavators' },
+      { label: 'Wheel Loaders', href: '/search?category=construction&subcategory=wheel-loaders' },
+      { label: 'Cranes', href: '/search?category=construction&subcategory=cranes' },
+      { label: 'Bulldozers', href: '/search?category=construction&subcategory=bulldozers' },
+      { label: 'Dump Trucks', href: '/search?category=construction&subcategory=dump-trucks' },
     ],
+    brands: ['Caterpillar', 'Komatsu', 'Liebherr', 'Volvo CE', 'JCB'],
   },
   {
     label: 'Vans',
     href: '/vans',
     children: [
       { label: 'All Vans', href: '/vans' },
-      { label: 'Cargo Vans', href: '/vans?type=cargo' },
-      { label: 'Passenger Vans', href: '/vans?type=passenger' },
+      { label: 'Cargo Vans', href: '/search?category=vans&subcategory=cargo' },
+      { label: 'Passenger Vans', href: '/search?category=vans&subcategory=passenger' },
+      { label: 'Box Vans', href: '/search?category=vans&subcategory=box' },
     ],
+    brands: ['Mercedes-Benz', 'Ford', 'Volkswagen', 'Iveco', 'Renault'],
   },
-  {
-    label: 'Cars',
-    href: '/cars',
-  },
-  {
-    label: 'Containers',
-    href: '/containers',
-  },
-  {
-    label: 'Parts',
-    href: '/parts',
-  },
+  { label: 'Cars', href: '/cars' },
+  { label: 'Containers', href: '/containers' },
+  { label: 'Parts', href: '/parts' },
 ];
 
 const languages = [
@@ -229,22 +237,59 @@ export function Header() {
                   {item.children && <ChevronDown className="w-3.5 h-3.5" />}
                 </Link>
 
-                {/* Dropdown */}
+                {/* Mega Menu Dropdown */}
                 {item.children && activeDropdown === item.label && (
                   <div
-                    className="absolute top-full left-0 mt-0.5 bg-white rounded-lg shadow-lg border border-border z-50 py-2 min-w-[200px]"
+                    className="absolute top-full left-0 mt-0.5 bg-white rounded-lg shadow-xl border border-border z-50 p-5 min-w-[420px]"
                     onMouseEnter={() => handleDropdownEnter(item.label)}
                     onMouseLeave={handleDropdownLeave}
                   >
-                    {item.children.map((child) => (
+                    <div className="flex gap-6">
+                      {/* Subcategories */}
+                      <div className="flex-1">
+                        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                          Categories
+                        </h4>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                          {item.children.map((child) => (
+                            <Link
+                              key={child.href}
+                              href={child.href}
+                              className="block py-1.5 text-sm text-foreground hover:text-primary transition-colors"
+                            >
+                              {child.label}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                      {/* Top Brands */}
+                      {item.brands && item.brands.length > 0 && (
+                        <div className="w-40 border-l border-border pl-5">
+                          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                            Top Brands
+                          </h4>
+                          <div className="space-y-1">
+                            {item.brands.map((brand) => (
+                              <Link
+                                key={brand}
+                                href={`/search?brand=${encodeURIComponent(brand)}`}
+                                className="block py-1.5 text-sm text-foreground hover:text-accent transition-colors"
+                              >
+                                {brand}
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="border-t border-border mt-4 pt-3">
                       <Link
-                        key={child.href}
-                        href={child.href}
-                        className="block px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-primary transition-colors"
+                        href={item.href}
+                        className="text-sm font-medium text-primary hover:text-accent transition-colors"
                       >
-                        {child.label}
+                        View all {item.label.toLowerCase()} &rarr;
                       </Link>
-                    ))}
+                    </div>
                   </div>
                 )}
               </div>
