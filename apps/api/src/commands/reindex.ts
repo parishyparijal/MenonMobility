@@ -1,21 +1,22 @@
-import { searchIndexQueue } from "@/config/queue";
+import { elasticsearchService } from "@/services/elasticsearch.service";
 
 // ---------------------------------------------------------------------------
 // CLI Command: Reindex all listings in Elasticsearch
 // ---------------------------------------------------------------------------
-// Run with: npm run reindex (tsx src/commands/reindex.ts)
+// Run with:
+//   npm run reindex              # incremental reindex
+//   npm run reindex -- --fresh   # delete + recreate index, then reindex all
 // ---------------------------------------------------------------------------
 
 async function reindex(): Promise<void> {
-  console.log("[Reindex] Dispatching full reindex job...");
+  const args = process.argv.slice(2);
+  const fresh = args.includes("--fresh");
 
-  await searchIndexQueue.add("reindex-all", {
-    type: "full-reindex",
-    timestamp: new Date().toISOString(),
-  });
+  console.log(`[Reindex] Starting ${fresh ? "FRESH" : "incremental"} reindex...`);
 
-  console.log("[Reindex] Reindex job added to queue successfully.");
-  console.log("[Reindex] The worker process will pick it up and execute it.");
+  const count = await elasticsearchService.reindexAll(fresh);
+
+  console.log(`[Reindex] Done! ${count} listings indexed.`);
   process.exit(0);
 }
 
