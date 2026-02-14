@@ -12,6 +12,7 @@ import {
   Building,
   CreditCard,
   BarChart3,
+  Upload,
   LogOut,
   X,
   Menu,
@@ -39,6 +40,7 @@ const navItems: SidebarNavItem[] = [
   { label: 'Messages', href: '/seller/messages', icon: MessageSquare, badge: 5 },
   { label: 'Reviews', href: '/seller/reviews', icon: Star },
   { label: 'Company Profile', href: '/seller/profile', icon: Building },
+  { label: 'Bulk Upload', href: '/seller/bulk-upload', icon: Upload },
   { label: 'Subscription', href: '/seller/subscription', icon: CreditCard },
   { label: 'Analytics', href: '/seller/analytics', icon: BarChart3 },
 ];
