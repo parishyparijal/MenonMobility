@@ -18,6 +18,7 @@ import { ListingCard, type ListingCardData } from '@/components/listings/listing
 import { ListingCardSkeleton } from '@/components/listings/listing-card-skeleton';
 import { Pagination } from '@/components/common/pagination';
 import { cn } from '@/lib/utils';
+import { getImagesForListing } from '@/lib/images';
 
 const categoryOptions = [
   'Trucks', 'Trailers', 'Construction', 'Vans', 'Cars', 'Containers', 'Parts', 'Agricultural',
@@ -62,7 +63,16 @@ const dummyListings: ListingCardData[] = Array.from({ length: 24 }, (_, i) => ({
   price: [89500, 125000, 78900, 115000, 92000, 98000, 76500, 165000][i % 8],
   currency: 'EUR',
   condition: (i % 5 === 0 ? 'NEW' : 'USED') as 'NEW' | 'USED',
-  images: [],
+  images: getImagesForListing([
+    'Mercedes-Benz Actros 2545 LS 6x2',
+    'Volvo FH 500 4x2 Globetrotter XL',
+    'Scania R 450 A4x2NA Highline',
+    'MAN TGX 18.510 4x2 BLS',
+    'DAF XF 480 FT Space Cab',
+    'Iveco S-Way AS440S48T/P',
+    'Renault T480 High Sleeper Cab',
+    'Caterpillar 320 GC Excavator',
+  ][i % 8]),
   year: 2019 + (i % 5),
   mileage: i % 5 === 0 ? 0 : 50000 + i * 25000,
   fuelType: 'Diesel',

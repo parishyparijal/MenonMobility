@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { getImagesForListing } from '@/lib/images';
 
 interface AdminListing {
   id: string;
@@ -36,6 +37,7 @@ interface AdminListing {
   currency: string;
   views: number;
   createdAt: string;
+  thumbnail?: string;
 }
 
 const tabs = [
@@ -49,14 +51,14 @@ const tabs = [
 ];
 
 const dummyListings: AdminListing[] = [
-  { id: '1', slug: 'mercedes-actros-2545', title: 'Mercedes-Benz Actros 2545 LS 6x2', seller: 'TransEuropa BV', status: 'PENDING_REVIEW', price: 89500, currency: 'EUR', views: 0, createdAt: '2024-01-18' },
-  { id: '2', slug: 'volvo-fh-500', title: 'Volvo FH 500 4x2 Globetrotter', seller: 'Nordic Trucks GmbH', status: 'PENDING_REVIEW', price: 125000, currency: 'EUR', views: 0, createdAt: '2024-01-18' },
-  { id: '3', slug: 'caterpillar-336f', title: 'Caterpillar 336F L Excavator', seller: 'BuildEquip BV', status: 'ACTIVE', price: 210000, currency: 'EUR', views: 3456, createdAt: '2024-01-10' },
-  { id: '4', slug: 'scania-g-410', title: 'Scania G 410 A6x2/4NA', seller: 'FleetPro NV', status: 'ACTIVE', price: 68900, currency: 'EUR', views: 1234, createdAt: '2024-01-08' },
-  { id: '5', slug: 'daf-cf-450', title: 'DAF CF 450 FT Space Cab', seller: 'DutchFleet BV', status: 'REJECTED', price: 81000, currency: 'EUR', views: 56, createdAt: '2024-01-05' },
-  { id: '6', slug: 'man-tgx-26', title: 'MAN TGX 26.510 6x2-4 BL', seller: 'BavariaTruck AG', status: 'ACTIVE', price: 142000, currency: 'EUR', views: 987, createdAt: '2024-01-03' },
-  { id: '7', slug: 'iveco-s-way', title: 'Iveco S-Way AS440S48T/P', seller: 'ItalTruck SRL', status: 'DRAFT', price: 98000, currency: 'EUR', views: 0, createdAt: '2024-01-15' },
-  { id: '8', slug: 'renault-t480', title: 'Renault T480 High Sleeper Cab', seller: 'FleetFrance SA', status: 'SOLD', price: 76500, currency: 'EUR', views: 2100, createdAt: '2023-12-20' },
+  { id: '1', slug: 'mercedes-actros-2545', title: 'Mercedes-Benz Actros 2545 LS 6x2', seller: 'TransEuropa BV', status: 'PENDING_REVIEW', price: 89500, currency: 'EUR', views: 0, createdAt: '2024-01-18', thumbnail: getImagesForListing('Mercedes-Benz Actros 2545')[0] },
+  { id: '2', slug: 'volvo-fh-500', title: 'Volvo FH 500 4x2 Globetrotter', seller: 'Nordic Trucks GmbH', status: 'PENDING_REVIEW', price: 125000, currency: 'EUR', views: 0, createdAt: '2024-01-18', thumbnail: getImagesForListing('Volvo FH 500')[0] },
+  { id: '3', slug: 'caterpillar-336f', title: 'Caterpillar 336F L Excavator', seller: 'BuildEquip BV', status: 'ACTIVE', price: 210000, currency: 'EUR', views: 3456, createdAt: '2024-01-10', thumbnail: getImagesForListing('Caterpillar 336F Excavator')[0] },
+  { id: '4', slug: 'scania-g-410', title: 'Scania G 410 A6x2/4NA', seller: 'FleetPro NV', status: 'ACTIVE', price: 68900, currency: 'EUR', views: 1234, createdAt: '2024-01-08', thumbnail: getImagesForListing('Scania G 410')[0] },
+  { id: '5', slug: 'daf-cf-450', title: 'DAF CF 450 FT Space Cab', seller: 'DutchFleet BV', status: 'REJECTED', price: 81000, currency: 'EUR', views: 56, createdAt: '2024-01-05', thumbnail: getImagesForListing('DAF CF 450')[0] },
+  { id: '6', slug: 'man-tgx-26', title: 'MAN TGX 26.510 6x2-4 BL', seller: 'BavariaTruck AG', status: 'ACTIVE', price: 142000, currency: 'EUR', views: 987, createdAt: '2024-01-03', thumbnail: getImagesForListing('MAN TGX 26.510')[0] },
+  { id: '7', slug: 'iveco-s-way', title: 'Iveco S-Way AS440S48T/P', seller: 'ItalTruck SRL', status: 'DRAFT', price: 98000, currency: 'EUR', views: 0, createdAt: '2024-01-15', thumbnail: getImagesForListing('Iveco S-Way')[0] },
+  { id: '8', slug: 'renault-t480', title: 'Renault T480 High Sleeper Cab', seller: 'FleetFrance SA', status: 'SOLD', price: 76500, currency: 'EUR', views: 2100, createdAt: '2023-12-20', thumbnail: getImagesForListing('Renault T480')[0] },
 ];
 
 export default function AdminListingsPage() {
@@ -163,8 +165,12 @@ export default function AdminListingsPage() {
                   <tr key={listing.id} className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors">
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-9 rounded bg-muted flex items-center justify-center text-muted-foreground text-xs shrink-0">
-                          IMG
+                        <div className="w-12 h-9 rounded bg-muted overflow-hidden shrink-0">
+                          {listing.thumbnail ? (
+                            <img src={listing.thumbnail} alt={listing.title} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">IMG</div>
+                          )}
                         </div>
                         <Link
                           href={`/listings/${listing.slug}`}

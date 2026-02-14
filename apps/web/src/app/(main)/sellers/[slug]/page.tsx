@@ -20,6 +20,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ListingCard, type ListingCardData } from '@/components/listings/listing-card';
 import { StarRating } from '@/components/common/star-rating';
 import { Pagination } from '@/components/common/pagination';
+import { getImagesForListing } from '@/lib/images';
 
 const dummySeller = {
   id: 'seller-1',
@@ -65,7 +66,12 @@ const sellerListings: ListingCardData[] = Array.from({ length: 8 }, (_, i) => ({
   price: [89500, 125000, 92000, 78900][i % 4],
   currency: 'EUR',
   condition: (i % 3 === 0 ? 'NEW' : 'USED') as 'NEW' | 'USED',
-  images: [],
+  images: getImagesForListing([
+    'Mercedes-Benz Actros 2545 LS 6x2',
+    'Volvo FH 500 4x2 Globetrotter',
+    'DAF XF 480 FT Space Cab',
+    'Scania R 450 Highline',
+  ][i % 4]),
   year: 2020 + (i % 4),
   mileage: i % 3 === 0 ? 0 : 80000 + i * 30000,
   fuelType: 'Diesel',

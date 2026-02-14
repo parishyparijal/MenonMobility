@@ -31,6 +31,7 @@ import { Input } from '@/components/ui/input';
 import { ListingCard, type ListingCardData } from '@/components/listings/listing-card';
 import { useFavoritesStore } from '@/store/favorites';
 import { cn } from '@/lib/utils';
+import { getImagesForListing, TRUCK_IMAGES } from '@/lib/images';
 
 const dummyListing = {
   id: '1',
@@ -69,7 +70,7 @@ The truck has been used primarily for long-haul transport within Western Europe 
   gvw: '25,000 kg',
   wheelbase: '4,600 mm',
   cabType: 'StreamSpace',
-  images: [] as string[],
+  images: getImagesForListing('Mercedes-Benz Actros 2545 LS 6x2 StreamSpace'),
   location: {
     country: 'Netherlands',
     city: 'Rotterdam',
@@ -134,7 +135,7 @@ const relatedListings: ListingCardData[] = [
     price: 125000,
     currency: 'EUR',
     condition: 'USED',
-    images: [],
+    images: getImagesForListing('Volvo FH 500 4x2 Globetrotter XL'),
     year: 2023,
     mileage: 95000,
     fuelType: 'Diesel',
@@ -149,7 +150,7 @@ const relatedListings: ListingCardData[] = [
     price: 78900,
     currency: 'EUR',
     condition: 'USED',
-    images: [],
+    images: getImagesForListing('Scania R 450 A4x2NA Highline'),
     year: 2021,
     mileage: 310000,
     fuelType: 'Diesel',
@@ -164,7 +165,7 @@ const relatedListings: ListingCardData[] = [
     price: 115000,
     currency: 'EUR',
     condition: 'NEW',
-    images: [],
+    images: getImagesForListing('MAN TGX 18.510 4x2 BLS'),
     year: 2023,
     mileage: 0,
     fuelType: 'Diesel',
@@ -179,7 +180,7 @@ const relatedListings: ListingCardData[] = [
     price: 92000,
     currency: 'EUR',
     condition: 'USED',
-    images: [],
+    images: getImagesForListing('DAF XF 480 FT Space Cab'),
     year: 2022,
     mileage: 220000,
     fuelType: 'Diesel',
@@ -209,7 +210,7 @@ export default function ListingDetailPage() {
     maximumFractionDigits: 0,
   }).format(dummyListing.price);
 
-  const placeholderImages = Array.from({ length: 6 }, (_, i) => i);
+  const placeholderImages = dummyListing.images.length > 0 ? dummyListing.images : Array.from({ length: 6 }, (_, i) => '');
 
   return (
     <div className="bg-background min-h-screen">
@@ -236,11 +237,18 @@ export default function ListingDetailPage() {
           <div className="flex-1 lg:max-w-[60%] space-y-6">
             {/* Image Gallery */}
             <div className="bg-white rounded-xl border border-border overflow-hidden">
-              <div className="relative aspect-[16/10] bg-muted flex items-center justify-center">
-                <div className="text-muted-foreground text-center">
-                  <Gauge className="w-16 h-16 mx-auto mb-2" />
-                  <p className="text-sm">Image {currentImage + 1} of {placeholderImages.length}</p>
-                </div>
+              <div className="relative aspect-[16/10] bg-muted">
+                {dummyListing.images[currentImage] ? (
+                  <img
+                    src={dummyListing.images[currentImage]}
+                    alt={`${dummyListing.title} - Image ${currentImage + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                    <Gauge className="w-16 h-16" />
+                  </div>
+                )}
                 {placeholderImages.length > 1 && (
                   <>
                     <button
@@ -265,15 +273,19 @@ export default function ListingDetailPage() {
               </div>
               {/* Thumbnails */}
               <div className="flex gap-2 p-3 overflow-x-auto">
-                {placeholderImages.map((_, i) => (
+                {placeholderImages.map((imgUrl, i) => (
                   <button
                     key={i}
                     onClick={() => setCurrentImage(i)}
                     className={cn(
-                      'w-20 h-14 rounded-lg bg-muted flex-shrink-0 border-2 transition-colors',
+                      'w-20 h-14 rounded-lg bg-muted flex-shrink-0 border-2 transition-colors overflow-hidden',
                       currentImage === i ? 'border-primary' : 'border-transparent hover:border-muted-foreground/30'
                     )}
-                  />
+                  >
+                    {imgUrl && (
+                      <img src={imgUrl} alt={`Thumbnail ${i + 1}`} className="w-full h-full object-cover" />
+                    )}
+                  </button>
                 ))}
               </div>
             </div>
