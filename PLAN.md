@@ -1,7 +1,7 @@
 # MenonTrucks - Complete Development Plan & Task List
 
 ## Document Info
-- **Version**: 2.0 (Aligned with SRS v1.0 by Redstone Catalyst)
+- **Version**: 2.1 (Milestone-aligned with SRS v1.0 by Redstone Catalyst)
 - **Client**: Menon Mobility (Romeo)
 - **Date**: 14 February 2026
 - **Reference**: TrucksNL.com (www.trucks.nl) — Europe's largest commercial vehicle marketplace
@@ -722,6 +722,21 @@ Organized into **7 development phases** across **3 milestones** as per SRS.
 - [ ] Write `.gitignore`
 - [ ] Write `.env.example` with all environment variables
 
+#### Task 1.8: CI/CD Pipeline Setup
+- [ ] GitHub Actions workflow: `.github/workflows/ci.yml`
+  - Trigger on push to main and pull requests
+  - Lint check (ESLint) for both apps/api and apps/web
+  - TypeScript type check (`tsc --noEmit`)
+  - Run unit tests
+  - Build check (ensure both apps build without errors)
+- [ ] GitHub Actions workflow: `.github/workflows/deploy.yml`
+  - Trigger on push to main (after CI passes)
+  - Build Docker images
+  - Push to container registry
+  - Deploy to staging server
+- [ ] Branch protection rules documentation (main branch)
+- [ ] **Verify**: Push to main triggers CI pipeline, all checks pass
+
 #### Task 1.2: Docker Infrastructure
 - [ ] Write `docker-compose.yml` with services:
   - nginx (1.25-alpine, reverse proxy, port 80)
@@ -894,25 +909,36 @@ Organized into **7 development phases** across **3 milestones** as per SRS.
 - [ ] ListingCardHorizontal — list view variant
 - [ ] **Verify**: Card displays correctly with real data
 
-#### Task 2.7: Seller Profile Page & Dashboard (Basic)
+#### Task 2.7: Seller Profile Page & Dashboard (Complete)
 - [ ] Seller public profile page (`/sellers/[slug]`):
   - Banner + logo + company info
   - Active listings grid
   - About tab (description, address)
   - Contact buttons
 - [ ] Seller profile API: GET /api/sellers/:slug, PUT /api/seller/profile
-- [ ] Seller dashboard (basic):
-  - Stats cards: Active Listings, Total Views, Total Favorites, Messages
-  - Recent messages list
-  - Quick actions: Add Listing, View Messages
-- [ ] **Verify**: Profile page and dashboard load with data
+- [ ] Seller dashboard layout: fixed left sidebar (deep blue) + top bar + content
+- [ ] Dashboard home: stats cards (Active Listings, Total Views, Total Favorites, Messages), views chart (Chart.js, 30 days), recent messages, quick actions
+- [ ] Listings management page: status tabs (All/Draft/Pending/Active/Sold/Expired), table with actions (edit/duplicate/delete/mark-sold), search, pagination
+- [ ] Create listing page (multi-step form):
+  - Step 1: Category selection (visual cards)
+  - Step 2: Basic info (title, brand, model, condition, price, currency, negotiable)
+  - Step 3: Vehicle details (year, mileage, fuel, transmission, power, emission, color, VIN + category-specific fields)
+  - Step 4: Description (textarea with character count)
+  - Step 5: Images (drag-drop, preview, reorder, max 20)
+  - Step 6: Location & contact (country, city, phone, email, whatsapp)
+  - Step 7: Review & submit (summary, edit links)
+  - "Save as Draft" on every step
+- [ ] Edit listing page: pre-populated multi-step form
+- [ ] Seller analytics page: date range, views/favorites/contacts charts, top listings
+- [ ] **Verify**: Full seller workflow: create → upload images → publish → view stats → manage listings
 
-#### Task 2.8: Contact Options
-- [ ] Contact seller form (creates message thread)
-- [ ] Phone contact button (click to reveal, masked initially)
-- [ ] WhatsApp button (opens wa.me link)
-- [ ] Contact tracking (increment contactCount on listing)
-- [ ] **Verify**: All 3 contact methods work
+#### Task 2.8: Contact Options (Complete)
+- [ ] Contact seller form (creates message thread) — full working form with validation
+- [ ] Phone contact button (click to reveal, masked initially as "Show Phone Number")
+- [ ] WhatsApp button (opens wa.me link with pre-filled message including listing title)
+- [ ] Contact tracking (increment contactCount on listing per contact type)
+- [ ] ContactButtons component: all 3 methods grouped with clear visual hierarchy
+- [ ] **Verify**: All 3 contact methods fully functional end-to-end
 
 #### Task 2.9: Seed Data (Demo Listings)
 - [ ] Location seeder: 40+ cities (NL, DE, UK, BE, FR)
@@ -1022,55 +1048,52 @@ Organized into **7 development phases** across **3 milestones** as per SRS.
 ### PHASE 4: User Features
 **Duration: ~5 days | Priority: HIGH**
 
-#### Task 4.1: Seller Dashboard (Complete)
-- [ ] Dashboard layout: fixed left sidebar (deep blue) + top bar + content
-- [ ] Dashboard home: stats cards, views chart (Chart.js, 30 days), recent messages, quick actions
-- [ ] Listings management: status tabs (All/Draft/Pending/Active/Sold/Expired), table with actions (edit/duplicate/delete/mark-sold), search, pagination
-- [ ] Create listing (multi-step form):
-  - Step 1: Category selection (visual cards)
-  - Step 2: Basic info (title, brand, model, condition, price, currency, negotiable)
-  - Step 3: Vehicle details (year, mileage, fuel, transmission, power, emission, color, VIN + category-specific fields)
-  - Step 4: Description (textarea with character count)
-  - Step 5: Images (drag-drop, preview, reorder, max 20)
-  - Step 6: Location & contact (country, city, phone, email, whatsapp)
-  - Step 7: Review & submit (summary, edit links)
-  - "Save as Draft" on every step
-- [ ] Edit listing: pre-populated multi-step form
-- [ ] Seller analytics: date range, views/favorites/contacts charts, top listings
-- [ ] **Verify**: Full seller workflow: create → upload images → publish → view stats
+> **Note**: Seller dashboard (complete) and contact options are already delivered in M1 Phase 2.
+> This phase focuses ONLY on M2 deliverables: favorites, saved searches, messaging, reviews.
 
-#### Task 4.2: Favorites & Comparison
-- [ ] Favorites backend: POST/DELETE /api/favorites/:listingId
-- [ ] Favorites page: grid of saved listings, empty state
-- [ ] Heart toggle on ListingCard (optimistic UI)
-- [ ] Comparison tool: add to compare (max 4), side-by-side spec table
-- [ ] Compare page: sticky header with listing titles, highlight differences
-- [ ] **Verify**: Add/remove favorites, comparison works with 2-4 listings
+#### Task 4.1: Favorites System
+- [ ] Favorites backend: POST/DELETE /api/favorites/:listingId, GET /api/favorites
+- [ ] Favorites page (`/favorites`): grid of saved listings, empty state
+- [ ] Heart toggle on ListingCard (optimistic UI with animation)
+- [ ] **Verify**: Add/remove favorites works, favorites page displays saved listings
 
-#### Task 4.3: Saved Searches & Email Alerts
+#### Task 4.2: Saved Searches & Email Alerts
 - [ ] Saved search CRUD: POST/GET/PUT/DELETE /api/saved-searches
 - [ ] "Save this search" button on search results page
-- [ ] Saved searches page: list with name, filters summary, frequency selector, delete
+- [ ] Saved searches page (`/saved-searches`): list with name, filters summary, frequency selector (never/daily/weekly), delete
 - [ ] BullMQ cron job: match new listings to saved searches, send email alerts (daily/weekly)
 - [ ] Email template with matching listings
 - [ ] **Verify**: Save search, receive email alert when matching listing appears
 
-#### Task 4.4: Messaging System
+#### Task 4.3: Messaging System
 - [ ] Message controller: threads, send, markRead, archive
 - [ ] "Send Message" from listing detail creates thread (buyer + seller + listing)
-- [ ] Messages page: two-column layout
+- [ ] Messages page (`/messages` and `/seller/messages`): two-column layout
   - Thread list (left): avatar, name, listing title, last message, unread badge, time
   - Conversation (right): message bubbles (sent=blue, received=gray), timestamps, reply input
 - [ ] Unread count badge on header nav
 - [ ] Mobile: toggle between list and conversation
 - [ ] **Verify**: Send message → appears in other party's inbox
 
-#### Task 4.5: Contact Options (Complete)
-- [ ] Phone button: click to reveal (masked initially)
-- [ ] WhatsApp button: opens wa.me link with pre-filled message
-- [ ] Contact form: creates message thread
-- [ ] Contact tracking: increment contactCount
-- [ ] **Verify**: All contact methods functional
+#### Task 4.4: Recently Viewed
+- [ ] Recently viewed backend: track views per user (GET /api/recently-viewed)
+- [ ] View tracking middleware: store in recently_viewed table on listing detail visit
+- [ ] Recently viewed page (`/recently-viewed`): listing grid with view timestamps
+- [ ] Cookie-based tracking for non-logged-in users
+- [ ] **Verify**: Visit listings → appear in recently viewed page
+
+#### Task 4.5: Seller Reviews System
+- [ ] Seller review backend:
+  - GET /api/sellers/:slug/reviews — list reviews
+  - POST /api/sellers/:slug/reviews — submit review (auth required, must have messaged seller)
+- [ ] One review per buyer per seller (validation)
+- [ ] Rating aggregation: update seller_profiles.rating and reviewCount on new review
+- [ ] Star rating input component (click to rate 1-5)
+- [ ] Review form: rating + title + body
+- [ ] Review list display on seller profile page (with seller response option)
+- [ ] Reviews tab in seller dashboard: view received reviews, respond to reviews
+- [ ] Admin review moderation (in admin panel Phase 5)
+- [ ] **Verify**: Submit review → appears on seller profile → seller can respond
 
 ---
 
@@ -1174,7 +1197,18 @@ Organized into **7 development phases** across **3 milestones** as per SRS.
 - [ ] Price stored in original currency, display in user's preferred
 - [ ] **Verify**: Prices display correctly in different currencies
 
-#### Task 7.3: Dealer Bulk Upload
+#### Task 7.3: Favorites & Vehicle Comparison Tool
+- [ ] Comparison backend: POST/GET/DELETE /api/comparisons
+- [ ] "Add to Compare" button on listing card and listing detail page (max 4)
+- [ ] Floating compare bar at bottom when items selected (shows count + "Compare Now" button)
+- [ ] Compare page (`/compare`): side-by-side spec comparison table
+  - Sticky header with listing images and titles
+  - All specs in rows, highlight differences
+  - Price comparison
+  - Remove individual listings from comparison
+- [ ] **Verify**: Add 2-4 listings to compare → comparison table shows correct differences
+
+#### Task 7.4: Dealer Bulk Upload
 - [ ] CSV/XML import endpoint: POST /api/seller/bulk-import
 - [ ] File validation and parsing
 - [ ] BullMQ job: ProcessBulkImport — parse rows, validate, create listings
@@ -1183,7 +1217,7 @@ Organized into **7 development phases** across **3 milestones** as per SRS.
 - [ ] Error report download
 - [ ] **Verify**: Upload CSV with 50 listings → all created correctly
 
-#### Task 7.4: SEO Optimization
+#### Task 7.5: SEO Optimization
 - [ ] SSR for all public pages (Next.js App Router)
 - [ ] Dynamic meta tags: title, description, Open Graph, Twitter Cards
 - [ ] JSON-LD structured data:
@@ -1199,7 +1233,7 @@ Organized into **7 development phases** across **3 milestones** as per SRS.
 - [ ] Clean SEO-friendly URLs: `/trucks/mercedes-actros-2024-12345`
 - [ ] **Verify**: Google structured data test passes, Lighthouse SEO > 90
 
-#### Task 7.5: Performance Optimization
+#### Task 7.6: Performance Optimization
 - [ ] Redis caching (TTLs per endpoint as defined in Section 7)
 - [ ] Cache invalidation via Prisma middleware hooks
 - [ ] Cache key normalization (sorted params, hashed)
@@ -1210,13 +1244,13 @@ Organized into **7 development phases** across **3 milestones** as per SRS.
 - [ ] API response compression (gzip)
 - [ ] **Verify**: Pages load under 3 seconds, Lighthouse Performance > 90
 
-#### Task 7.6: Email Notification System
+#### Task 7.7: Email Notification System
 - [ ] Email templates: welcome, verification, password reset, listing approved/rejected, new message, saved search alert, subscription expiring
 - [ ] Email service with queue (BullMQ)
 - [ ] Notification center: bell icon, dropdown, full page
 - [ ] **Verify**: All email types send correctly
 
-#### Task 7.7: Security Audit & Hardening
+#### Task 7.8: Security Audit & Hardening
 - [ ] Input validation review (all Zod schemas)
 - [ ] SQL injection test (Prisma parameterized)
 - [ ] XSS protection test (helmet.js)
@@ -1227,7 +1261,7 @@ Organized into **7 development phases** across **3 milestones** as per SRS.
 - [ ] HTTPS enforcement
 - [ ] **Verify**: No vulnerabilities found
 
-#### Task 7.8: Static Pages & Final Polish
+#### Task 7.9: Static Pages & Final Polish
 - [ ] About page — company story, values
 - [ ] Contact page — form (name, email, subject, message) + company address
 - [ ] Terms of Service page
@@ -1242,7 +1276,7 @@ Organized into **7 development phases** across **3 milestones** as per SRS.
 - [ ] Mobile responsive audit (375px, 768px, 1920px)
 - [ ] **Verify**: All pages render, responsive, no broken states
 
-#### Task 7.9: Testing
+#### Task 7.10: Testing
 - [ ] Unit tests for core services (auth, listing CRUD, search)
 - [ ] API integration tests for all endpoints
 - [ ] E2E tests for critical flows:
@@ -1252,7 +1286,24 @@ Organized into **7 development phases** across **3 milestones** as per SRS.
   - Subscribe → Stripe checkout → Plan active
 - [ ] **Verify**: All tests pass
 
-#### Task 7.10: Production Deployment
+#### Task 7.11: API Documentation
+- [ ] API endpoint documentation (all 70+ endpoints)
+  - Request/response formats with examples
+  - Authentication requirements per endpoint
+  - Error codes and messages
+  - Query parameters and filters
+- [ ] Generate OpenAPI/Swagger spec
+- [ ] Host interactive API docs (Swagger UI or similar)
+- [ ] **Verify**: All endpoints documented, examples accurate
+
+#### Task 7.12: User Guide Documentation
+- [ ] Buyer guide: how to search, filter, contact sellers, save favorites, compare
+- [ ] Seller guide: how to register, create listings, manage dashboard, upload images, view analytics
+- [ ] Admin guide: how to moderate listings, manage users, manage categories, view analytics
+- [ ] Platform overview and FAQ
+- [ ] **Verify**: All user roles have complete documentation
+
+#### Task 7.13: Production Deployment & Handover
 - [ ] Docker production configuration
 - [ ] Environment variables for production
 - [ ] Database migration on production
@@ -1261,6 +1312,7 @@ Organized into **7 development phases** across **3 milestones** as per SRS.
 - [ ] Cloudflare CDN configuration
 - [ ] Monitoring setup (error tracking)
 - [ ] Deployment documentation
+- [ ] Client handover: source code, credentials, documentation package
 - [ ] **Verify**: Platform live and functional on production URL
 
 ---
