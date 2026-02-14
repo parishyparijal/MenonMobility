@@ -1,86 +1,45 @@
-# ===========================================================
-# MenonTrucks – Docker Makefile
-# ===========================================================
+.PHONY: up down restart build fresh logs shell-api shell-web migrate seed studio es-reindex install
 
-DOCKER_COMPOSE = docker compose
-PHP_CONTAINER  = menontrucks-php
-NODE_CONTAINER = menontrucks-node
-
-.PHONY: up down restart fresh migrate seed shell logs test build \
-        queue-restart cache-clear key-generate install
-
-# -----------------------------------------------------------
-# Core commands
-# -----------------------------------------------------------
-
-## Start all services in detached mode
 up:
-	$(DOCKER_COMPOSE) up -d
+	docker compose up -d
 
-## Stop all services
 down:
-	$(DOCKER_COMPOSE) down
+	docker compose down
 
-## Restart all services
 restart:
-	$(DOCKER_COMPOSE) down
-	$(DOCKER_COMPOSE) up -d
+	docker compose restart
 
-## Build all Docker images
 build:
-	$(DOCKER_COMPOSE) build
+	docker compose build
 
-# -----------------------------------------------------------
-# Database & seeding
-# -----------------------------------------------------------
+fresh: down
+	docker compose up -d --build
+	@echo "Waiting for services to be ready..."
+	@sleep 10
+	$(MAKE) migrate
+	$(MAKE) seed
 
-## Run database migrations
-migrate:
-	$(DOCKER_COMPOSE) exec php php artisan migrate
-
-## Run database seeders
-seed:
-	$(DOCKER_COMPOSE) exec php php artisan db:seed
-
-## Fresh migration + seed + Elasticsearch reindex
-fresh:
-	$(DOCKER_COMPOSE) exec php php artisan migrate:fresh --seed
-	$(DOCKER_COMPOSE) exec php php artisan scout:flush || true
-	$(DOCKER_COMPOSE) exec php php artisan scout:import || true
-	@echo "Fresh migration, seeding, and reindexing complete."
-
-# -----------------------------------------------------------
-# Utilities
-# -----------------------------------------------------------
-
-## Open a bash shell in the PHP container
-shell:
-	$(DOCKER_COMPOSE) exec php bash
-
-## Tail logs for all services
 logs:
-	$(DOCKER_COMPOSE) logs -f
+	docker compose logs -f
 
-## Run the test suite
-test:
-	$(DOCKER_COMPOSE) exec php php artisan test
+shell-api:
+	docker compose exec api sh
 
-## Restart the queue worker
-queue-restart:
-	$(DOCKER_COMPOSE) restart queue-worker
+shell-web:
+	docker compose exec web sh
 
-## Clear all caches
-cache-clear:
-	$(DOCKER_COMPOSE) exec php php artisan optimize:clear
+migrate:
+	docker compose exec api npx prisma migrate dev
 
-## Generate application key
-key-generate:
-	$(DOCKER_COMPOSE) exec php php artisan key:generate
+seed:
+	docker compose exec api npx prisma db seed
 
-## First-time install: build, start, migrate, seed
-install: build up
-	$(DOCKER_COMPOSE) exec php composer install
-	$(DOCKER_COMPOSE) exec php php artisan key:generate
-	$(DOCKER_COMPOSE) exec php php artisan migrate --seed
-	$(DOCKER_COMPOSE) exec php php artisan storage:link
-	@echo "MenonTrucks is ready! Visit http://localhost"
+studio:
+	docker compose exec api npx prisma studio
+
+es-reindex:
+	docker compose exec api npm run reindex
+
+install:
+	docker compose exec api npm install
+	docker compose exec web npm install
