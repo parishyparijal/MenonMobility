@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { ListingCard, type ListingCardData } from '@/components/listings/listing-card';
 import { Pagination } from '@/components/common/pagination';
 import { cn } from '@/lib/utils';
+import { getImagesForListing } from '@/lib/images';
 
 const categoryData: Record<string, {
   name: string;
@@ -83,7 +84,12 @@ const dummyListings: ListingCardData[] = Array.from({ length: 12 }, (_, i) => ({
   price: [89500, 125000, 78900, 115000][i % 4],
   currency: 'EUR',
   condition: (i % 4 === 0 ? 'NEW' : 'USED') as 'NEW' | 'USED',
-  images: [],
+  images: getImagesForListing([
+    'Mercedes-Benz Actros 2545 LS 6x2',
+    'Volvo FH 500 4x2 Globetrotter',
+    'Scania R 450 Highline',
+    'MAN TGX 18.510 4x2 BLS',
+  ][i % 4]),
   year: 2020 + (i % 4),
   mileage: i % 4 === 0 ? 0 : 100000 + i * 30000,
   fuelType: 'Diesel',

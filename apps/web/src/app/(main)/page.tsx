@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { ListingCard, type ListingCardData } from '@/components/listings/listing-card';
+import { getImagesForListing, BRAND_IMAGES } from '@/lib/images';
 
 const categories = [
   { name: 'Trucks', slug: 'trucks', icon: Truck },
@@ -43,7 +44,7 @@ const featuredListings: ListingCardData[] = [
     price: 89500,
     currency: 'EUR',
     condition: 'USED',
-    images: [],
+    images: getImagesForListing('Mercedes-Benz Actros 2545 LS 6x2'),
     year: 2022,
     mileage: 185000,
     fuelType: 'Diesel',
@@ -58,7 +59,7 @@ const featuredListings: ListingCardData[] = [
     price: 125000,
     currency: 'EUR',
     condition: 'USED',
-    images: [],
+    images: getImagesForListing('Volvo FH 500 4x2 Globetrotter XL'),
     year: 2023,
     mileage: 95000,
     fuelType: 'Diesel',
@@ -73,7 +74,7 @@ const featuredListings: ListingCardData[] = [
     price: 78900,
     currency: 'EUR',
     condition: 'USED',
-    images: [],
+    images: getImagesForListing('Scania R 450 A4x2NA Highline'),
     year: 2021,
     mileage: 310000,
     fuelType: 'Diesel',
@@ -88,7 +89,7 @@ const featuredListings: ListingCardData[] = [
     price: 115000,
     currency: 'EUR',
     condition: 'NEW',
-    images: [],
+    images: getImagesForListing('MAN TGX 18.510 4x2 BLS'),
     year: 2023,
     mileage: 0,
     fuelType: 'Diesel',
@@ -103,7 +104,7 @@ const featuredListings: ListingCardData[] = [
     price: 92000,
     currency: 'EUR',
     condition: 'USED',
-    images: [],
+    images: getImagesForListing('DAF XF 480 FT Space Cab'),
     year: 2022,
     mileage: 220000,
     fuelType: 'Diesel',
@@ -118,7 +119,7 @@ const featuredListings: ListingCardData[] = [
     price: 165000,
     currency: 'EUR',
     condition: 'USED',
-    images: [],
+    images: getImagesForListing('Caterpillar 320 GC Excavator'),
     year: 2021,
     mileage: 4500,
     fuelType: 'Diesel',
@@ -294,9 +295,14 @@ export default function HomePage() {
             <Link
               key={brand}
               href={`/search?brand=${encodeURIComponent(brand)}`}
-              className="flex items-center justify-center h-20 bg-white rounded-xl border border-border hover:shadow-md hover:border-primary transition-all"
+              className="flex flex-col items-center justify-center h-24 bg-white rounded-xl border border-border hover:shadow-md hover:border-primary transition-all overflow-hidden relative group"
             >
-              <span className="text-sm font-semibold text-foreground">{brand}</span>
+              {BRAND_IMAGES[brand] && (
+                <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity">
+                  <img src={BRAND_IMAGES[brand]} alt={brand} className="w-full h-full object-cover" />
+                </div>
+              )}
+              <span className="text-sm font-semibold text-foreground relative z-10">{brand}</span>
             </Link>
           ))}
         </div>
