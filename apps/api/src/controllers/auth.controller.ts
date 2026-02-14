@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { prisma } from "../config/database";
-import { authService } from "../services/auth.service";
-import { AppError } from "../middleware/errorHandler";
+import prisma from "@/config/database";
+import { authService } from "@/services/auth.service";
+import { AppError } from "@/middleware/errorHandler";
 
 export const authController = {
   async register(req: Request, res: Response, next: NextFunction) {
@@ -10,7 +10,7 @@ export const authController = {
 
       const existing = await prisma.user.findUnique({ where: { email } });
       if (existing) {
-        throw new AppError(409, "Email already registered");
+        throw new AppError("Email already registered", 409);
       }
 
       const passwordHash = await authService.hashPassword(password);
@@ -82,11 +82,11 @@ export const authController = {
       });
 
       if (!user || user.deletedAt) {
-        throw new AppError(401, "Invalid email or password");
+        throw new AppError("Invalid email or password", 401);
       }
 
       if (!user.isActive) {
-        throw new AppError(403, "Account is suspended");
+        throw new AppError("Account is suspended", 403);
       }
 
       const valid = await authService.comparePassword(
@@ -94,7 +94,7 @@ export const authController = {
         user.passwordHash
       );
       if (!valid) {
-        throw new AppError(401, "Invalid email or password");
+        throw new AppError("Invalid email or password", 401);
       }
 
       // Update last login
@@ -161,7 +161,7 @@ export const authController = {
       });
 
       if (!storedToken || storedToken.expiresAt < new Date()) {
-        throw new AppError(401, "Invalid or expired refresh token");
+        throw new AppError("Invalid or expired refresh token", 401);
       }
 
       // Delete old token
@@ -216,7 +216,7 @@ export const authController = {
       });
 
       if (!user) {
-        throw new AppError(404, "User not found");
+        throw new AppError("User not found", 404);
       }
 
       res.json({
@@ -311,7 +311,7 @@ export const authController = {
         resetToken.email !== email ||
         resetToken.expiresAt < new Date()
       ) {
-        throw new AppError(400, "Invalid or expired reset token");
+        throw new AppError("Invalid or expired reset token", 400);
       }
 
       const passwordHash = await authService.hashPassword(password);
@@ -352,7 +352,7 @@ export const authController = {
       });
 
       if (!user) {
-        throw new AppError(404, "User not found");
+        throw new AppError("User not found", 404);
       }
 
       const valid = await authService.comparePassword(
@@ -360,7 +360,7 @@ export const authController = {
         user.passwordHash
       );
       if (!valid) {
-        throw new AppError(400, "Current password is incorrect");
+        throw new AppError("Current password is incorrect", 400);
       }
 
       const passwordHash = await authService.hashPassword(newPassword);

@@ -56,8 +56,7 @@ export async function authenticate(
         id: true,
         email: true,
         role: true,
-        firstName: true,
-        lastName: true,
+        name: true,
         isActive: true,
       },
     });
@@ -70,13 +69,11 @@ export async function authenticate(
       throw new AppError("Your account has been deactivated.", 403);
     }
 
-    // Attach user to the request object
     req.user = {
-      id: user.id,
+      userId: user.id,
       email: user.email,
       role: user.role,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      name: user.name,
     };
 
     next();
@@ -86,7 +83,7 @@ export async function authenticate(
       return;
     }
     if (err instanceof jwt.TokenExpiredError) {
-      next(new AppError("Token has expired. Please refresh your session.", 401));
+      next(new AppError("Token has expired.", 401));
       return;
     }
     if (err instanceof jwt.JsonWebTokenError) {
@@ -99,8 +96,7 @@ export async function authenticate(
 
 /**
  * Optional authentication middleware.
- * Attaches user to request if a valid token is found, but does NOT reject
- * the request if there is no token.
+ * Attaches user to request if a valid token is found, but does NOT reject.
  */
 export async function optionalAuth(
   req: Request,
@@ -122,25 +118,22 @@ export async function optionalAuth(
         id: true,
         email: true,
         role: true,
-        firstName: true,
-        lastName: true,
+        name: true,
         isActive: true,
       },
     });
 
     if (user && user.isActive) {
       req.user = {
-        id: user.id,
+        userId: user.id,
         email: user.email,
         role: user.role,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        name: user.name,
       };
     }
 
     next();
   } catch {
-    // Silently ignore token errors for optional auth
     next();
   }
 }

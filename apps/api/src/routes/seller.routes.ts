@@ -2,6 +2,17 @@ import { Router, type Request, type Response } from "express";
 import { authenticate } from "@/middleware/auth";
 import { ensureRole } from "@/middleware/roles";
 import { uploadLimiter } from "@/middleware/rateLimiter";
+import { validate } from "@/middleware/validate";
+import { sellerListingController } from "@/controllers/seller-listing.controller";
+import { listingImageController, imageUpload } from "@/controllers/listing-image.controller";
+import {
+  sellerListingQuerySchema,
+  idParamSchema,
+  listingImageParamSchema,
+  createListingSchema,
+  updateListingSchema,
+  imageReorderSchema,
+} from "@/validators/listing.validator";
 
 // ---------------------------------------------------------------------------
 // Seller Routes — /api/seller
@@ -13,68 +24,19 @@ const router = Router();
 // Apply auth + role check to all seller routes
 router.use(authenticate, ensureRole("SELLER", "ADMIN"));
 
+// ── Dashboard & Analytics ─────────────────────────────────────────────
+
 // GET /api/seller/dashboard — Seller dashboard stats
 router.get("/dashboard", (_req: Request, res: Response) => {
   res.json({ success: true, data: null, message: "TODO: seller dashboard" });
-});
-
-// GET /api/seller/listings — Seller's own listings
-router.get("/listings", (_req: Request, res: Response) => {
-  res.json({ success: true, data: [], message: "TODO: seller listings" });
-});
-
-// POST /api/seller/listings — Create a new listing
-router.post("/listings", (_req: Request, res: Response) => {
-  res.status(201).json({ success: true, data: null, message: "TODO: create listing" });
-});
-
-// GET /api/seller/listings/:id — Get a single listing (seller view)
-router.get("/listings/:id", (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    data: null,
-    message: `TODO: get seller listing "${req.params.id}"`,
-  });
-});
-
-// PUT /api/seller/listings/:id — Update a listing
-router.put("/listings/:id", (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    data: null,
-    message: `TODO: update seller listing "${req.params.id}"`,
-  });
-});
-
-// DELETE /api/seller/listings/:id — Delete a listing
-router.delete("/listings/:id", (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    message: `TODO: delete seller listing "${req.params.id}"`,
-  });
-});
-
-// POST /api/seller/listings/:id/images — Upload images for a listing
-router.post("/listings/:id/images", uploadLimiter, (req: Request, res: Response) => {
-  res.status(201).json({
-    success: true,
-    data: [],
-    message: `TODO: upload images for listing "${req.params.id}"`,
-  });
-});
-
-// DELETE /api/seller/listings/:id/images/:imageId — Remove a listing image
-router.delete("/listings/:id/images/:imageId", (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    message: `TODO: delete image "${req.params.imageId}" from listing "${req.params.id}"`,
-  });
 });
 
 // GET /api/seller/analytics — Seller analytics / insights
 router.get("/analytics", (_req: Request, res: Response) => {
   res.json({ success: true, data: null, message: "TODO: seller analytics" });
 });
+
+// ── Profile ───────────────────────────────────────────────────────────
 
 // GET /api/seller/profile — Seller profile
 router.get("/profile", (_req: Request, res: Response) => {
@@ -85,5 +47,97 @@ router.get("/profile", (_req: Request, res: Response) => {
 router.put("/profile", (_req: Request, res: Response) => {
   res.json({ success: true, data: null, message: "TODO: update seller profile" });
 });
+
+// ── Listing CRUD ──────────────────────────────────────────────────────
+
+// GET /api/seller/listings — Seller's own listings (with status filter)
+router.get(
+  "/listings",
+  validate({ query: sellerListingQuerySchema }),
+  sellerListingController.list
+);
+
+// POST /api/seller/listings — Create a new listing
+router.post(
+  "/listings",
+  validate({ body: createListingSchema }),
+  sellerListingController.create
+);
+
+// GET /api/seller/listings/:id — Get a single listing (seller view)
+router.get(
+  "/listings/:id",
+  validate({ params: idParamSchema }),
+  sellerListingController.getById
+);
+
+// PUT /api/seller/listings/:id — Update a listing
+router.put(
+  "/listings/:id",
+  validate({ params: idParamSchema, body: updateListingSchema }),
+  sellerListingController.update
+);
+
+// DELETE /api/seller/listings/:id — Soft delete a listing
+router.delete(
+  "/listings/:id",
+  validate({ params: idParamSchema }),
+  sellerListingController.remove
+);
+
+// ── Listing Lifecycle ─────────────────────────────────────────────────
+
+// POST /api/seller/listings/:id/publish — Submit for review
+router.post(
+  "/listings/:id/publish",
+  validate({ params: idParamSchema }),
+  sellerListingController.publish
+);
+
+// POST /api/seller/listings/:id/mark-sold — Mark as sold
+router.post(
+  "/listings/:id/mark-sold",
+  validate({ params: idParamSchema }),
+  sellerListingController.markSold
+);
+
+// POST /api/seller/listings/:id/renew — Extend listing expiry
+router.post(
+  "/listings/:id/renew",
+  validate({ params: idParamSchema }),
+  sellerListingController.renew
+);
+
+// POST /api/seller/listings/:id/duplicate — Clone listing as draft
+router.post(
+  "/listings/:id/duplicate",
+  validate({ params: idParamSchema }),
+  sellerListingController.duplicate
+);
+
+// ── Listing Images ────────────────────────────────────────────────────
+
+// POST /api/seller/listings/:id/images — Upload images
+router.post(
+  "/listings/:id/images",
+  validate({ params: idParamSchema }),
+  uploadLimiter,
+  imageUpload.array("images", 10),
+  listingImageController.upload
+);
+
+// PUT /api/seller/listings/:id/images/reorder — Reorder images
+router.put(
+  "/listings/:id/images/reorder",
+  validate({ params: idParamSchema, body: imageReorderSchema }),
+  listingImageController.reorder
+);
+
+// DELETE /api/seller/listings/:id/images/:imageId — Delete an image
+router.delete(
+  "/listings/:id/images/:imageId",
+  validate({ params: listingImageParamSchema }),
+  listingImageController.remove
+);
 
 export default router;

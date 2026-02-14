@@ -1,4 +1,7 @@
-import { Router, type Request, type Response } from "express";
+import { Router } from "express";
+import { searchController } from "@/controllers/search.controller";
+import { validate } from "@/middleware/validate";
+import { searchQuerySchema, suggestionsQuerySchema } from "@/validators/search.validator";
 
 // ---------------------------------------------------------------------------
 // Search Routes — /api/search
@@ -6,14 +9,18 @@ import { Router, type Request, type Response } from "express";
 
 const router = Router();
 
-// GET /api/search — Full-text search for listings via Elasticsearch
-router.get("/", (_req: Request, res: Response) => {
-  res.json({ success: true, data: [], message: "TODO: search listings" });
-});
+// GET /api/search — Full-text search across listings
+router.get(
+  "/",
+  validate({ query: searchQuerySchema }),
+  searchController.search
+);
 
 // GET /api/search/suggestions — Autocomplete / typeahead suggestions
-router.get("/suggestions", (_req: Request, res: Response) => {
-  res.json({ success: true, data: [], message: "TODO: search suggestions" });
-});
+router.get(
+  "/suggestions",
+  validate({ query: suggestionsQuerySchema }),
+  searchController.suggestions
+);
 
 export default router;

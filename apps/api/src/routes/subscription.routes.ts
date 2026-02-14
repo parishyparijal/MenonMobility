@@ -1,5 +1,11 @@
-import { Router, type Request, type Response } from "express";
+import { Router } from "express";
 import { authenticate } from "@/middleware/auth";
+import { validate } from "@/middleware/validate";
+import { subscriptionController } from "@/controllers/subscription.controller";
+import {
+  subscribeBodySchema,
+  changePlanBodySchema,
+} from "@/validators/subscription.validator";
 
 // ---------------------------------------------------------------------------
 // Subscription Routes — /api/subscriptions
@@ -8,28 +14,28 @@ import { authenticate } from "@/middleware/auth";
 const router = Router();
 
 // GET /api/subscriptions/plans — List available subscription plans (public)
-router.get("/plans", (_req: Request, res: Response) => {
-  res.json({ success: true, data: [], message: "TODO: list subscription plans" });
-});
-
-// POST /api/subscriptions/checkout — Create a Stripe checkout session
-router.post("/checkout", authenticate, (_req: Request, res: Response) => {
-  res.json({ success: true, data: null, message: "TODO: create checkout session" });
-});
+router.get("/plans", subscriptionController.listPlans);
 
 // GET /api/subscriptions/current — Get current user's active subscription
-router.get("/current", authenticate, (_req: Request, res: Response) => {
-  res.json({ success: true, data: null, message: "TODO: get current subscription" });
-});
+router.get("/current", authenticate, subscriptionController.getMySubscription);
+
+// POST /api/subscriptions/subscribe — Create a subscription
+router.post(
+  "/subscribe",
+  authenticate,
+  validate({ body: subscribeBodySchema }),
+  subscriptionController.subscribe
+);
+
+// POST /api/subscriptions/change-plan — Switch to a different plan
+router.post(
+  "/change-plan",
+  authenticate,
+  validate({ body: changePlanBodySchema }),
+  subscriptionController.changePlan
+);
 
 // POST /api/subscriptions/cancel — Cancel current subscription
-router.post("/cancel", authenticate, (_req: Request, res: Response) => {
-  res.json({ success: true, message: "TODO: cancel subscription" });
-});
-
-// POST /api/subscriptions/webhook — Stripe webhook handler (no auth — verified by signature)
-router.post("/webhook", (_req: Request, res: Response) => {
-  res.json({ success: true, message: "TODO: handle Stripe webhook" });
-});
+router.post("/cancel", authenticate, subscriptionController.cancel);
 
 export default router;
