@@ -275,10 +275,10 @@ export default function SearchPage() {
         );
       }
       if (priceMin) {
-        filtered = filtered.filter((l) => l.price >= Number(priceMin));
+        filtered = filtered.filter((l) => (l.price ?? 0) >= Number(priceMin));
       }
       if (priceMax) {
-        filtered = filtered.filter((l) => l.price <= Number(priceMax));
+        filtered = filtered.filter((l) => (l.price ?? 0) <= Number(priceMax));
       }
       if (yearMin) {
         filtered = filtered.filter((l) => l.year >= Number(yearMin));
@@ -290,10 +290,10 @@ export default function SearchPage() {
       // Sort
       switch (sort) {
         case 'price-asc':
-          filtered.sort((a, b) => a.price - b.price);
+          filtered.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
           break;
         case 'price-desc':
-          filtered.sort((a, b) => b.price - a.price);
+          filtered.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
           break;
         case 'year-desc':
           filtered.sort((a, b) => b.year - a.year);

@@ -55,7 +55,7 @@ Key highlights:
 The truck has been used primarily for long-haul transport within Western Europe and has been kept in top condition. Ideal for fleet operations or owner-operators looking for a reliable and fuel-efficient tractor unit.`,
   price: 89500,
   currency: 'EUR',
-  condition: 'USED' as const,
+  condition: 'USED' as string,
   category: 'trucks',
   brand: 'Mercedes-Benz',
   model: 'Actros 2545 LS',
