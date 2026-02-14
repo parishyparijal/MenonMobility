@@ -1,5 +1,11 @@
-import { Router, type Request, type Response } from "express";
+import { Router } from "express";
 import { optionalAuth } from "@/middleware/auth";
+import { validate } from "@/middleware/validate";
+import { listingController } from "@/controllers/listing.controller";
+import {
+  listingQuerySchema,
+  slugParamSchema,
+} from "@/validators/listing.validator";
 
 // ---------------------------------------------------------------------------
 // Public Listing Routes — /api/listings
@@ -8,26 +14,27 @@ import { optionalAuth } from "@/middleware/auth";
 const router = Router();
 
 // GET /api/listings — List all published listings (paginated, filterable)
-router.get("/", optionalAuth, (_req: Request, res: Response) => {
-  res.json({ success: true, data: [], message: "TODO: list published listings" });
-});
+router.get(
+  "/",
+  optionalAuth,
+  validate({ query: listingQuerySchema }),
+  listingController.list
+);
 
 // GET /api/listings/:slug — Get a single listing by slug
-router.get("/:slug", optionalAuth, (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    data: null,
-    message: `TODO: get listing by slug "${req.params.slug}"`,
-  });
-});
+router.get(
+  "/:slug",
+  optionalAuth,
+  validate({ params: slugParamSchema }),
+  listingController.getBySlug
+);
 
 // GET /api/listings/:slug/related — Get related listings
-router.get("/:slug/related", optionalAuth, (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    data: [],
-    message: `TODO: get related listings for slug "${req.params.slug}"`,
-  });
-});
+router.get(
+  "/:slug/related",
+  optionalAuth,
+  validate({ params: slugParamSchema }),
+  listingController.getRelated
+);
 
 export default router;

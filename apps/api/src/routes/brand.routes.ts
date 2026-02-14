@@ -1,4 +1,10 @@
-import { Router, type Request, type Response } from "express";
+import { Router } from "express";
+import { validate } from "@/middleware/validate";
+import { brandController } from "@/controllers/brand.controller";
+import {
+  listBrandsQuerySchema,
+  brandSlugParamsSchema,
+} from "@/validators/brand.validator";
 
 // ---------------------------------------------------------------------------
 // Brand Routes — /api/brands
@@ -6,18 +12,18 @@ import { Router, type Request, type Response } from "express";
 
 const router = Router();
 
-// GET /api/brands — List all brands
-router.get("/", (_req: Request, res: Response) => {
-  res.json({ success: true, data: [], message: "TODO: list brands" });
-});
+// GET /api/brands — List all brands (optionally filter by category slug)
+router.get(
+  "/",
+  validate({ query: listBrandsQuerySchema }),
+  brandController.list
+);
 
-// GET /api/brands/:id/models — Get models for a specific brand
-router.get("/:id/models", (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    data: [],
-    message: `TODO: get models for brand "${req.params.id}"`,
-  });
-});
+// GET /api/brands/:slug — Get a single brand by slug with models
+router.get(
+  "/:slug",
+  validate({ params: brandSlugParamsSchema }),
+  brandController.getBySlug
+);
 
 export default router;

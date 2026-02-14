@@ -1,5 +1,8 @@
-import { Router, type Request, type Response } from "express";
+import { Router } from "express";
 import { authLimiter } from "@/middleware/rateLimiter";
+import { validate } from "@/middleware/validate";
+import { contactController } from "@/controllers/contact.controller";
+import { contactFormBodySchema } from "@/validators/contact.validator";
 
 // ---------------------------------------------------------------------------
 // Contact Routes — /api/contact
@@ -8,8 +11,11 @@ import { authLimiter } from "@/middleware/rateLimiter";
 const router = Router();
 
 // POST /api/contact — Submit a contact form (public, rate-limited)
-router.post("/", authLimiter, (_req: Request, res: Response) => {
-  res.status(201).json({ success: true, message: "TODO: submit contact form" });
-});
+router.post(
+  "/",
+  authLimiter,
+  validate({ body: contactFormBodySchema }),
+  contactController.submit
+);
 
 export default router;

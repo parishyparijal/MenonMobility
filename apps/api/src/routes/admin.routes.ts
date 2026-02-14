@@ -1,6 +1,24 @@
-import { Router, type Request, type Response } from "express";
+import { Router } from "express";
 import { authenticate } from "@/middleware/auth";
 import { ensureRole } from "@/middleware/roles";
+import { validate } from "@/middleware/validate";
+import { adminController } from "@/controllers/admin.controller";
+import { pageController } from "@/controllers/page.controller";
+import {
+  listUsersQuerySchema,
+  userIdParamsSchema,
+  updateUserBodySchema,
+  listListingsQuerySchema,
+  listingIdParamsSchema,
+  rejectListingBodySchema,
+  listReviewsQuerySchema,
+  reviewIdParamsSchema,
+} from "@/validators/admin.validator";
+import {
+  createPageBodySchema,
+  updatePageBodySchema,
+  pageIdParamsSchema,
+} from "@/validators/page.validator";
 
 // ---------------------------------------------------------------------------
 // Admin Routes — /api/admin
@@ -13,151 +31,90 @@ const router = Router();
 router.use(authenticate, ensureRole("ADMIN"));
 
 // ---- Dashboard ----
-router.get("/dashboard", (_req: Request, res: Response) => {
-  res.json({ success: true, data: null, message: "TODO: admin dashboard stats" });
-});
+router.get("/dashboard", adminController.dashboard);
 
 // ---- User Management ----
-router.get("/users", (_req: Request, res: Response) => {
-  res.json({ success: true, data: [], message: "TODO: list users" });
-});
+router.get(
+  "/users",
+  validate({ query: listUsersQuerySchema }),
+  adminController.listUsers
+);
 
-router.get("/users/:id", (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    data: null,
-    message: `TODO: get user "${req.params.id}"`,
-  });
-});
+router.get(
+  "/users/:id",
+  validate({ params: userIdParamsSchema }),
+  adminController.getUser
+);
 
-router.put("/users/:id", (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    data: null,
-    message: `TODO: update user "${req.params.id}"`,
-  });
-});
+router.put(
+  "/users/:id",
+  validate({ params: userIdParamsSchema, body: updateUserBodySchema }),
+  adminController.updateUser
+);
 
-router.delete("/users/:id", (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    message: `TODO: delete user "${req.params.id}"`,
-  });
-});
-
-router.patch("/users/:id/ban", (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    message: `TODO: ban/unban user "${req.params.id}"`,
-  });
-});
+router.patch(
+  "/users/:id/ban",
+  validate({ params: userIdParamsSchema }),
+  adminController.banUser
+);
 
 // ---- Listing Management ----
-router.get("/listings", (_req: Request, res: Response) => {
-  res.json({ success: true, data: [], message: "TODO: admin list all listings" });
-});
+router.get(
+  "/listings",
+  validate({ query: listListingsQuerySchema }),
+  adminController.listListings
+);
 
-router.get("/listings/:id", (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    data: null,
-    message: `TODO: admin get listing "${req.params.id}"`,
-  });
-});
+router.patch(
+  "/listings/:id/approve",
+  validate({ params: listingIdParamsSchema }),
+  adminController.approveListing
+);
 
-router.patch("/listings/:id/approve", (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    message: `TODO: approve listing "${req.params.id}"`,
-  });
-});
+router.patch(
+  "/listings/:id/reject",
+  validate({ params: listingIdParamsSchema, body: rejectListingBodySchema }),
+  adminController.rejectListing
+);
 
-router.patch("/listings/:id/reject", (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    message: `TODO: reject listing "${req.params.id}"`,
-  });
-});
+router.delete(
+  "/listings/:id",
+  validate({ params: listingIdParamsSchema }),
+  adminController.deleteListing
+);
 
-router.delete("/listings/:id", (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    message: `TODO: admin delete listing "${req.params.id}"`,
-  });
-});
+// ---- Review Management ----
+router.get(
+  "/reviews",
+  validate({ query: listReviewsQuerySchema }),
+  adminController.listReviews
+);
 
-// ---- Category Management ----
-router.post("/categories", (_req: Request, res: Response) => {
-  res.status(201).json({ success: true, data: null, message: "TODO: create category" });
-});
-
-router.put("/categories/:id", (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    data: null,
-    message: `TODO: update category "${req.params.id}"`,
-  });
-});
-
-router.delete("/categories/:id", (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    message: `TODO: delete category "${req.params.id}"`,
-  });
-});
-
-// ---- Brand Management ----
-router.post("/brands", (_req: Request, res: Response) => {
-  res.status(201).json({ success: true, data: null, message: "TODO: create brand" });
-});
-
-router.put("/brands/:id", (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    data: null,
-    message: `TODO: update brand "${req.params.id}"`,
-  });
-});
-
-router.delete("/brands/:id", (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    message: `TODO: delete brand "${req.params.id}"`,
-  });
-});
-
-// ---- Subscription Management ----
-router.get("/subscriptions", (_req: Request, res: Response) => {
-  res.json({ success: true, data: [], message: "TODO: admin list subscriptions" });
-});
-
-// ---- Reports & Analytics ----
-router.get("/reports", (_req: Request, res: Response) => {
-  res.json({ success: true, data: null, message: "TODO: admin reports" });
-});
+router.delete(
+  "/reviews/:id",
+  validate({ params: reviewIdParamsSchema }),
+  adminController.deleteReview
+);
 
 // ---- Page / CMS Management ----
-router.get("/pages", (_req: Request, res: Response) => {
-  res.json({ success: true, data: [], message: "TODO: admin list CMS pages" });
-});
+router.get("/pages", pageController.adminList);
 
-router.post("/pages", (_req: Request, res: Response) => {
-  res.status(201).json({ success: true, data: null, message: "TODO: create CMS page" });
-});
+router.post(
+  "/pages",
+  validate({ body: createPageBodySchema }),
+  pageController.create
+);
 
-router.put("/pages/:id", (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    data: null,
-    message: `TODO: update CMS page "${req.params.id}"`,
-  });
-});
+router.put(
+  "/pages/:id",
+  validate({ params: pageIdParamsSchema, body: updatePageBodySchema }),
+  pageController.update
+);
 
-router.delete("/pages/:id", (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    message: `TODO: delete CMS page "${req.params.id}"`,
-  });
-});
+router.delete(
+  "/pages/:id",
+  validate({ params: pageIdParamsSchema }),
+  pageController.remove
+);
 
 export default router;
