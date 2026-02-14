@@ -51,7 +51,7 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="bg-[#1E3A5F] text-white">
+    <footer className="bg-primary text-white">
       {/* Main Footer */}
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
@@ -61,7 +61,7 @@ export function Footer() {
               <img
                 src="/logo.png"
                 alt="Menon Mobility"
-                className="h-9 w-auto object-contain brightness-0 invert"
+                className="h-12 w-auto object-contain bg-white rounded-lg px-2 py-1"
               />
             </Link>
             <p className="text-sm text-white/70 mb-6 max-w-[240px]">

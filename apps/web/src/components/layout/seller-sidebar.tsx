@@ -61,7 +61,7 @@ export function SellerSidebar({ isOpen, onClose }: SellerSidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 bg-[#1E3A5F] text-white flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-auto',
+          'fixed inset-y-0 left-0 z-50 w-64 bg-primary text-white flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-auto',
           isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -71,7 +71,7 @@ export function SellerSidebar({ isOpen, onClose }: SellerSidebarProps) {
             <img
               src="/logo.png"
               alt="Menon Mobility"
-              className="h-8 w-auto object-contain brightness-0 invert"
+              className="h-10 w-auto object-contain bg-white rounded-lg px-2 py-1"
             />
           </Link>
           <button

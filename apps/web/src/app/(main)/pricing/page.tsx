@@ -106,7 +106,7 @@ export default function PricingPage() {
   return (
     <div className="bg-background min-h-screen">
       {/* Header */}
-      <section className="bg-gradient-to-br from-[#1E3A5F] to-[#0F1F32] text-white py-16">
+      <section className="bg-gradient-to-br from-primary to-primary-950 text-white py-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">Simple, Transparent Pricing</h1>
           <p className="text-lg text-white/80 max-w-2xl mx-auto">

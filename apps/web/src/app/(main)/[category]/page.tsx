@@ -111,7 +111,7 @@ export default function CategoryPage() {
   return (
     <div className="bg-background min-h-screen">
       {/* Category Header */}
-      <section className="bg-gradient-to-r from-[#1E3A5F] to-[#0F1F32] text-white py-10">
+      <section className="bg-gradient-to-r from-primary to-primary-950 text-white py-10">
         <div className="container mx-auto px-4">
           <nav className="flex items-center gap-2 text-sm text-white/60 mb-4">
             <Link href="/" className="hover:text-white transition-colors">Home</Link>
