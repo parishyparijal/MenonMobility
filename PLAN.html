@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>MenonTrucks - Complete Development Plan v2.0</title>
+<title>MenonTrucks - Complete Development Plan v2.1</title>
 <style>
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 950px; margin: 40px auto; padding: 0 20px; color: #222222; line-height: 1.7; font-size: 14px; }
   h1 { color: #1E3A5F; border-bottom: 3px solid #F59E0B; padding-bottom: 10px; font-size: 28px; }
@@ -38,7 +38,7 @@
 <h1 id="menontrucks-complete-development-plan-task-list">MenonTrucks - Complete Development Plan &amp; Task List</h1>
 <h2 id="document-info">Document Info</h2>
 <ul>
-<li><strong>Version</strong>: 2.0 (Aligned with SRS v1.0 by Redstone Catalyst)</li>
+<li><strong>Version</strong>: 2.1 (Milestone-aligned with SRS v1.0 by Redstone Catalyst)</li>
 <li><strong>Client</strong>: Menon Mobility (Romeo)</li>
 <li><strong>Date</strong>: 14 February 2026</li>
 <li><strong>Reference</strong>: TrucksNL.com (www.trucks.nl) — Europe's largest commercial vehicle marketplace</li>
@@ -1297,6 +1297,22 @@ POST   /api/contact                — Contact form submission
 <li>[ ] Write <code>.gitignore</code></li>
 <li>[ ] Write <code>.env.example</code> with all environment variables</li>
 </ul>
+<h4 id="task-18-cicd-pipeline-setup">Task 1.8: CI/CD Pipeline Setup</h4>
+<ul>
+<li>[ ] GitHub Actions workflow: <code>.github/workflows/ci.yml</code></li>
+<li>Trigger on push to main and pull requests</li>
+<li>Lint check (ESLint) for both apps/api and apps/web</li>
+<li>TypeScript type check (<code>tsc --noEmit</code>)</li>
+<li>Run unit tests</li>
+<li>Build check (ensure both apps build without errors)</li>
+<li>[ ] GitHub Actions workflow: <code>.github/workflows/deploy.yml</code></li>
+<li>Trigger on push to main (after CI passes)</li>
+<li>Build Docker images</li>
+<li>Push to container registry</li>
+<li>Deploy to staging server</li>
+<li>[ ] Branch protection rules documentation (main branch)</li>
+<li>[ ] <strong>Verify</strong>: Push to main triggers CI pipeline, all checks pass</li>
+</ul>
 <h4 id="task-12-docker-infrastructure">Task 1.2: Docker Infrastructure</h4>
 <ul>
 <li>[ ] Write <code>docker-compose.yml</code> with services:</li>
@@ -1475,7 +1491,7 @@ POST   /api/contact                — Contact form submission
 <li>[ ] ListingCardHorizontal — list view variant</li>
 <li>[ ] <strong>Verify</strong>: Card displays correctly with real data</li>
 </ul>
-<h4 id="task-27-seller-profile-page-dashboard-basic">Task 2.7: Seller Profile Page &amp; Dashboard (Basic)</h4>
+<h4 id="task-27-seller-profile-page-dashboard-complete">Task 2.7: Seller Profile Page &amp; Dashboard (Complete)</h4>
 <ul>
 <li>[ ] Seller public profile page (<code>/sellers/[slug]</code>):</li>
 <li>Banner + logo + company info</li>
@@ -1483,19 +1499,30 @@ POST   /api/contact                — Contact form submission
 <li>About tab (description, address)</li>
 <li>Contact buttons</li>
 <li>[ ] Seller profile API: GET /api/sellers/:slug, PUT /api/seller/profile</li>
-<li>[ ] Seller dashboard (basic):</li>
-<li>Stats cards: Active Listings, Total Views, Total Favorites, Messages</li>
-<li>Recent messages list</li>
-<li>Quick actions: Add Listing, View Messages</li>
-<li>[ ] <strong>Verify</strong>: Profile page and dashboard load with data</li>
+<li>[ ] Seller dashboard layout: fixed left sidebar (deep blue) + top bar + content</li>
+<li>[ ] Dashboard home: stats cards (Active Listings, Total Views, Total Favorites, Messages), views chart (Chart.js, 30 days), recent messages, quick actions</li>
+<li>[ ] Listings management page: status tabs (All/Draft/Pending/Active/Sold/Expired), table with actions (edit/duplicate/delete/mark-sold), search, pagination</li>
+<li>[ ] Create listing page (multi-step form):</li>
+<li>Step 1: Category selection (visual cards)</li>
+<li>Step 2: Basic info (title, brand, model, condition, price, currency, negotiable)</li>
+<li>Step 3: Vehicle details (year, mileage, fuel, transmission, power, emission, color, VIN + category-specific fields)</li>
+<li>Step 4: Description (textarea with character count)</li>
+<li>Step 5: Images (drag-drop, preview, reorder, max 20)</li>
+<li>Step 6: Location &amp; contact (country, city, phone, email, whatsapp)</li>
+<li>Step 7: Review &amp; submit (summary, edit links)</li>
+<li>"Save as Draft" on every step</li>
+<li>[ ] Edit listing page: pre-populated multi-step form</li>
+<li>[ ] Seller analytics page: date range, views/favorites/contacts charts, top listings</li>
+<li>[ ] <strong>Verify</strong>: Full seller workflow: create → upload images → publish → view stats → manage listings</li>
 </ul>
-<h4 id="task-28-contact-options">Task 2.8: Contact Options</h4>
+<h4 id="task-28-contact-options-complete">Task 2.8: Contact Options (Complete)</h4>
 <ul>
-<li>[ ] Contact seller form (creates message thread)</li>
-<li>[ ] Phone contact button (click to reveal, masked initially)</li>
-<li>[ ] WhatsApp button (opens wa.me link)</li>
-<li>[ ] Contact tracking (increment contactCount on listing)</li>
-<li>[ ] <strong>Verify</strong>: All 3 contact methods work</li>
+<li>[ ] Contact seller form (creates message thread) — full working form with validation</li>
+<li>[ ] Phone contact button (click to reveal, masked initially as "Show Phone Number")</li>
+<li>[ ] WhatsApp button (opens wa.me link with pre-filled message including listing title)</li>
+<li>[ ] Contact tracking (increment contactCount on listing per contact type)</li>
+<li>[ ] ContactButtons component: all 3 methods grouped with clear visual hierarchy</li>
+<li>[ ] <strong>Verify</strong>: All 3 contact methods fully functional end-to-end</li>
 </ul>
 <h4 id="task-29-seed-data-demo-listings">Task 2.9: Seed Data (Demo Listings)</h4>
 <ul>
@@ -1607,60 +1634,58 @@ POST   /api/contact                — Contact form submission
 <hr />
 <h3 id="phase-4-user-features">PHASE 4: User Features</h3>
 <p><strong>Duration: ~5 days | Priority: HIGH</strong></p>
-<h4 id="task-41-seller-dashboard-complete">Task 4.1: Seller Dashboard (Complete)</h4>
+<blockquote>
+<p><strong>Note</strong>: Seller dashboard (complete) and contact options are already delivered in M1 Phase 2.<br />
+This phase focuses ONLY on M2 deliverables: favorites, saved searches, messaging, reviews.</p>
+</blockquote>
+<h4 id="task-41-favorites-system">Task 4.1: Favorites System</h4>
 <ul>
-<li>[ ] Dashboard layout: fixed left sidebar (deep blue) + top bar + content</li>
-<li>[ ] Dashboard home: stats cards, views chart (Chart.js, 30 days), recent messages, quick actions</li>
-<li>[ ] Listings management: status tabs (All/Draft/Pending/Active/Sold/Expired), table with actions (edit/duplicate/delete/mark-sold), search, pagination</li>
-<li>[ ] Create listing (multi-step form):</li>
-<li>Step 1: Category selection (visual cards)</li>
-<li>Step 2: Basic info (title, brand, model, condition, price, currency, negotiable)</li>
-<li>Step 3: Vehicle details (year, mileage, fuel, transmission, power, emission, color, VIN + category-specific fields)</li>
-<li>Step 4: Description (textarea with character count)</li>
-<li>Step 5: Images (drag-drop, preview, reorder, max 20)</li>
-<li>Step 6: Location &amp; contact (country, city, phone, email, whatsapp)</li>
-<li>Step 7: Review &amp; submit (summary, edit links)</li>
-<li>"Save as Draft" on every step</li>
-<li>[ ] Edit listing: pre-populated multi-step form</li>
-<li>[ ] Seller analytics: date range, views/favorites/contacts charts, top listings</li>
-<li>[ ] <strong>Verify</strong>: Full seller workflow: create → upload images → publish → view stats</li>
+<li>[ ] Favorites backend: POST/DELETE /api/favorites/:listingId, GET /api/favorites</li>
+<li>[ ] Favorites page (<code>/favorites</code>): grid of saved listings, empty state</li>
+<li>[ ] Heart toggle on ListingCard (optimistic UI with animation)</li>
+<li>[ ] <strong>Verify</strong>: Add/remove favorites works, favorites page displays saved listings</li>
 </ul>
-<h4 id="task-42-favorites-comparison">Task 4.2: Favorites &amp; Comparison</h4>
-<ul>
-<li>[ ] Favorites backend: POST/DELETE /api/favorites/:listingId</li>
-<li>[ ] Favorites page: grid of saved listings, empty state</li>
-<li>[ ] Heart toggle on ListingCard (optimistic UI)</li>
-<li>[ ] Comparison tool: add to compare (max 4), side-by-side spec table</li>
-<li>[ ] Compare page: sticky header with listing titles, highlight differences</li>
-<li>[ ] <strong>Verify</strong>: Add/remove favorites, comparison works with 2-4 listings</li>
-</ul>
-<h4 id="task-43-saved-searches-email-alerts">Task 4.3: Saved Searches &amp; Email Alerts</h4>
+<h4 id="task-42-saved-searches-email-alerts">Task 4.2: Saved Searches &amp; Email Alerts</h4>
 <ul>
 <li>[ ] Saved search CRUD: POST/GET/PUT/DELETE /api/saved-searches</li>
 <li>[ ] "Save this search" button on search results page</li>
-<li>[ ] Saved searches page: list with name, filters summary, frequency selector, delete</li>
+<li>[ ] Saved searches page (<code>/saved-searches</code>): list with name, filters summary, frequency selector (never/daily/weekly), delete</li>
 <li>[ ] BullMQ cron job: match new listings to saved searches, send email alerts (daily/weekly)</li>
 <li>[ ] Email template with matching listings</li>
 <li>[ ] <strong>Verify</strong>: Save search, receive email alert when matching listing appears</li>
 </ul>
-<h4 id="task-44-messaging-system">Task 4.4: Messaging System</h4>
+<h4 id="task-43-messaging-system">Task 4.3: Messaging System</h4>
 <ul>
 <li>[ ] Message controller: threads, send, markRead, archive</li>
 <li>[ ] "Send Message" from listing detail creates thread (buyer + seller + listing)</li>
-<li>[ ] Messages page: two-column layout</li>
+<li>[ ] Messages page (<code>/messages</code> and <code>/seller/messages</code>): two-column layout</li>
 <li>Thread list (left): avatar, name, listing title, last message, unread badge, time</li>
 <li>Conversation (right): message bubbles (sent=blue, received=gray), timestamps, reply input</li>
 <li>[ ] Unread count badge on header nav</li>
 <li>[ ] Mobile: toggle between list and conversation</li>
 <li>[ ] <strong>Verify</strong>: Send message → appears in other party's inbox</li>
 </ul>
-<h4 id="task-45-contact-options-complete">Task 4.5: Contact Options (Complete)</h4>
+<h4 id="task-44-recently-viewed">Task 4.4: Recently Viewed</h4>
 <ul>
-<li>[ ] Phone button: click to reveal (masked initially)</li>
-<li>[ ] WhatsApp button: opens wa.me link with pre-filled message</li>
-<li>[ ] Contact form: creates message thread</li>
-<li>[ ] Contact tracking: increment contactCount</li>
-<li>[ ] <strong>Verify</strong>: All contact methods functional</li>
+<li>[ ] Recently viewed backend: track views per user (GET /api/recently-viewed)</li>
+<li>[ ] View tracking middleware: store in recently_viewed table on listing detail visit</li>
+<li>[ ] Recently viewed page (<code>/recently-viewed</code>): listing grid with view timestamps</li>
+<li>[ ] Cookie-based tracking for non-logged-in users</li>
+<li>[ ] <strong>Verify</strong>: Visit listings → appear in recently viewed page</li>
+</ul>
+<h4 id="task-45-seller-reviews-system">Task 4.5: Seller Reviews System</h4>
+<ul>
+<li>[ ] Seller review backend:</li>
+<li>GET /api/sellers/:slug/reviews — list reviews</li>
+<li>POST /api/sellers/:slug/reviews — submit review (auth required, must have messaged seller)</li>
+<li>[ ] One review per buyer per seller (validation)</li>
+<li>[ ] Rating aggregation: update seller_profiles.rating and reviewCount on new review</li>
+<li>[ ] Star rating input component (click to rate 1-5)</li>
+<li>[ ] Review form: rating + title + body</li>
+<li>[ ] Review list display on seller profile page (with seller response option)</li>
+<li>[ ] Reviews tab in seller dashboard: view received reviews, respond to reviews</li>
+<li>[ ] Admin review moderation (in admin panel Phase 5)</li>
+<li>[ ] <strong>Verify</strong>: Submit review → appears on seller profile → seller can respond</li>
 </ul>
 <hr />
 <h3 id="phase-5-admin-panel">PHASE 5: Admin Panel</h3>
@@ -1768,7 +1793,19 @@ POST   /api/contact                — Contact form submission
 <li>[ ] Price stored in original currency, display in user's preferred</li>
 <li>[ ] <strong>Verify</strong>: Prices display correctly in different currencies</li>
 </ul>
-<h4 id="task-73-dealer-bulk-upload">Task 7.3: Dealer Bulk Upload</h4>
+<h4 id="task-73-favorites-vehicle-comparison-tool">Task 7.3: Favorites &amp; Vehicle Comparison Tool</h4>
+<ul>
+<li>[ ] Comparison backend: POST/GET/DELETE /api/comparisons</li>
+<li>[ ] "Add to Compare" button on listing card and listing detail page (max 4)</li>
+<li>[ ] Floating compare bar at bottom when items selected (shows count + "Compare Now" button)</li>
+<li>[ ] Compare page (<code>/compare</code>): side-by-side spec comparison table</li>
+<li>Sticky header with listing images and titles</li>
+<li>All specs in rows, highlight differences</li>
+<li>Price comparison</li>
+<li>Remove individual listings from comparison</li>
+<li>[ ] <strong>Verify</strong>: Add 2-4 listings to compare → comparison table shows correct differences</li>
+</ul>
+<h4 id="task-74-dealer-bulk-upload">Task 7.4: Dealer Bulk Upload</h4>
 <ul>
 <li>[ ] CSV/XML import endpoint: POST /api/seller/bulk-import</li>
 <li>[ ] File validation and parsing</li>
@@ -1778,7 +1815,7 @@ POST   /api/contact                — Contact form submission
 <li>[ ] Error report download</li>
 <li>[ ] <strong>Verify</strong>: Upload CSV with 50 listings → all created correctly</li>
 </ul>
-<h4 id="task-74-seo-optimization">Task 7.4: SEO Optimization</h4>
+<h4 id="task-75-seo-optimization">Task 7.5: SEO Optimization</h4>
 <ul>
 <li>[ ] SSR for all public pages (Next.js App Router)</li>
 <li>[ ] Dynamic meta tags: title, description, Open Graph, Twitter Cards</li>
@@ -1795,7 +1832,7 @@ POST   /api/contact                — Contact form submission
 <li>[ ] Clean SEO-friendly URLs: <code>/trucks/mercedes-actros-2024-12345</code></li>
 <li>[ ] <strong>Verify</strong>: Google structured data test passes, Lighthouse SEO &gt; 90</li>
 </ul>
-<h4 id="task-75-performance-optimization">Task 7.5: Performance Optimization</h4>
+<h4 id="task-76-performance-optimization">Task 7.6: Performance Optimization</h4>
 <ul>
 <li>[ ] Redis caching (TTLs per endpoint as defined in Section 7)</li>
 <li>[ ] Cache invalidation via Prisma middleware hooks</li>
@@ -1807,14 +1844,14 @@ POST   /api/contact                — Contact form submission
 <li>[ ] API response compression (gzip)</li>
 <li>[ ] <strong>Verify</strong>: Pages load under 3 seconds, Lighthouse Performance &gt; 90</li>
 </ul>
-<h4 id="task-76-email-notification-system">Task 7.6: Email Notification System</h4>
+<h4 id="task-77-email-notification-system">Task 7.7: Email Notification System</h4>
 <ul>
 <li>[ ] Email templates: welcome, verification, password reset, listing approved/rejected, new message, saved search alert, subscription expiring</li>
 <li>[ ] Email service with queue (BullMQ)</li>
 <li>[ ] Notification center: bell icon, dropdown, full page</li>
 <li>[ ] <strong>Verify</strong>: All email types send correctly</li>
 </ul>
-<h4 id="task-77-security-audit-hardening">Task 7.7: Security Audit &amp; Hardening</h4>
+<h4 id="task-78-security-audit-hardening">Task 7.8: Security Audit &amp; Hardening</h4>
 <ul>
 <li>[ ] Input validation review (all Zod schemas)</li>
 <li>[ ] SQL injection test (Prisma parameterized)</li>
@@ -1826,7 +1863,7 @@ POST   /api/contact                — Contact form submission
 <li>[ ] HTTPS enforcement</li>
 <li>[ ] <strong>Verify</strong>: No vulnerabilities found</li>
 </ul>
-<h4 id="task-78-static-pages-final-polish">Task 7.8: Static Pages &amp; Final Polish</h4>
+<h4 id="task-79-static-pages-final-polish">Task 7.9: Static Pages &amp; Final Polish</h4>
 <ul>
 <li>[ ] About page — company story, values</li>
 <li>[ ] Contact page — form (name, email, subject, message) + company address</li>
@@ -1842,7 +1879,7 @@ POST   /api/contact                — Contact form submission
 <li>[ ] Mobile responsive audit (375px, 768px, 1920px)</li>
 <li>[ ] <strong>Verify</strong>: All pages render, responsive, no broken states</li>
 </ul>
-<h4 id="task-79-testing">Task 7.9: Testing</h4>
+<h4 id="task-710-testing">Task 7.10: Testing</h4>
 <ul>
 <li>[ ] Unit tests for core services (auth, listing CRUD, search)</li>
 <li>[ ] API integration tests for all endpoints</li>
@@ -1853,7 +1890,26 @@ POST   /api/contact                — Contact form submission
 <li>Subscribe → Stripe checkout → Plan active</li>
 <li>[ ] <strong>Verify</strong>: All tests pass</li>
 </ul>
-<h4 id="task-710-production-deployment">Task 7.10: Production Deployment</h4>
+<h4 id="task-711-api-documentation">Task 7.11: API Documentation</h4>
+<ul>
+<li>[ ] API endpoint documentation (all 70+ endpoints)</li>
+<li>Request/response formats with examples</li>
+<li>Authentication requirements per endpoint</li>
+<li>Error codes and messages</li>
+<li>Query parameters and filters</li>
+<li>[ ] Generate OpenAPI/Swagger spec</li>
+<li>[ ] Host interactive API docs (Swagger UI or similar)</li>
+<li>[ ] <strong>Verify</strong>: All endpoints documented, examples accurate</li>
+</ul>
+<h4 id="task-712-user-guide-documentation">Task 7.12: User Guide Documentation</h4>
+<ul>
+<li>[ ] Buyer guide: how to search, filter, contact sellers, save favorites, compare</li>
+<li>[ ] Seller guide: how to register, create listings, manage dashboard, upload images, view analytics</li>
+<li>[ ] Admin guide: how to moderate listings, manage users, manage categories, view analytics</li>
+<li>[ ] Platform overview and FAQ</li>
+<li>[ ] <strong>Verify</strong>: All user roles have complete documentation</li>
+</ul>
+<h4 id="task-713-production-deployment-handover">Task 7.13: Production Deployment &amp; Handover</h4>
 <ul>
 <li>[ ] Docker production configuration</li>
 <li>[ ] Environment variables for production</li>
@@ -1863,6 +1919,7 @@ POST   /api/contact                — Contact form submission
 <li>[ ] Cloudflare CDN configuration</li>
 <li>[ ] Monitoring setup (error tracking)</li>
 <li>[ ] Deployment documentation</li>
+<li>[ ] Client handover: source code, credentials, documentation package</li>
 <li>[ ] <strong>Verify</strong>: Platform live and functional on production URL</li>
 </ul>
 <hr />
@@ -2038,7 +2095,7 @@ POST   /api/contact                — Contact form submission
 <li><strong>Budget</strong>: €2,400</li>
 </ul>
 <footer style="margin-top:60px; padding-top:20px; border-top:2px solid #E5E7EB; color:#6B7280; font-size:12px; text-align:center;">
-  MenonTrucks Development Plan v2.0 — Aligned with SRS by Redstone Catalyst — Generated 14 Feb 2026
+  MenonTrucks Development Plan v2.1 — Milestone-Aligned with SRS by Redstone Catalyst — 14 Feb 2026
 </footer>
 </body>
 </html>
