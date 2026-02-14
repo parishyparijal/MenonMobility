@@ -1,0 +1,755 @@
+// ─────────────────────────────────────────────────────────────
+// MenonTrucks - Prisma Schema
+// Database: PostgreSQL
+// ─────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────────────────────
+
+enum UserRole {
+  BUYER
+  SELLER
+  ADMIN
+}
+
+enum ListingStatus {
+  DRAFT
+  PENDING_REVIEW
+  ACTIVE
+  SOLD
+  EXPIRED
+  REJECTED
+  ARCHIVED
+}
+
+enum VehicleCondition {
+  NEW
+  USED
+  REFURBISHED
+}
+
+enum FuelType {
+  DIESEL
+  PETROL
+  ELECTRIC
+  HYBRID
+  LPG
+  CNG
+  HYDROGEN
+}
+
+enum TransmissionType {
+  MANUAL
+  AUTOMATIC
+  SEMI_AUTOMATIC
+}
+
+enum EmissionClass {
+  EURO1
+  EURO2
+  EURO3
+  EURO4
+  EURO5
+  EURO6
+  EURO6D
+}
+
+enum ContainerSize {
+  FT20
+  FT40
+  FT45
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  PAST_DUE
+  EXPIRED
+}
+
+enum ImportStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum EmailFrequency {
+  NEVER
+  DAILY
+  WEEKLY
+}
+
+enum AdPlacement {
+  HOMEPAGE
+  CATEGORY
+  SEARCH
+  SIDEBAR
+}
+
+enum PaymentType {
+  SUBSCRIPTION
+  FEATURED
+  LISTING
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+// ─────────────────────────────────────────────────────────────
+// 1. User
+// ─────────────────────────────────────────────────────────────
+
+model User {
+  id              String    @id @default(uuid()) @db.Uuid
+  name            String
+  email           String    @unique
+  passwordHash    String
+  role            UserRole  @default(BUYER)
+  phone           String?
+  whatsapp        String?
+  avatarUrl       String?
+  locale          String    @default("en")
+  isActive        Boolean   @default(true)
+  emailVerifiedAt DateTime?
+  lastLoginAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  // Relations
+  listings         Listing[]
+  sellerProfile    SellerProfile?
+  favorites        Favorite[]
+  savedSearches    SavedSearch[]
+  sentMessages     Message[]          @relation("MessageSender")
+  buyerThreads     MessageThread[]    @relation("ThreadBuyer")
+  sellerThreads    MessageThread[]    @relation("ThreadSeller")
+  notifications    Notification[]
+  reviewsGiven     SellerReview[]     @relation("ReviewBuyer")
+  subscriptions    UserSubscription[]
+  payments         Payment[]
+  recentlyViewed   RecentlyViewed[]
+  comparisons      ListingComparison?
+  bulkImports      BulkImport[]
+  refreshTokens    RefreshToken[]
+}
+
+// ─────────────────────────────────────────────────────────────
+// 2. RefreshToken
+// ─────────────────────────────────────────────────────────────
+
+model RefreshToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 3. PasswordResetToken
+// ─────────────────────────────────────────────────────────────
+
+model PasswordResetToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────────────────────
+// 4. SellerProfile
+// ─────────────────────────────────────────────────────────────
+
+model SellerProfile {
+  id             String    @id @default(uuid()) @db.Uuid
+  userId         String    @unique @db.Uuid
+  companyName    String
+  slug           String    @unique
+  description    String?
+  website        String?
+  address        String?
+  city           String?
+  region         String?
+  countryCode    String?
+  lat            Float?
+  lng            Float?
+  logoUrl        String?
+  bannerUrl      String?
+  isVerified     Boolean   @default(false)
+  verifiedAt     DateTime?
+  responseRate   Float?
+  avgResponseTime Int?
+  rating         Float     @default(0)
+  reviewCount    Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Relations
+  user    User           @relation(fields: [userId], references: [id])
+  reviews SellerReview[]
+}
+
+// ─────────────────────────────────────────────────────────────
+// 5. SellerReview
+// ─────────────────────────────────────────────────────────────
+
+model SellerReview {
+  id                 String    @id @default(uuid()) @db.Uuid
+  buyerId            String    @db.Uuid
+  sellerId           String    @db.Uuid
+  listingId          String?   @db.Uuid
+  rating             Int
+  title              String?
+  body               String
+  isVerifiedPurchase Boolean   @default(false)
+  sellerResponse     String?
+  respondedAt        DateTime?
+  createdAt          DateTime  @default(now())
+
+  // Relations
+  buyer   User          @relation("ReviewBuyer", fields: [buyerId], references: [id])
+  seller  SellerProfile @relation(fields: [sellerId], references: [id])
+  listing Listing?      @relation(fields: [listingId], references: [id])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 6. Category
+// ─────────────────────────────────────────────────────────────
+
+model Category {
+  id              String    @id @default(uuid()) @db.Uuid
+  parentId        String?   @db.Uuid
+  name            Json
+  slug            String    @unique
+  description     Json?
+  icon            String?
+  imageUrl        String?
+  sortOrder       Int       @default(0)
+  listingCount    Int       @default(0)
+  isActive        Boolean   @default(true)
+  metaTitle       String?
+  metaDescription String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  parent            Category?          @relation("CategoryTree", fields: [parentId], references: [id])
+  children          Category[]         @relation("CategoryTree")
+  listings          Listing[]
+  specificationKeys SpecificationKey[]
+  brandCategories   BrandCategory[]
+
+  // Indexes
+  @@index([parentId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 7. Brand
+// ─────────────────────────────────────────────────────────────
+
+model Brand {
+  id       String  @id @default(uuid()) @db.Uuid
+  name     String
+  slug     String  @unique
+  logoUrl  String?
+  isActive Boolean @default(true)
+
+  // Relations
+  models          BrandModel[]
+  brandCategories BrandCategory[]
+  listings        Listing[]
+}
+
+// ─────────────────────────────────────────────────────────────
+// 8. BrandCategory
+// ─────────────────────────────────────────────────────────────
+
+model BrandCategory {
+  id         String @id @default(uuid()) @db.Uuid
+  brandId    String @db.Uuid
+  categoryId String @db.Uuid
+
+  // Relations
+  brand    Brand    @relation(fields: [brandId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@unique([brandId, categoryId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 9. BrandModel
+// ─────────────────────────────────────────────────────────────
+
+model BrandModel {
+  id       String  @id @default(uuid()) @db.Uuid
+  brandId  String  @db.Uuid
+  name     String
+  slug     String
+  isActive Boolean @default(true)
+
+  // Relations
+  brand    Brand     @relation(fields: [brandId], references: [id])
+  listings Listing[]
+}
+
+// ─────────────────────────────────────────────────────────────
+// 10. Listing
+// ─────────────────────────────────────────────────────────────
+
+model Listing {
+  id                String            @id @default(uuid()) @db.Uuid
+  sellerId          String            @db.Uuid
+  categoryId        String            @db.Uuid
+  brandId           String?           @db.Uuid
+  modelId           String?           @db.Uuid
+  title             String
+  slug              String            @unique
+  description       String?
+  price             Float?
+  priceCurrency     String            @default("EUR")
+  priceOnRequest    Boolean           @default(false)
+  priceNegotiable   Boolean           @default(false)
+  condition         VehicleCondition  @default(USED)
+  status            ListingStatus     @default(DRAFT)
+  year              Int?
+  mileageKm         Int?
+  operatingHours    Int?
+  fuelType          FuelType?
+  transmission      TransmissionType?
+  powerHp           Int?
+  powerKw           Int?
+  color             String?
+  vin               String?
+  gvwKg             Int?
+  payloadKg         Int?
+  axleCount         Int?
+  cabType           String?
+  emissionClass     EmissionClass?
+  wheelbaseMm       Int?
+  suspensionType    String?
+  containerSize     ContainerSize?
+  containerType     String?
+  countryCode       String?
+  region            String?
+  city              String?
+  postalCode        String?
+  lat               Float?
+  lng               Float?
+  contactPhone      String?
+  contactEmail      String?
+  contactWhatsapp   String?
+  hidePhone         Boolean           @default(false)
+  viewCount         Int               @default(0)
+  favoriteCount     Int               @default(0)
+  contactCount      Int               @default(0)
+  imageCount        Int               @default(0)
+  isFeatured        Boolean           @default(false)
+  featuredUntil     DateTime?
+  featuredPlacement String?
+  metaTitle         String?
+  metaDescription   String?
+  publishedAt       DateTime?
+  expiresAt         DateTime?
+  soldAt            DateTime?
+  rejectedReason    String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  deletedAt         DateTime?
+
+  // Relations
+  seller         User                   @relation(fields: [sellerId], references: [id])
+  category       Category               @relation(fields: [categoryId], references: [id])
+  brand          Brand?                 @relation(fields: [brandId], references: [id])
+  model          BrandModel?            @relation(fields: [modelId], references: [id])
+  images         ListingImage[]
+  specifications ListingSpecification[]
+  favorites      Favorite[]
+  threads        MessageThread[]
+  featuredEntries FeaturedListing[]
+  reviews        SellerReview[]
+  recentlyViewed RecentlyViewed[]
+
+  // Indexes
+  @@index([categoryId, status])
+  @@index([sellerId])
+  @@index([brandId])
+  @@index([price])
+  @@index([createdAt])
+  @@index([countryCode, status])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 11. ListingImage
+// ─────────────────────────────────────────────────────────────
+
+model ListingImage {
+  id           String   @id @default(uuid()) @db.Uuid
+  listingId    String   @db.Uuid
+  position     Int      @default(0)
+  originalUrl  String
+  largeUrl     String?
+  mediumUrl    String?
+  thumbnailUrl String?
+  webpUrl      String?
+  altText      String?
+  fileSize     Int?
+  width        Int?
+  height       Int?
+  createdAt    DateTime @default(now())
+
+  // Relations
+  listing Listing @relation(fields: [listingId], references: [id])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 12. SpecificationKey
+// ─────────────────────────────────────────────────────────────
+
+model SpecificationKey {
+  id           String   @id @default(uuid()) @db.Uuid
+  categoryId   String   @db.Uuid
+  name         Json
+  slug         String
+  unit         String?
+  dataType     String   @default("text")
+  sortOrder    Int      @default(0)
+  isFilterable Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  // Relations
+  category       Category               @relation(fields: [categoryId], references: [id])
+  specifications ListingSpecification[]
+}
+
+// ─────────────────────────────────────────────────────────────
+// 13. ListingSpecification
+// ─────────────────────────────────────────────────────────────
+
+model ListingSpecification {
+  id        String @id @default(uuid()) @db.Uuid
+  listingId String @db.Uuid
+  specKeyId String @db.Uuid
+  value     String
+
+  // Relations
+  listing Listing          @relation(fields: [listingId], references: [id])
+  specKey SpecificationKey @relation(fields: [specKeyId], references: [id])
+
+  @@unique([listingId, specKeyId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 14. Location
+// ─────────────────────────────────────────────────────────────
+
+model Location {
+  id          String  @id @default(uuid()) @db.Uuid
+  countryCode String
+  countryName String
+  region      String?
+  city        String
+  lat         Float?
+  lng         Float?
+  postalCode  String?
+
+  @@unique([countryCode, city])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 15. Favorite
+// ─────────────────────────────────────────────────────────────
+
+model Favorite {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  listingId String   @db.Uuid
+  createdAt DateTime @default(now())
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id])
+  listing Listing @relation(fields: [listingId], references: [id])
+
+  @@unique([userId, listingId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 16. SavedSearch
+// ─────────────────────────────────────────────────────────────
+
+model SavedSearch {
+  id             String         @id @default(uuid()) @db.Uuid
+  userId         String         @db.Uuid
+  name           String
+  filters        Json
+  emailFrequency EmailFrequency @default(NEVER)
+  lastNotifiedAt DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 17. RecentlyViewed
+// ─────────────────────────────────────────────────────────────
+
+model RecentlyViewed {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  listingId String   @db.Uuid
+  viewedAt  DateTime @default(now())
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id])
+  listing Listing @relation(fields: [listingId], references: [id])
+
+  @@unique([userId, listingId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 18. ListingComparison
+// ─────────────────────────────────────────────────────────────
+
+model ListingComparison {
+  id         String @id @default(uuid()) @db.Uuid
+  userId     String @unique @db.Uuid
+  listingIds Json
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 19. MessageThread
+// ─────────────────────────────────────────────────────────────
+
+model MessageThread {
+  id               String   @id @default(uuid()) @db.Uuid
+  listingId        String   @db.Uuid
+  buyerId          String   @db.Uuid
+  sellerId         String   @db.Uuid
+  lastMessageAt    DateTime
+  isArchivedBuyer  Boolean  @default(false)
+  isArchivedSeller Boolean  @default(false)
+  createdAt        DateTime @default(now())
+
+  // Relations
+  listing  Listing   @relation(fields: [listingId], references: [id])
+  buyer    User      @relation("ThreadBuyer", fields: [buyerId], references: [id])
+  seller   User      @relation("ThreadSeller", fields: [sellerId], references: [id])
+  messages Message[]
+
+  @@unique([listingId, buyerId, sellerId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 20. Message
+// ─────────────────────────────────────────────────────────────
+
+model Message {
+  id          String    @id @default(uuid()) @db.Uuid
+  threadId    String    @db.Uuid
+  senderId    String    @db.Uuid
+  body        String
+  attachments Json?
+  isRead      Boolean   @default(false)
+  readAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  // Relations
+  thread MessageThread @relation(fields: [threadId], references: [id])
+  sender User          @relation("MessageSender", fields: [senderId], references: [id])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 21. Notification
+// ─────────────────────────────────────────────────────────────
+
+model Notification {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  type      String
+  title     String
+  body      String?
+  data      Json?
+  isRead    Boolean   @default(false)
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 22. SubscriptionPlan
+// ─────────────────────────────────────────────────────────────
+
+model SubscriptionPlan {
+  id                   String             @id @default(uuid()) @db.Uuid
+  name                 String
+  slug                 String             @unique
+  description          String?
+  priceMonthly         Float
+  priceYearly          Float
+  maxListings          Int
+  maxImages            Int
+  features             Json
+  stripeMonthlyPriceId String?
+  stripeYearlyPriceId  String?
+  sortOrder            Int                @default(0)
+  isActive             Boolean            @default(true)
+  createdAt            DateTime           @default(now())
+
+  // Relations
+  subscriptions UserSubscription[]
+}
+
+// ─────────────────────────────────────────────────────────────
+// 23. UserSubscription
+// ─────────────────────────────────────────────────────────────
+
+model UserSubscription {
+  id                   String             @id @default(uuid()) @db.Uuid
+  userId               String             @db.Uuid
+  planId               String             @db.Uuid
+  stripeSubscriptionId String?            @unique
+  status               SubscriptionStatus @default(ACTIVE)
+  periodStart          DateTime
+  periodEnd            DateTime
+  cancelledAt          DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  // Relations
+  user User             @relation(fields: [userId], references: [id])
+  plan SubscriptionPlan @relation(fields: [planId], references: [id])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 24. FeaturedListing
+// ─────────────────────────────────────────────────────────────
+
+model FeaturedListing {
+  id               String      @id @default(uuid()) @db.Uuid
+  listingId        String      @db.Uuid
+  placement        AdPlacement
+  startsAt         DateTime
+  endsAt           DateTime
+  pricePaid        Float
+  stripePaymentId  String?
+  createdAt        DateTime    @default(now())
+
+  // Relations
+  listing Listing @relation(fields: [listingId], references: [id])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 25. Payment
+// ─────────────────────────────────────────────────────────────
+
+model Payment {
+  id                    String        @id @default(uuid()) @db.Uuid
+  userId                String        @db.Uuid
+  stripePaymentIntentId String?       @unique
+  amount                Float
+  currency              String        @default("EUR")
+  status                PaymentStatus @default(PENDING)
+  type                  PaymentType
+  metadata              Json?
+  createdAt             DateTime      @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+}
+
+// ─────────────────────────────────────────────────────────────
+// 26. BannerAd
+// ─────────────────────────────────────────────────────────────
+
+model BannerAd {
+  id          String      @id @default(uuid()) @db.Uuid
+  title       String
+  imageUrl    String
+  targetUrl   String
+  placement   AdPlacement
+  categories  Json?
+  countries   Json?
+  impressions Int         @default(0)
+  clicks      Int         @default(0)
+  startsAt    DateTime
+  endsAt      DateTime
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+// ─────────────────────────────────────────────────────────────
+// 27. Page
+// ─────────────────────────────────────────────────────────────
+
+model Page {
+  id          String   @id @default(uuid()) @db.Uuid
+  slug        String   @unique
+  title       Json
+  body        Json
+  isPublished Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────────────────────
+// 28. Faq
+// ─────────────────────────────────────────────────────────────
+
+model Faq {
+  id        String   @id @default(uuid()) @db.Uuid
+  category  String
+  question  Json
+  answer    Json
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────────────────────
+// 29. BulkImport
+// ─────────────────────────────────────────────────────────────
+
+model BulkImport {
+  id            String       @id @default(uuid()) @db.Uuid
+  userId        String       @db.Uuid
+  fileName      String
+  fileUrl       String?
+  status        ImportStatus @default(PENDING)
+  totalRows     Int          @default(0)
+  processedRows Int          @default(0)
+  errorRows     Int          @default(0)
+  errors        Json?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+}
