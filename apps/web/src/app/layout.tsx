@@ -9,16 +9,18 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'MenonTrucks - Commercial Vehicle Marketplace',
+  title: 'Menon Mobility - Commercial Vehicle Marketplace',
   description:
-    'Buy and sell commercial vehicles with confidence. MenonTrucks is India\'s trusted marketplace for trucks, buses, and commercial vehicles.',
+    'Buy and sell commercial vehicles with confidence. Menon Mobility is Europe\'s trusted marketplace for trucks, trailers, and commercial vehicles.',
   keywords: [
     'trucks',
     'commercial vehicles',
     'buy trucks',
     'sell trucks',
     'marketplace',
-    'MenonTrucks',
+    'Menon Mobility',
+    'trailers',
+    'construction equipment',
   ],
 };
 

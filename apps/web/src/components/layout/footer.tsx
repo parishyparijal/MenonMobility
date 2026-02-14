@@ -57,25 +57,12 @@ export function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand Column */}
           <div className="sm:col-span-2 lg:col-span-1">
-            <Link href="/" className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-5 h-5"
-                >
-                  <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
-                  <path d="M15 18h2a1 1 0 0 0 1-1v-3.28a1 1 0 0 0-.684-.948l-1.923-.641a1 1 0 0 1-.684-.949V6a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v12" />
-                  <circle cx="7" cy="18" r="2" />
-                  <circle cx="17" cy="18" r="2" />
-                </svg>
-              </div>
-              <span className="text-xl font-bold">MenonTrucks</span>
+            <Link href="/" className="flex items-center mb-4">
+              <img
+                src="/logo.png"
+                alt="Menon Mobility"
+                className="h-9 w-auto object-contain brightness-0 invert"
+              />
             </Link>
             <p className="text-sm text-white/70 mb-6 max-w-[240px]">
               Europe&apos;s trusted marketplace for commercial vehicles, trucks,
@@ -124,7 +111,7 @@ export function Footer() {
       <div className="border-t border-white/10">
         <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-sm text-white/50">
-            &copy; 2024 MenonTrucks. All rights reserved.
+            &copy; 2024 Menon Mobility. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             <button className="text-sm text-white/50 hover:text-white transition-colors">

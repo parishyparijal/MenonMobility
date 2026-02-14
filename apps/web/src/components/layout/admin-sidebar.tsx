@@ -71,18 +71,15 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       >
         {/* Logo */}
         <div className="flex items-center justify-between h-16 px-5 border-b border-white/10">
-          <Link href="/admin" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
-              <Shield className="w-4.5 h-4.5 text-red-400" />
-            </div>
-            <div>
-              <span className="text-lg font-bold block leading-tight">
-                MenonTrucks
-              </span>
-              <span className="text-[10px] uppercase tracking-wider text-red-400 font-semibold">
-                Admin Panel
-              </span>
-            </div>
+          <Link href="/admin" className="flex items-center gap-2">
+            <img
+              src="/logo.png"
+              alt="Menon Mobility"
+              className="h-7 w-auto object-contain brightness-0 invert"
+            />
+            <span className="text-[10px] uppercase tracking-wider text-red-400 font-semibold bg-red-500/20 px-1.5 py-0.5 rounded">
+              Admin
+            </span>
           </Link>
           <button
             onClick={onClose}
