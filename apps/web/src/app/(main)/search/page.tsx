@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Search,
@@ -19,7 +19,11 @@ import { ListingCardSkeleton } from '@/components/listings/listing-card-skeleton
 import { Pagination } from '@/components/common/pagination';
 import { cn } from '@/lib/utils';
 import { getImagesForListing } from '@/lib/images';
+import { api } from '@/lib/api';
 
+// ---------------------------------------------------------------------------
+// Static filter options (used when API aggregations are unavailable)
+// ---------------------------------------------------------------------------
 const categoryOptions = [
   'Trucks', 'Trailers', 'Construction', 'Vans', 'Cars', 'Containers', 'Parts', 'Agricultural',
 ];
@@ -46,7 +50,9 @@ const sortOptions = [
   { value: 'year-asc', label: 'Year: Oldest' },
 ];
 
-// Dummy data
+// ---------------------------------------------------------------------------
+// Fallback dummy data (when API is not available)
+// ---------------------------------------------------------------------------
 const dummyListings: ListingCardData[] = Array.from({ length: 24 }, (_, i) => ({
   id: String(i + 1),
   slug: `listing-${i + 1}`,
@@ -86,6 +92,66 @@ const dummyListings: ListingCardData[] = Array.from({ length: 24 }, (_, i) => ({
   isFeatured: i < 3,
 }));
 
+// ---------------------------------------------------------------------------
+// Map API sort param name to backend expected format
+// ---------------------------------------------------------------------------
+function mapSortParam(sort: string): string {
+  switch (sort) {
+    case 'newest': return 'date_desc';
+    case 'oldest': return 'date_asc';
+    case 'price-asc': return 'price_asc';
+    case 'price-desc': return 'price_desc';
+    case 'year-desc': return 'year_desc';
+    case 'year-asc': return 'year_asc';
+    default: return 'relevance';
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Map API listing response to frontend ListingCardData
+// ---------------------------------------------------------------------------
+function mapApiListing(listing: any): ListingCardData {
+  // Handle images — API returns objects, frontend expects string[]
+  let images: string[] = [];
+  if (listing.images && Array.isArray(listing.images)) {
+    if (typeof listing.images[0] === 'string') {
+      images = listing.images;
+    } else {
+      images = listing.images
+        .map((img: any) => img.mediumUrl || img.thumbnailUrl || img.originalUrl)
+        .filter(Boolean);
+    }
+  }
+  // If no API images, use our image mapping based on title
+  if (images.length === 0) {
+    images = getImagesForListing(listing.title || '');
+  }
+
+  return {
+    id: listing.id,
+    slug: listing.slug,
+    title: listing.title,
+    price: listing.price ? Number(listing.price) : 0,
+    currency: listing.priceCurrency || 'EUR',
+    condition: listing.condition || 'USED',
+    images,
+    year: listing.year,
+    mileage: listing.mileageKm,
+    fuelType: listing.fuelType,
+    location: {
+      city: listing.city || listing.location?.city || '',
+      country: listing.countryCode || listing.location?.country || '',
+    },
+    seller: {
+      name: listing.sellerName || listing.seller?.name || listing.sellerCompany || 'Dealer',
+    },
+    isFeatured: listing.isFeatured,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// FilterSection component
+// ---------------------------------------------------------------------------
 interface FilterSectionProps {
   title: string;
   defaultOpen?: boolean;
@@ -108,6 +174,9 @@ function FilterSection({ title, defaultOpen = true, children }: FilterSectionPro
   );
 }
 
+// ---------------------------------------------------------------------------
+// SearchPage Component
+// ---------------------------------------------------------------------------
 export default function SearchPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -115,8 +184,17 @@ export default function SearchPage() {
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const [brandSearch, setBrandSearch] = useState('');
+
+  // Data state
+  const [listings, setListings] = useState<ListingCardData[]>(dummyListings);
+  const [totalResults, setTotalResults] = useState(186);
+  const [totalPages, setTotalPages] = useState(8);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usingApi, setUsingApi] = useState(false);
+
+  // Debounce timer for search input
+  const searchTimer = useRef<NodeJS.Timeout | null>(null);
 
   // Read filters from URL
   const query = searchParams.get('q') || '';
@@ -131,7 +209,119 @@ export default function SearchPage() {
   const yearMin = searchParams.get('yearMin') || '';
   const yearMax = searchParams.get('yearMax') || '';
   const sort = searchParams.get('sort') || 'newest';
+  const page = parseInt(searchParams.get('page') || '1', 10);
 
+  // ---------------------------------------------------------------------------
+  // Fetch data from API (with fallback to dummy data)
+  // ---------------------------------------------------------------------------
+  const fetchSearchResults = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      // Build API query params
+      const params = new URLSearchParams();
+      if (query) params.set('q', query);
+      if (selectedCategories.length > 0) params.set('category', selectedCategories[0]);
+      if (selectedBrands.length > 0) params.set('brand', selectedBrands[0]);
+      if (selectedConditions.length > 0) params.set('condition', selectedConditions[0].toUpperCase());
+      if (selectedFuelTypes.length > 0) params.set('fuelType', selectedFuelTypes[0].toUpperCase());
+      if (selectedTransmissions.length > 0) params.set('transmission', selectedTransmissions[0].toUpperCase().replace('-', '_'));
+      if (selectedCountries.length > 0) params.set('countryCode', selectedCountries[0]);
+      if (priceMin) params.set('minPrice', priceMin);
+      if (priceMax) params.set('maxPrice', priceMax);
+      if (yearMin) params.set('minYear', yearMin);
+      if (yearMax) params.set('maxYear', yearMax);
+      params.set('sort', mapSortParam(sort));
+      params.set('page', String(page));
+      params.set('limit', '24');
+
+      const response = await api.get<any>(`/search?${params.toString()}`);
+
+      if (response?.success && response?.data?.listings) {
+        const apiListings = response.data.listings.map(mapApiListing);
+        setListings(apiListings.length > 0 ? apiListings : dummyListings);
+        setTotalResults(response.pagination?.total || apiListings.length);
+        setTotalPages(response.pagination?.totalPages || 1);
+        setCurrentPage(response.pagination?.page || page);
+        setUsingApi(true);
+      } else {
+        throw new Error('Invalid response');
+      }
+    } catch {
+      // API unavailable — use filtered dummy data
+      let filtered = [...dummyListings];
+
+      if (query) {
+        const q = query.toLowerCase();
+        filtered = filtered.filter((l) =>
+          l.title.toLowerCase().includes(q) ||
+          l.seller.name.toLowerCase().includes(q)
+        );
+      }
+      if (selectedCategories.length > 0) {
+        // Simple category matching based on title keywords
+        filtered = filtered.filter((l) =>
+          selectedCategories.some((c) => l.title.toLowerCase().includes(c.toLowerCase()))
+        );
+      }
+      if (selectedBrands.length > 0) {
+        filtered = filtered.filter((l) =>
+          selectedBrands.some((b) => l.title.toLowerCase().includes(b.toLowerCase()))
+        );
+      }
+      if (selectedConditions.length > 0) {
+        filtered = filtered.filter((l) =>
+          selectedConditions.some((c) => l.condition.toLowerCase() === c.toLowerCase())
+        );
+      }
+      if (priceMin) {
+        filtered = filtered.filter((l) => l.price >= Number(priceMin));
+      }
+      if (priceMax) {
+        filtered = filtered.filter((l) => l.price <= Number(priceMax));
+      }
+      if (yearMin) {
+        filtered = filtered.filter((l) => l.year >= Number(yearMin));
+      }
+      if (yearMax) {
+        filtered = filtered.filter((l) => l.year <= Number(yearMax));
+      }
+
+      // Sort
+      switch (sort) {
+        case 'price-asc':
+          filtered.sort((a, b) => a.price - b.price);
+          break;
+        case 'price-desc':
+          filtered.sort((a, b) => b.price - a.price);
+          break;
+        case 'year-desc':
+          filtered.sort((a, b) => b.year - a.year);
+          break;
+        case 'year-asc':
+          filtered.sort((a, b) => a.year - b.year);
+          break;
+      }
+
+      setListings(filtered);
+      setTotalResults(filtered.length);
+      setTotalPages(Math.ceil(filtered.length / 24) || 1);
+      setCurrentPage(page);
+      setUsingApi(false);
+    } finally {
+      setIsLoading(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams.toString()]);
+
+  // Fetch on URL param changes
+  useEffect(() => {
+    fetchSearchResults();
+  }, [fetchSearchResults]);
+
+  // ---------------------------------------------------------------------------
+  // URL state management
+  // ---------------------------------------------------------------------------
   const updateURL = useCallback(
     (key: string, value: string | string[], replace = false) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -139,18 +329,10 @@ export default function SearchPage() {
       if (Array.isArray(value)) {
         params.delete(key);
         value.forEach((v) => params.append(key, v));
-      } else if (replace) {
-        if (value) {
-          params.set(key, value);
-        } else {
-          params.delete(key);
-        }
+      } else if (value) {
+        params.set(key, value);
       } else {
-        if (value) {
-          params.set(key, value);
-        } else {
-          params.delete(key);
-        }
+        params.delete(key);
       }
 
       params.delete('page');
@@ -191,20 +373,26 @@ export default function SearchPage() {
     b.toLowerCase().includes(brandSearch.toLowerCase())
   );
 
-  const totalPages = 8;
-  const totalResults = 186;
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+  const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
-    params.set('page', String(page));
+    params.set('page', String(newPage));
     router.push(`/search?${params.toString()}`, { scroll: false });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Debounced search input handler
+  const handleSearchInput = (value: string) => {
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => {
+      updateURL('q', value, true);
+    }, 300);
+  };
+
+  // ---------------------------------------------------------------------------
+  // Filter sidebar content (shared between desktop & mobile)
+  // ---------------------------------------------------------------------------
   const filterContent = (
     <div className="space-y-0">
-      {/* Category */}
       <FilterSection title="Category">
         <div className="space-y-2">
           {categoryOptions.map((cat) => (
@@ -218,7 +406,6 @@ export default function SearchPage() {
         </div>
       </FilterSection>
 
-      {/* Brand */}
       <FilterSection title="Brand">
         <Input
           placeholder="Search brands..."
@@ -238,7 +425,6 @@ export default function SearchPage() {
         </div>
       </FilterSection>
 
-      {/* Price Range */}
       <FilterSection title="Price Range">
         <div className="flex gap-2">
           <Input
@@ -258,7 +444,6 @@ export default function SearchPage() {
         </div>
       </FilterSection>
 
-      {/* Year Range */}
       <FilterSection title="Year Range">
         <div className="flex gap-2">
           <Input
@@ -278,7 +463,6 @@ export default function SearchPage() {
         </div>
       </FilterSection>
 
-      {/* Condition */}
       <FilterSection title="Condition">
         <div className="space-y-2">
           {conditionOptions.map((cond) => (
@@ -292,7 +476,6 @@ export default function SearchPage() {
         </div>
       </FilterSection>
 
-      {/* Fuel Type */}
       <FilterSection title="Fuel Type" defaultOpen={false}>
         <div className="space-y-2">
           {fuelTypeOptions.map((fuel) => (
@@ -306,7 +489,6 @@ export default function SearchPage() {
         </div>
       </FilterSection>
 
-      {/* Transmission */}
       <FilterSection title="Transmission" defaultOpen={false}>
         <div className="space-y-2">
           {transmissionOptions.map((trans) => (
@@ -322,7 +504,6 @@ export default function SearchPage() {
         </div>
       </FilterSection>
 
-      {/* Country */}
       <FilterSection title="Country" defaultOpen={false}>
         <div className="space-y-2 max-h-48 overflow-y-auto">
           {countryOptions.map((country) => (
@@ -338,7 +519,6 @@ export default function SearchPage() {
         </div>
       </FilterSection>
 
-      {/* Clear All */}
       {hasActiveFilters && (
         <Button variant="ghost" size="sm" className="w-full text-destructive" onClick={clearAllFilters}>
           Clear All Filters
@@ -347,6 +527,45 @@ export default function SearchPage() {
     </div>
   );
 
+  // ---------------------------------------------------------------------------
+  // Active filter chips
+  // ---------------------------------------------------------------------------
+  const activeFilterChips: { label: string; onRemove: () => void }[] = [];
+
+  selectedCategories.forEach((cat) => {
+    activeFilterChips.push({
+      label: `Category: ${cat}`,
+      onRemove: () => toggleArrayFilter('category', cat, selectedCategories),
+    });
+  });
+  selectedBrands.forEach((brand) => {
+    activeFilterChips.push({
+      label: `Brand: ${brand}`,
+      onRemove: () => toggleArrayFilter('brand', brand, selectedBrands),
+    });
+  });
+  selectedConditions.forEach((cond) => {
+    activeFilterChips.push({
+      label: `Condition: ${cond}`,
+      onRemove: () => toggleArrayFilter('condition', cond, selectedConditions),
+    });
+  });
+  if (priceMin || priceMax) {
+    activeFilterChips.push({
+      label: `Price: ${priceMin || '0'} - ${priceMax || '...'}`,
+      onRemove: () => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete('priceMin');
+        params.delete('priceMax');
+        params.delete('page');
+        router.push(`/search?${params.toString()}`, { scroll: false });
+      },
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Render
+  // ---------------------------------------------------------------------------
   return (
     <div className="bg-background min-h-screen">
       {/* Search Bar */}
@@ -359,8 +578,10 @@ export default function SearchPage() {
                 type="text"
                 placeholder="Search vehicles..."
                 defaultValue={query}
+                onChange={(e) => handleSearchInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
+                    if (searchTimer.current) clearTimeout(searchTimer.current);
                     updateURL('q', (e.target as HTMLInputElement).value, true);
                   }
                 }}
@@ -408,6 +629,29 @@ export default function SearchPage() {
       </div>
 
       <div className="container mx-auto px-4 py-6">
+        {/* Active Filter Chips */}
+        {activeFilterChips.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {activeFilterChips.map((chip, i) => (
+              <span
+                key={i}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-xs font-medium rounded-full"
+              >
+                {chip.label}
+                <button onClick={chip.onRemove} className="hover:text-destructive">
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
+            <button
+              onClick={clearAllFilters}
+              className="text-xs text-muted-foreground hover:text-destructive px-2"
+            >
+              Clear all
+            </button>
+          </div>
+        )}
+
         <div className="flex gap-6">
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block w-64 flex-shrink-0">
@@ -431,6 +675,17 @@ export default function SearchPage() {
                   <ListingCardSkeleton key={i} view={view} />
                 ))}
               </div>
+            ) : listings.length === 0 ? (
+              <div className="text-center py-16">
+                <Search className="w-12 h-12 mx-auto text-muted-foreground/50 mb-4" />
+                <h3 className="text-lg font-semibold text-foreground mb-2">No results found</h3>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Try adjusting your search or filters to find what you&apos;re looking for.
+                </p>
+                <Button variant="accent" onClick={clearAllFilters}>
+                  Clear All Filters
+                </Button>
+              </div>
             ) : (
               <>
                 <div
@@ -440,17 +695,19 @@ export default function SearchPage() {
                       : 'space-y-4'
                   )}
                 >
-                  {dummyListings.map((listing) => (
+                  {listings.map((listing) => (
                     <ListingCard key={listing.id} listing={listing} view={view} />
                   ))}
                 </div>
-                <div className="mt-8">
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                  />
-                </div>
+                {totalPages > 1 && (
+                  <div className="mt-8">
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
+                    />
+                  </div>
+                )}
               </>
             )}
           </div>
