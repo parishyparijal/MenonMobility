@@ -66,32 +66,34 @@ async function processImage(
   const width = metadata.width || 0;
   const height = metadata.height || 0;
 
-  // Save original
+  // Save original (max 2400px width)
   const originalFileName = `${baseName}-original${ext}`;
   const originalPath = path.join(listingDir, originalFileName);
-  await sharp(buffer).toFile(originalPath);
+  await sharp(buffer)
+    .resize(2400, undefined, { fit: "inside", withoutEnlargement: true })
+    .toFile(originalPath);
 
-  // Generate thumbnail (150x150, cover)
+  // Generate thumbnail (300x225, cover crop)
   const thumbFileName = `${baseName}-thumb.webp`;
   const thumbPath = path.join(listingDir, thumbFileName);
   await sharp(buffer)
-    .resize(150, 150, { fit: "cover" })
+    .resize(300, 225, { fit: "cover" })
     .webp({ quality: 80 })
     .toFile(thumbPath);
 
-  // Generate medium (600x450, fit inside)
+  // Generate medium (600px width, maintain aspect)
   const mediumFileName = `${baseName}-medium.webp`;
   const mediumPath = path.join(listingDir, mediumFileName);
   await sharp(buffer)
-    .resize(600, 450, { fit: "inside", withoutEnlargement: true })
+    .resize(600, undefined, { fit: "inside", withoutEnlargement: true })
     .webp({ quality: 80 })
     .toFile(mediumPath);
 
-  // Generate large (1200x900, fit inside)
+  // Generate large (1200px width, maintain aspect)
   const largeFileName = `${baseName}-large.webp`;
   const largePath = path.join(listingDir, largeFileName);
   await sharp(buffer)
-    .resize(1200, 900, { fit: "inside", withoutEnlargement: true })
+    .resize(1200, undefined, { fit: "inside", withoutEnlargement: true })
     .webp({ quality: 85 })
     .toFile(largePath);
 

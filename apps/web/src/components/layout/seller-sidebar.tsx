@@ -38,7 +38,7 @@ const navItems: SidebarNavItem[] = [
   { label: 'Add Listing', href: '/seller/listings/new', icon: Plus },
   { label: 'Messages', href: '/seller/messages', icon: MessageSquare, badge: 5 },
   { label: 'Reviews', href: '/seller/reviews', icon: Star },
-  { label: 'Company Profile', href: '/seller/company', icon: Building },
+  { label: 'Company Profile', href: '/seller/profile', icon: Building },
   { label: 'Subscription', href: '/seller/subscription', icon: CreditCard },
   { label: 'Analytics', href: '/seller/analytics', icon: BarChart3 },
 ];
