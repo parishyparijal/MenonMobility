@@ -12,32 +12,30 @@ const footerLinks = {
     ],
   },
   equipment: {
-    title: 'Equipment',
+    title: 'More Vehicles',
     links: [
-      { label: 'Construction', href: '/equipment?type=construction' },
-      { label: 'Agricultural', href: '/equipment?type=agricultural' },
-      { label: 'Forklifts', href: '/equipment?type=forklifts' },
-      { label: 'Material Handling', href: '/equipment?type=material-handling' },
+      { label: 'Construction', href: '/construction' },
+      { label: 'Vans', href: '/vans' },
+      { label: 'Cars', href: '/cars' },
+      { label: 'Parts & Accessories', href: '/parts' },
     ],
   },
   company: {
     title: 'Company',
     links: [
-      { label: 'About', href: '/about' },
+      { label: 'About Us', href: '/about' },
       { label: 'Contact', href: '/contact' },
-      { label: 'Careers', href: '/careers' },
-      { label: 'Blog', href: '/blog' },
-      { label: 'Press', href: '/press' },
+      { label: 'Pricing', href: '/pricing' },
+      { label: 'FAQ', href: '/faq' },
     ],
   },
   support: {
-    title: 'Support',
+    title: 'Legal',
     links: [
-      { label: 'Help Center', href: '/help' },
-      { label: 'Terms', href: '/terms' },
-      { label: 'Privacy', href: '/privacy' },
-      { label: 'Advertise', href: '/advertise' },
-      { label: 'Sitemap', href: '/sitemap' },
+      { label: 'Terms of Service', href: '/terms' },
+      { label: 'Privacy Policy', href: '/privacy' },
+      { label: 'Sell Your Vehicle', href: '/register' },
+      { label: 'Advertise', href: '/contact' },
     ],
   },
 };
@@ -111,7 +109,7 @@ export function Footer() {
       <div className="border-t border-white/10">
         <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-sm text-white/50">
-            &copy; 2024 Menon Mobility. All rights reserved.
+            &copy; {new Date().getFullYear()} Menon Mobility. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             <button className="text-sm text-white/50 hover:text-white transition-colors">
