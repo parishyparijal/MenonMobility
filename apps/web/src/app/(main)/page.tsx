@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { ListingCard, type ListingCardData } from '@/components/listings/listing-card';
-import { getImagesForListing, BRAND_IMAGES } from '@/lib/images';
+import { getImagesForListing, BRAND_IMAGES, CATEGORY_HERO_IMAGES } from '@/lib/images';
 
 const categories = [
   { name: 'Trucks', slug: 'trucks', icon: Truck },
@@ -197,8 +197,14 @@ export default function HomePage() {
   return (
     <div className="bg-background">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary via-primary to-primary-950 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
+      <section className="relative text-white overflow-hidden">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${CATEGORY_HERO_IMAGES.trucks})` }}
+        />
+        {/* Dark Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/85 to-primary-950/80" />
         <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-4">
