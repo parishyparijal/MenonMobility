@@ -33,6 +33,11 @@ function findLabel(options: FilterOption[], value: string): string {
   return options.find((o) => o.value === value)?.label || value;
 }
 
+/** Normalize a URL param to slug format (lowercase, spaces→hyphens) */
+function toSlug(v: string): string {
+  return v.toLowerCase().replace(/\s+/g, '-');
+}
+
 // ---------------------------------------------------------------------------
 // Static filter options — values match API expected formats
 // ---------------------------------------------------------------------------
@@ -253,14 +258,15 @@ export default function SearchPage() {
   // Debounce timer for search input
   const searchTimer = useRef<NodeJS.Timeout | null>(null);
 
-  // Read filters from URL — values are already API-compatible (slugs, enums, ISO codes)
+  // Read filters from URL — normalize to API-compatible values
+  // This handles both new format (slugs) and legacy format (display names)
   const query = searchParams.get('q') || '';
-  const selectedCategories = searchParams.getAll('category');
-  const selectedBrands = searchParams.getAll('brand');
-  const selectedConditions = searchParams.getAll('condition');
-  const selectedFuelTypes = searchParams.getAll('fuelType');
-  const selectedTransmissions = searchParams.getAll('transmission');
-  const selectedCountries = searchParams.getAll('country');
+  const selectedCategories = searchParams.getAll('category').map(toSlug);
+  const selectedBrands = searchParams.getAll('brand').map(toSlug);
+  const selectedConditions = searchParams.getAll('condition').map((v) => v.toUpperCase());
+  const selectedFuelTypes = searchParams.getAll('fuelType').map((v) => v.toUpperCase());
+  const selectedTransmissions = searchParams.getAll('transmission').map((v) => v.toUpperCase().replace(/-/g, '_'));
+  const selectedCountries = searchParams.getAll('country').map((v) => v.toUpperCase());
   const priceMin = searchParams.get('priceMin') || '';
   const priceMax = searchParams.get('priceMax') || '';
   const yearMin = searchParams.get('yearMin') || '';
