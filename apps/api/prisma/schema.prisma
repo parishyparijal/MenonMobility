@@ -129,6 +129,7 @@ model User {
   lastLoginAt     DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+  stripeCustomerId String?   @unique
   deletedAt       DateTime?
 
   // Relations

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import prisma from "@/config/database";
 import { AppError } from "@/middleware/errorHandler";
+import { stripeService } from "@/services/stripe.service";
 
 // ---------------------------------------------------------------------------
 // Subscription Controller
@@ -83,8 +84,8 @@ export const subscriptionController = {
 
   /**
    * POST /api/subscriptions/subscribe
-   * Create a subscription for the authenticated user.
-   * For now, directly creates the UserSubscription record (Stripe integration later).
+   * Create a Stripe Checkout session for subscribing to a plan.
+   * Returns the checkout URL for the client to redirect to.
    */
   async subscribe(req: Request, res: Response, next: NextFunction) {
     try {
@@ -115,43 +116,18 @@ export const subscriptionController = {
         );
       }
 
-      // Calculate period based on billing cycle
-      const now = new Date();
-      const periodEnd = new Date(now);
-      if (billingCycle === "YEARLY") {
-        periodEnd.setFullYear(periodEnd.getFullYear() + 1);
-      } else {
-        periodEnd.setMonth(periodEnd.getMonth() + 1);
-      }
-
-      const subscription = await prisma.userSubscription.create({
-        data: {
+      // Create Stripe checkout session
+      const { sessionId, url } =
+        await stripeService.createSubscriptionCheckout(
           userId,
           planId,
-          status: "ACTIVE",
-          periodStart: now,
-          periodEnd,
-        },
-        include: {
-          plan: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              priceMonthly: true,
-              priceYearly: true,
-              maxListings: true,
-              maxImages: true,
-              features: true,
-            },
-          },
-        },
-      });
+          billingCycle || "MONTHLY"
+        );
 
-      res.status(201).json({
+      res.json({
         success: true,
-        data: subscription,
-        message: `Successfully subscribed to ${plan.name} plan`,
+        data: { sessionId, url },
+        message: "Checkout session created. Redirect to the URL to complete payment.",
       });
     } catch (error) {
       next(error);
@@ -160,7 +136,8 @@ export const subscriptionController = {
 
   /**
    * POST /api/subscriptions/change-plan
-   * Switch to a different plan. Updates the current subscription.
+   * Create a new checkout session for the new plan.
+   * Current subscription will be cancelled when the new one activates (via webhook).
    */
   async changePlan(req: Request, res: Response, next: NextFunction) {
     try {
@@ -185,50 +162,29 @@ export const subscriptionController = {
       });
 
       if (!currentSubscription) {
-        throw new AppError("You don't have an active subscription to change", 400);
+        throw new AppError(
+          "You don't have an active subscription to change",
+          400
+        );
       }
 
       if (currentSubscription.planId === planId) {
         throw new AppError("You are already on this plan", 400);
       }
 
-      // Calculate new period
-      const now = new Date();
-      const periodEnd = new Date(now);
-      if (billingCycle === "YEARLY") {
-        periodEnd.setFullYear(periodEnd.getFullYear() + 1);
-      } else {
-        periodEnd.setMonth(periodEnd.getMonth() + 1);
-      }
-
-      // Update subscription to new plan
-      const updated = await prisma.userSubscription.update({
-        where: { id: currentSubscription.id },
-        data: {
+      // Create a new checkout session for the new plan
+      // The webhook handler will cancel the old subscription
+      const { sessionId, url } =
+        await stripeService.createSubscriptionCheckout(
+          userId,
           planId,
-          periodStart: now,
-          periodEnd,
-        },
-        include: {
-          plan: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              priceMonthly: true,
-              priceYearly: true,
-              maxListings: true,
-              maxImages: true,
-              features: true,
-            },
-          },
-        },
-      });
+          billingCycle || "MONTHLY"
+        );
 
       res.json({
         success: true,
-        data: updated,
-        message: `Plan changed to ${newPlan.name}`,
+        data: { sessionId, url },
+        message: "Checkout session created for plan change.",
       });
     } catch (error) {
       next(error);
@@ -237,7 +193,7 @@ export const subscriptionController = {
 
   /**
    * POST /api/subscriptions/cancel
-   * Cancel the current active subscription. Sets cancelledAt and status=CANCELLED.
+   * Cancel the current active subscription at period end.
    */
   async cancel(req: Request, res: Response, next: NextFunction) {
     try {
@@ -251,9 +207,20 @@ export const subscriptionController = {
       });
 
       if (!subscription) {
-        throw new AppError("You don't have an active subscription to cancel", 400);
+        throw new AppError(
+          "You don't have an active subscription to cancel",
+          400
+        );
       }
 
+      // Cancel via Stripe if we have a subscription ID
+      if (subscription.stripeSubscriptionId) {
+        await stripeService.cancelSubscription(
+          subscription.stripeSubscriptionId
+        );
+      }
+
+      // Update local record
       const updated = await prisma.userSubscription.update({
         where: { id: subscription.id },
         data: {
@@ -275,6 +242,25 @@ export const subscriptionController = {
         success: true,
         data: updated,
         message: "Subscription cancelled successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * POST /api/subscriptions/billing-portal
+   * Create a Stripe Customer Portal session for managing billing.
+   */
+  async billingPortal(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user!.userId;
+
+      const url = await stripeService.createPortalSession(userId);
+
+      res.json({
+        success: true,
+        data: { url },
       });
     } catch (error) {
       next(error);

@@ -16,6 +16,9 @@ import contactRoutes from "./contact.routes";
 import pageRoutes from "./page.routes";
 import savedSearchRoutes from "./saved-search.routes";
 import recentlyViewedRoutes from "./recently-viewed.routes";
+import featuredListingRoutes from "./featured-listing.routes";
+import paymentRoutes from "./payment.routes";
+import sitemapRoutes from "./sitemap.routes";
 
 // ---------------------------------------------------------------------------
 // Main API Router
@@ -39,5 +42,8 @@ router.use("/contact", contactRoutes);
 router.use("/pages", pageRoutes);
 router.use("/saved-searches", savedSearchRoutes);
 router.use("/recently-viewed", recentlyViewedRoutes);
+router.use("/featured-listings", featuredListingRoutes);
+router.use("/payments", paymentRoutes);
+router.use("/sitemap", sitemapRoutes);
 
 export default router;
