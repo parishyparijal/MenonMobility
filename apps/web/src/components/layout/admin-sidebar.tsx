@@ -72,12 +72,12 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         )}
       >
         {/* Logo */}
-        <div className="flex items-center justify-between h-16 px-5 border-b border-white/10">
+        <div className="flex items-center justify-between h-20 px-5 border-b border-white/10">
           <Link href="/admin" className="flex items-center gap-2">
             <img
               src="/logo.png"
               alt="Menon Mobility"
-              className="h-10 w-auto object-contain bg-white rounded-lg px-2 py-1"
+              className="h-14 w-auto object-contain bg-white rounded-lg px-2 py-1"
             />
             <span className="text-[10px] uppercase tracking-wider text-accent-400 font-semibold bg-accent-500/20 px-1.5 py-0.5 rounded">
               Admin
