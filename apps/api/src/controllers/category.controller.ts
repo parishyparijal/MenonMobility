@@ -203,10 +203,92 @@ export const categoryController = {
     }
   },
 
+  // ── Admin CRUD ──────────────────────────────────────────────────────
+
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { name, slug, description, icon, imageUrl, parentId, sortOrder, isActive } = req.body;
+
+      const existing = await prisma.category.findUnique({ where: { slug } });
+      if (existing) {
+        throw new AppError("A category with this slug already exists", 409);
+      }
+
+      if (parentId) {
+        const parent = await prisma.category.findUnique({ where: { id: parentId } });
+        if (!parent) throw new AppError("Parent category not found", 404);
+      }
+
+      const category = await prisma.category.create({
+        data: { name, slug, description: description || null, icon: icon || null, imageUrl: imageUrl || null, parentId: parentId || null, sortOrder: sortOrder ?? 0, isActive: isActive ?? true },
+      });
+
+      res.status(201).json({ success: true, data: category, message: "Category created" });
+    } catch (error) { next(error); }
+  },
+
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = req.params.id as string;
+      const { name, slug, description, icon, imageUrl, parentId, sortOrder, isActive } = req.body;
+
+      const existing = await prisma.category.findUnique({ where: { id } });
+      if (!existing) throw new AppError("Category not found", 404);
+
+      if (slug && slug !== existing.slug) {
+        const slugTaken = await prisma.category.findUnique({ where: { slug } });
+        if (slugTaken) throw new AppError("A category with this slug already exists", 409);
+      }
+
+      if (parentId === id) throw new AppError("Category cannot be its own parent", 400);
+
+      const category = await prisma.category.update({
+        where: { id },
+        data: {
+          ...(name !== undefined && { name }),
+          ...(slug !== undefined && { slug }),
+          ...(description !== undefined && { description }),
+          ...(icon !== undefined && { icon }),
+          ...(imageUrl !== undefined && { imageUrl }),
+          ...(parentId !== undefined && { parentId }),
+          ...(sortOrder !== undefined && { sortOrder }),
+          ...(isActive !== undefined && { isActive }),
+        },
+      });
+
+      res.json({ success: true, data: category, message: "Category updated" });
+    } catch (error) { next(error); }
+  },
+
+  async remove(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = req.params.id as string;
+
+      const category = await prisma.category.findUnique({
+        where: { id },
+        include: { children: { select: { id: true } }, _count: { select: { listings: true } } },
+      });
+
+      if (!category) throw new AppError("Category not found", 404);
+
+      if (category._count.listings > 0) {
+        throw new AppError(`Cannot delete category with ${category._count.listings} listings. Reassign listings first.`, 400);
+      }
+
+      if (category.children.length > 0) {
+        await prisma.category.updateMany({ where: { parentId: id }, data: { parentId: category.parentId } });
+      }
+
+      await prisma.brandCategory.deleteMany({ where: { categoryId: id } });
+      await prisma.category.delete({ where: { id } });
+
+      res.json({ success: true, message: "Category deleted" });
+    } catch (error) { next(error); }
+  },
+
   /**
    * GET /api/categories/:slug/filters
    * Get available filter options for a category, derived from active listings.
-   * Returns brands, price range, fuel types, conditions, years, etc.
    */
   async getFilters(req: Request, res: Response, next: NextFunction) {
     try {

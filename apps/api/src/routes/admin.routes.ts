@@ -4,6 +4,8 @@ import { ensureRole } from "@/middleware/roles";
 import { validate } from "@/middleware/validate";
 import { adminController } from "@/controllers/admin.controller";
 import { pageController } from "@/controllers/page.controller";
+import { categoryController } from "@/controllers/category.controller";
+import { brandController } from "@/controllers/brand.controller";
 import {
   listUsersQuerySchema,
   userIdParamsSchema,
@@ -13,6 +15,15 @@ import {
   rejectListingBodySchema,
   listReviewsQuerySchema,
   reviewIdParamsSchema,
+  categoryIdParamsSchema,
+  createCategoryBodySchema,
+  updateCategoryBodySchema,
+  brandIdParamsSchema,
+  createBrandBodySchema,
+  updateBrandBodySchema,
+  modelIdParamsSchema,
+  createModelBodySchema,
+  updateModelBodySchema,
 } from "@/validators/admin.validator";
 import {
   createPageBodySchema,
@@ -115,6 +126,63 @@ router.delete(
   "/pages/:id",
   validate({ params: pageIdParamsSchema }),
   pageController.remove
+);
+
+// ---- Category Management ----
+router.post(
+  "/categories",
+  validate({ body: createCategoryBodySchema }),
+  categoryController.create
+);
+
+router.put(
+  "/categories/:id",
+  validate({ params: categoryIdParamsSchema, body: updateCategoryBodySchema }),
+  categoryController.update
+);
+
+router.delete(
+  "/categories/:id",
+  validate({ params: categoryIdParamsSchema }),
+  categoryController.remove
+);
+
+// ---- Brand Management ----
+router.post(
+  "/brands",
+  validate({ body: createBrandBodySchema }),
+  brandController.create
+);
+
+router.put(
+  "/brands/:id",
+  validate({ params: brandIdParamsSchema, body: updateBrandBodySchema }),
+  brandController.update
+);
+
+router.delete(
+  "/brands/:id",
+  validate({ params: brandIdParamsSchema }),
+  brandController.remove
+);
+
+// ---- Brand Model Management ----
+router.post(
+  "/brands/:id/models",
+  validate({ params: brandIdParamsSchema, body: createModelBodySchema }),
+  brandController.createModel
+);
+
+router.put(
+  "/brands/:id/models/:modelId",
+  validate({ params: modelIdParamsSchema, body: updateModelBodySchema }),
+  brandController.updateModel
+);
+
+router.delete(
+  "/brands/:id/models/:modelId",
+  validate({ params: modelIdParamsSchema }),
+  brandController.deleteModel
 );
 
 export default router;

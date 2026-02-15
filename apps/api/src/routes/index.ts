@@ -14,6 +14,8 @@ import notificationRoutes from "./notification.routes";
 import subscriptionRoutes from "./subscription.routes";
 import contactRoutes from "./contact.routes";
 import pageRoutes from "./page.routes";
+import savedSearchRoutes from "./saved-search.routes";
+import recentlyViewedRoutes from "./recently-viewed.routes";
 
 // ---------------------------------------------------------------------------
 // Main API Router
@@ -35,5 +37,7 @@ router.use("/notifications", notificationRoutes);
 router.use("/subscriptions", subscriptionRoutes);
 router.use("/contact", contactRoutes);
 router.use("/pages", pageRoutes);
+router.use("/saved-searches", savedSearchRoutes);
+router.use("/recently-viewed", recentlyViewedRoutes);
 
 export default router;
