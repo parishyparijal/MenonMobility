@@ -158,7 +158,7 @@ export function ListingCard({ listing, view = 'grid' }: ListingCardProps) {
           </Badge>
           <button
             onClick={handleFavoriteClick}
-            className="absolute bottom-2 right-2 p-2 rounded-full bg-white/90 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
+            className="absolute bottom-2 right-2 p-2 rounded-full bg-white/90 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
           >
             <Heart
               className={cn(
