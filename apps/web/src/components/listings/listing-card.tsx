@@ -89,7 +89,7 @@ export function ListingCard({ listing, view = 'grid' }: ListingCardProps) {
                   <Calendar className="w-3.5 h-3.5" />
                   {listing.year}
                 </span>
-                {listing.mileage !== undefined && (
+                {listing.mileage != null && (
                   <span className="flex items-center gap-1">
                     <Gauge className="w-3.5 h-3.5" />
                     {listing.mileage.toLocaleString()} km
@@ -180,7 +180,7 @@ export function ListingCard({ listing, view = 'grid' }: ListingCardProps) {
               <Calendar className="w-3 h-3" />
               {listing.year}
             </span>
-            {listing.mileage !== undefined && (
+            {listing.mileage != null && (
               <>
                 <span className="text-border">|</span>
                 <span className="flex items-center gap-1">

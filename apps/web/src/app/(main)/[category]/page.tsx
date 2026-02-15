@@ -321,7 +321,7 @@ function mapApiListing(listing: any): ListingCardData {
     condition: listing.condition || 'USED',
     images,
     year: listing.year,
-    mileage: listing.mileageKm,
+    mileage: listing.mileageKm ?? undefined,
     fuelType: listing.fuelType,
     location: {
       city: listing.city || listing.location?.city || '',
