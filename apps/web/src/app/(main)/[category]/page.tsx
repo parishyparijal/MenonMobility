@@ -239,8 +239,6 @@ export default function CategoryPage() {
         />
         {/* Dark Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-primary/70 via-primary/55 to-primary-950/45" />
-        {/* Bottom fade for smooth transition */}
-        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background to-transparent" />
 
         <div className="container mx-auto px-4 relative z-10">
           <nav className="flex items-center gap-2 text-sm text-white/60 mb-4">
