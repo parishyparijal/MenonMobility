@@ -59,7 +59,7 @@ export function Footer() {
               <img
                 src="/logo.png"
                 alt="Menon Mobility"
-                className="h-16 w-auto object-contain bg-white rounded-lg px-3 py-1"
+                className="h-10 w-auto object-contain bg-white rounded-lg px-3 py-1.5"
               />
             </Link>
             <p className="text-sm text-white/70 mb-6 max-w-[240px]">

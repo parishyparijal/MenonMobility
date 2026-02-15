@@ -208,13 +208,13 @@ export function Header() {
 
       {/* Main Header */}
       <header className="bg-white border-b border-border shadow-sm sticky top-0 z-40">
-        <div className="container mx-auto flex items-center justify-between h-20 px-4">
+        <div className="container mx-auto flex items-center justify-between h-16 px-4">
           {/* Left: Logo */}
           <Link href="/" className="flex items-center shrink-0">
             <img
               src="/logo.png"
               alt="Menon Mobility"
-              className="h-16 md:h-[4.5rem] w-auto object-contain"
+              className="h-10 md:h-12 w-auto object-contain"
             />
           </Link>
 

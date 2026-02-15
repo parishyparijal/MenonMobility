@@ -68,12 +68,12 @@ export function SellerSidebar({ isOpen, onClose }: SellerSidebarProps) {
         )}
       >
         {/* Logo */}
-        <div className="flex items-center justify-between h-20 px-5 border-b border-white/10">
+        <div className="flex items-center justify-between h-16 px-5 border-b border-white/10">
           <Link href="/seller" className="flex items-center">
             <img
               src="/logo.png"
               alt="Menon Mobility"
-              className="h-14 w-auto object-contain bg-white rounded-lg px-2 py-1"
+              className="h-9 w-auto object-contain bg-white rounded-lg px-2 py-1"
             />
           </Link>
           <button
