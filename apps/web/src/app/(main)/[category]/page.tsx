@@ -76,9 +76,15 @@ const categoryData: Record<string, {
   },
   cars: {
     name: 'Cars',
-    description: 'Browse commercial cars and company vehicles from verified European dealers.',
-    subcategories: [],
-    topBrands: [],
+    description: 'Browse commercial cars and company vehicles from verified European dealers. Sedans, SUVs, and fleet vehicles.',
+    subcategories: [
+      { name: 'Sedans', slug: 'sedans' },
+      { name: 'SUVs', slug: 'suvs' },
+      { name: 'Estate Cars', slug: 'estate' },
+      { name: 'Electric Cars', slug: 'electric' },
+      { name: 'Company Cars', slug: 'company' },
+    ],
+    topBrands: ['BMW', 'Audi', 'Mercedes-Benz', 'Volkswagen', 'Toyota', 'Volvo'],
     listingCount: 8200,
   },
   containers: {
@@ -116,34 +122,101 @@ const defaultCategory = {
   listingCount: 5000,
 };
 
-const dummyListings: ListingCardData[] = Array.from({ length: 12 }, (_, i) => ({
-  id: `cat-${i}`,
-  slug: `category-listing-${i}`,
-  title: [
-    'Mercedes-Benz Actros 2545 LS 6x2',
-    'Volvo FH 500 4x2 Globetrotter',
-    'Scania R 450 Highline',
-    'MAN TGX 18.510 4x2 BLS',
-  ][i % 4],
-  price: [89500, 125000, 78900, 115000][i % 4],
-  currency: 'EUR',
-  condition: (i % 4 === 0 ? 'NEW' : 'USED') as 'NEW' | 'USED',
-  images: getImagesForListing([
-    'Mercedes-Benz Actros 2545 LS 6x2',
-    'Volvo FH 500 4x2 Globetrotter',
-    'Scania R 450 Highline',
-    'MAN TGX 18.510 4x2 BLS',
-  ][i % 4]),
-  year: 2020 + (i % 4),
-  mileage: i % 4 === 0 ? 0 : 100000 + i * 30000,
-  fuelType: 'Diesel',
-  location: {
-    city: ['Rotterdam', 'Hamburg', 'Antwerp', 'Munich'][i % 4],
-    country: ['Netherlands', 'Germany', 'Belgium', 'Germany'][i % 4],
+const categoryListingData: Record<string, {
+  titles: string[];
+  prices: number[];
+  fuelTypes: string[];
+  sellers: string[];
+  cities: string[];
+  countries: string[];
+  mileageBase: number;
+}> = {
+  trucks: {
+    titles: ['Mercedes-Benz Actros 2545 LS 6x2', 'Volvo FH 500 4x2 Globetrotter', 'Scania R 450 Highline', 'MAN TGX 18.510 4x2 BLS'],
+    prices: [89500, 125000, 78900, 115000],
+    fuelTypes: ['Diesel', 'Diesel', 'Diesel', 'Diesel'],
+    sellers: ['TransEuropa BV', 'Nordic Trucks', 'FleetPro NV', 'BavariaTruck AG'],
+    cities: ['Rotterdam', 'Hamburg', 'Antwerp', 'Munich'],
+    countries: ['Netherlands', 'Germany', 'Belgium', 'Germany'],
+    mileageBase: 120000,
   },
-  seller: { name: ['TransEuropa BV', 'Nordic Trucks', 'FleetPro NV', 'BavariaTruck AG'][i % 4] },
-  isFeatured: i < 2,
-}));
+  trailers: {
+    titles: ['Schmitz Cargobull Curtainsider SCS 24/L', 'Krone Mega Liner SDC 27 eLTU', 'Kögel Flatbed SNCO 24 P90', 'Lamberet Reefer SR2 Thermo King'],
+    prices: [32000, 45000, 28500, 52000],
+    fuelTypes: ['N/A', 'N/A', 'N/A', 'N/A'],
+    sellers: ['TrailerPoint GmbH', 'Krone Center', 'FleetTrailers BV', 'CoolTransport NV'],
+    cities: ['Bremen', 'Werlte', 'Rotterdam', 'Brussels'],
+    countries: ['Germany', 'Germany', 'Netherlands', 'Belgium'],
+    mileageBase: 0,
+  },
+  construction: {
+    titles: ['CAT 320 GC Excavator', 'Komatsu PC210 LC-11 Excavator', 'Liebherr L 566 XPower Wheel Loader', 'Volvo EC220E Excavator'],
+    prices: [185000, 142000, 220000, 168000],
+    fuelTypes: ['Diesel', 'Diesel', 'Diesel', 'Diesel'],
+    sellers: ['Zeppelin AG', 'Kuhn Baumaschinen', 'Liebherr Direct', 'Swecon AB'],
+    cities: ['Munich', 'Cologne', 'Biberach', 'Stockholm'],
+    countries: ['Germany', 'Germany', 'Germany', 'Sweden'],
+    mileageBase: 5000,
+  },
+  vans: {
+    titles: ['Mercedes-Benz Sprinter 316 CDI L3H2', 'Ford Transit 350 L3H2 EcoBlue', 'VW Crafter 35 TDI L4H3', 'Iveco Daily 35S18 Hi-Matic'],
+    prices: [38500, 32000, 35800, 29500],
+    fuelTypes: ['Diesel', 'Diesel', 'Diesel', 'Diesel'],
+    sellers: ['VanCenter BV', 'Ford Trucks Direct', 'Volkswagen Commercial', 'Iveco Dealer NL'],
+    cities: ['Amsterdam', 'London', 'Hannover', 'Milan'],
+    countries: ['Netherlands', 'United Kingdom', 'Germany', 'Italy'],
+    mileageBase: 60000,
+  },
+  cars: {
+    titles: ['BMW 5 Series 530d xDrive Touring', 'Audi A6 Avant 45 TDI quattro', 'Mercedes-Benz E-Class E300 AMG Line', 'VW Passat Variant 2.0 TDI Business'],
+    prices: [52000, 48500, 55000, 34500],
+    fuelTypes: ['Diesel', 'Diesel', 'Petrol', 'Diesel'],
+    sellers: ['BMW Premium Select', 'Audi Zentrum', 'Mercedes-Benz Certified', 'Das WeltAuto'],
+    cities: ['Munich', 'Ingolstadt', 'Stuttgart', 'Wolfsburg'],
+    countries: ['Germany', 'Germany', 'Germany', 'Germany'],
+    mileageBase: 45000,
+  },
+  containers: {
+    titles: ['20ft Standard Shipping Container', '40ft High Cube Container HC', 'Reefer Container 40ft Carrier Unit', '20ft Storage Container Side Opening'],
+    prices: [2800, 4500, 12000, 3200],
+    fuelTypes: ['N/A', 'N/A', 'N/A', 'N/A'],
+    sellers: ['ContainerPort BV', 'EuroBox GmbH', 'SeaCargo Containers', 'FlexiStore Ltd'],
+    cities: ['Rotterdam', 'Hamburg', 'Antwerp', 'Felixstowe'],
+    countries: ['Netherlands', 'Germany', 'Belgium', 'United Kingdom'],
+    mileageBase: 0,
+  },
+  parts: {
+    titles: ['Truck Engine Assembly OM471 Mercedes', 'Brake Caliper Set Knorr-Bremse SB7', 'Tyre Set 315/80 R22.5 Continental', 'Air Filter Kit Mann+Hummel C30810'],
+    prices: [8500, 420, 1200, 85],
+    fuelTypes: ['N/A', 'N/A', 'N/A', 'N/A'],
+    sellers: ['EuroParts Direct', 'BrakeTech GmbH', 'TyrePro BV', 'FilterKing NL'],
+    cities: ['Düsseldorf', 'Stuttgart', 'Rotterdam', 'Amsterdam'],
+    countries: ['Germany', 'Germany', 'Netherlands', 'Netherlands'],
+    mileageBase: 0,
+  },
+};
+
+function getDummyListings(categorySlug: string): ListingCardData[] {
+  const data = categoryListingData[categorySlug] || categoryListingData.trucks;
+  return Array.from({ length: 12 }, (_, i) => ({
+    id: `cat-${i}`,
+    slug: `category-listing-${i}`,
+    title: data.titles[i % data.titles.length],
+    price: data.prices[i % data.prices.length],
+    currency: 'EUR',
+    condition: (i % 4 === 0 ? 'NEW' : 'USED') as 'NEW' | 'USED',
+    images: getImagesForListing(data.titles[i % data.titles.length]),
+    year: 2020 + (i % 4),
+    mileage: data.mileageBase === 0 ? 0 : data.mileageBase + i * 15000,
+    fuelType: data.fuelTypes[i % data.fuelTypes.length],
+    location: {
+      city: data.cities[i % data.cities.length],
+      country: data.countries[i % data.countries.length],
+    },
+    seller: { name: data.sellers[i % data.sellers.length] },
+    isFeatured: i < 2,
+  }));
+}
 
 export default function CategoryPage() {
   const params = useParams();
@@ -151,6 +224,7 @@ export default function CategoryPage() {
   const category = categoryData[categorySlug] || defaultCategory;
   const [currentPage, setCurrentPage] = useState(1);
   const [view, setView] = useState<'grid' | 'list'>('grid');
+  const dummyListings = getDummyListings(categorySlug);
 
   return (
     <div className="bg-background min-h-screen">
