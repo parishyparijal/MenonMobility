@@ -204,7 +204,7 @@ export default function HomePage() {
           style={{ backgroundImage: `url('/hero-bg.jpg')` }}
         />
         {/* Dark Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/85 via-primary/70 to-primary-950/75" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/70 via-primary/55 to-primary-950/45" />
         <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-4">

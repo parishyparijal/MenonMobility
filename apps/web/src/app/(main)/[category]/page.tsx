@@ -238,7 +238,7 @@ export default function CategoryPage() {
           }}
         />
         {/* Dark Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/80 to-primary-950/70" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/70 via-primary/55 to-primary-950/45" />
         {/* Bottom fade for smooth transition */}
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background to-transparent" />
 
@@ -250,7 +250,7 @@ export default function CategoryPage() {
           </nav>
           <h1 className="text-3xl md:text-4xl font-bold mb-3">{category.name}</h1>
           <p className="text-white/85 max-w-2xl text-lg">{category.description}</p>
-          <p className="text-sm text-accent font-semibold mt-4 bg-white/10 backdrop-blur-sm inline-block px-3 py-1 rounded-full">
+          <p className="text-sm text-accent font-semibold mt-4 bg-white/10 inline-block px-3 py-1 rounded-full">
             {category.listingCount.toLocaleString()} listings available
           </p>
         </div>
