@@ -147,8 +147,8 @@ export const CAR_IMAGES = {
     img('photo-1580273916550-e323be2ae537'),  // White BMW sedan
   ],
   'audi': [
-    img('photo-1606611013016-969c19ba72f4'),  // Dark sedan
-    img('photo-1549317661-bd32c8ce0afa'),     // Audi on dark road
+    '/cars-audi-1.jpg',                       // Blue Audi RS6 Avant
+    '/cars-audi-2.jpg',                       // Blue Audi A5 Sportback
     img('photo-1617531653332-bd46c24f2068'),  // Audi A4
   ],
   'mercedes-car': [
@@ -157,7 +157,7 @@ export const CAR_IMAGES = {
     img('photo-1503376780353-7e6692767b70'),  // Premium car road
   ],
   'volkswagen-car': [
-    img('photo-1568844293986-8d0400f58968'),  // VW Golf
+    img('photo-1494976388531-d1058494cdd8'),  // Sedan driving
     img('photo-1533473359331-0135ef1b58bf'),  // Compact SUV
     img('photo-1552519507-da3b142c6e3d'),     // Red car
   ],
