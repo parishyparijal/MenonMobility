@@ -22,23 +22,81 @@ import { getImagesForListing } from '@/lib/images';
 import { api } from '@/lib/api';
 
 // ---------------------------------------------------------------------------
-// Static filter options (used when API aggregations are unavailable)
+// Filter option types & helpers
 // ---------------------------------------------------------------------------
-const categoryOptions = [
-  'Trucks', 'Trailers', 'Construction', 'Vans', 'Cars', 'Containers', 'Parts', 'Agricultural',
+interface FilterOption {
+  label: string;
+  value: string;
+}
+
+function findLabel(options: FilterOption[], value: string): string {
+  return options.find((o) => o.value === value)?.label || value;
+}
+
+// ---------------------------------------------------------------------------
+// Static filter options — values match API expected formats
+// ---------------------------------------------------------------------------
+const categoryOptions: FilterOption[] = [
+  { label: 'Trucks', value: 'trucks' },
+  { label: 'Trailers', value: 'trailers' },
+  { label: 'Construction', value: 'construction' },
+  { label: 'Vans', value: 'vans' },
+  { label: 'Cars', value: 'cars' },
+  { label: 'Containers', value: 'containers' },
+  { label: 'Parts', value: 'parts' },
+  { label: 'Agricultural', value: 'agricultural' },
 ];
 
-const brandOptions = [
-  'Mercedes-Benz', 'Volvo', 'Scania', 'MAN', 'DAF', 'Iveco', 'Renault', 'Caterpillar',
-  'Komatsu', 'Liebherr', 'CASE', 'John Deere',
+const brandOptions: FilterOption[] = [
+  { label: 'Mercedes-Benz', value: 'mercedes-benz' },
+  { label: 'Volvo', value: 'volvo' },
+  { label: 'Scania', value: 'scania' },
+  { label: 'MAN', value: 'man' },
+  { label: 'DAF', value: 'daf' },
+  { label: 'Iveco', value: 'iveco' },
+  { label: 'Renault', value: 'renault' },
+  { label: 'Caterpillar', value: 'caterpillar' },
+  { label: 'Komatsu', value: 'komatsu' },
+  { label: 'Liebherr', value: 'liebherr' },
+  { label: 'CASE', value: 'case' },
+  { label: 'John Deere', value: 'john-deere' },
 ];
 
-const conditionOptions = ['New', 'Used'];
-const fuelTypeOptions = ['Diesel', 'Electric', 'Hybrid', 'LNG', 'CNG', 'Petrol'];
-const transmissionOptions = ['Manual', 'Automatic', 'Semi-automatic'];
-const countryOptions = [
-  'Netherlands', 'Germany', 'Belgium', 'France', 'Poland', 'Spain', 'Italy', 'United Kingdom',
-  'Czech Republic', 'Austria', 'Sweden', 'Denmark',
+const conditionOptions: FilterOption[] = [
+  { label: 'New', value: 'NEW' },
+  { label: 'Used', value: 'USED' },
+  { label: 'Refurbished', value: 'REFURBISHED' },
+];
+
+const fuelTypeOptions: FilterOption[] = [
+  { label: 'Diesel', value: 'DIESEL' },
+  { label: 'Petrol', value: 'PETROL' },
+  { label: 'Electric', value: 'ELECTRIC' },
+  { label: 'Hybrid', value: 'HYBRID' },
+  { label: 'LPG', value: 'LPG' },
+  { label: 'CNG', value: 'CNG' },
+  { label: 'Hydrogen', value: 'HYDROGEN' },
+];
+
+const transmissionOptions: FilterOption[] = [
+  { label: 'Manual', value: 'MANUAL' },
+  { label: 'Automatic', value: 'AUTOMATIC' },
+  { label: 'Semi-Automatic', value: 'SEMI_AUTOMATIC' },
+];
+
+const countryOptions: FilterOption[] = [
+  { label: 'Netherlands', value: 'NL' },
+  { label: 'Germany', value: 'DE' },
+  { label: 'Belgium', value: 'BE' },
+  { label: 'France', value: 'FR' },
+  { label: 'Poland', value: 'PL' },
+  { label: 'Spain', value: 'ES' },
+  { label: 'Italy', value: 'IT' },
+  { label: 'United Kingdom', value: 'GB' },
+  { label: 'Czech Republic', value: 'CZ' },
+  { label: 'Austria', value: 'AT' },
+  { label: 'Sweden', value: 'SE' },
+  { label: 'Denmark', value: 'DK' },
 ];
 
 const sortOptions = [
@@ -191,12 +249,11 @@ export default function SearchPage() {
   const [totalResults, setTotalResults] = useState(186);
   const [totalPages, setTotalPages] = useState(8);
   const [currentPage, setCurrentPage] = useState(1);
-  const [usingApi, setUsingApi] = useState(false);
 
   // Debounce timer for search input
   const searchTimer = useRef<NodeJS.Timeout | null>(null);
 
-  // Read filters from URL
+  // Read filters from URL — values are already API-compatible (slugs, enums, ISO codes)
   const query = searchParams.get('q') || '';
   const selectedCategories = searchParams.getAll('category');
   const selectedBrands = searchParams.getAll('brand');
@@ -218,14 +275,14 @@ export default function SearchPage() {
     setIsLoading(true);
 
     try {
-      // Build API query params
+      // Build API query params — values are already in the correct format
       const params = new URLSearchParams();
       if (query) params.set('q', query);
       if (selectedCategories.length > 0) params.set('category', selectedCategories[0]);
       if (selectedBrands.length > 0) params.set('brand', selectedBrands[0]);
-      if (selectedConditions.length > 0) params.set('condition', selectedConditions[0].toUpperCase());
-      if (selectedFuelTypes.length > 0) params.set('fuelType', selectedFuelTypes[0].toUpperCase());
-      if (selectedTransmissions.length > 0) params.set('transmission', selectedTransmissions[0].toUpperCase().replace('-', '_'));
+      if (selectedConditions.length > 0) params.set('condition', selectedConditions[0]);
+      if (selectedFuelTypes.length > 0) params.set('fuelType', selectedFuelTypes[0]);
+      if (selectedTransmissions.length > 0) params.set('transmission', selectedTransmissions[0]);
       if (selectedCountries.length > 0) params.set('countryCode', selectedCountries[0]);
       if (priceMin) params.set('minPrice', priceMin);
       if (priceMax) params.set('maxPrice', priceMax);
@@ -243,7 +300,6 @@ export default function SearchPage() {
         setTotalResults(response.pagination?.total || apiListings.length);
         setTotalPages(response.pagination?.totalPages || 1);
         setCurrentPage(response.pagination?.page || page);
-        setUsingApi(true);
       } else {
         throw new Error('Invalid response');
       }
@@ -259,7 +315,6 @@ export default function SearchPage() {
         );
       }
       if (selectedCategories.length > 0) {
-        // Simple category matching based on title keywords
         filtered = filtered.filter((l) =>
           selectedCategories.some((c) => l.title.toLowerCase().includes(c.toLowerCase()))
         );
@@ -307,7 +362,6 @@ export default function SearchPage() {
       setTotalResults(filtered.length);
       setTotalPages(Math.ceil(filtered.length / 24) || 1);
       setCurrentPage(page);
-      setUsingApi(false);
     } finally {
       setIsLoading(false);
     }
@@ -370,7 +424,7 @@ export default function SearchPage() {
     yearMax;
 
   const filteredBrands = brandOptions.filter((b) =>
-    b.toLowerCase().includes(brandSearch.toLowerCase())
+    b.label.toLowerCase().includes(brandSearch.toLowerCase())
   );
 
   const handlePageChange = (newPage: number) => {
@@ -395,12 +449,12 @@ export default function SearchPage() {
     <div className="space-y-0">
       <FilterSection title="Category">
         <div className="space-y-2">
-          {categoryOptions.map((cat) => (
+          {categoryOptions.map((opt) => (
             <Checkbox
-              key={cat}
-              label={cat}
-              checked={selectedCategories.includes(cat.toLowerCase())}
-              onCheckedChange={() => toggleArrayFilter('category', cat.toLowerCase(), selectedCategories)}
+              key={opt.value}
+              label={opt.label}
+              checked={selectedCategories.includes(opt.value)}
+              onCheckedChange={() => toggleArrayFilter('category', opt.value, selectedCategories)}
             />
           ))}
         </div>
@@ -414,12 +468,12 @@ export default function SearchPage() {
           className="mb-3 h-8 text-xs"
         />
         <div className="space-y-2 max-h-48 overflow-y-auto">
-          {filteredBrands.map((brand) => (
+          {filteredBrands.map((opt) => (
             <Checkbox
-              key={brand}
-              label={brand}
-              checked={selectedBrands.includes(brand)}
-              onCheckedChange={() => toggleArrayFilter('brand', brand, selectedBrands)}
+              key={opt.value}
+              label={opt.label}
+              checked={selectedBrands.includes(opt.value)}
+              onCheckedChange={() => toggleArrayFilter('brand', opt.value, selectedBrands)}
             />
           ))}
         </div>
@@ -465,12 +519,12 @@ export default function SearchPage() {
 
       <FilterSection title="Condition">
         <div className="space-y-2">
-          {conditionOptions.map((cond) => (
+          {conditionOptions.map((opt) => (
             <Checkbox
-              key={cond}
-              label={cond}
-              checked={selectedConditions.includes(cond.toLowerCase())}
-              onCheckedChange={() => toggleArrayFilter('condition', cond.toLowerCase(), selectedConditions)}
+              key={opt.value}
+              label={opt.label}
+              checked={selectedConditions.includes(opt.value)}
+              onCheckedChange={() => toggleArrayFilter('condition', opt.value, selectedConditions)}
             />
           ))}
         </div>
@@ -478,12 +532,12 @@ export default function SearchPage() {
 
       <FilterSection title="Fuel Type" defaultOpen={false}>
         <div className="space-y-2">
-          {fuelTypeOptions.map((fuel) => (
+          {fuelTypeOptions.map((opt) => (
             <Checkbox
-              key={fuel}
-              label={fuel}
-              checked={selectedFuelTypes.includes(fuel.toLowerCase())}
-              onCheckedChange={() => toggleArrayFilter('fuelType', fuel.toLowerCase(), selectedFuelTypes)}
+              key={opt.value}
+              label={opt.label}
+              checked={selectedFuelTypes.includes(opt.value)}
+              onCheckedChange={() => toggleArrayFilter('fuelType', opt.value, selectedFuelTypes)}
             />
           ))}
         </div>
@@ -491,13 +545,13 @@ export default function SearchPage() {
 
       <FilterSection title="Transmission" defaultOpen={false}>
         <div className="space-y-2">
-          {transmissionOptions.map((trans) => (
+          {transmissionOptions.map((opt) => (
             <Checkbox
-              key={trans}
-              label={trans}
-              checked={selectedTransmissions.includes(trans.toLowerCase())}
+              key={opt.value}
+              label={opt.label}
+              checked={selectedTransmissions.includes(opt.value)}
               onCheckedChange={() =>
-                toggleArrayFilter('transmission', trans.toLowerCase(), selectedTransmissions)
+                toggleArrayFilter('transmission', opt.value, selectedTransmissions)
               }
             />
           ))}
@@ -506,13 +560,13 @@ export default function SearchPage() {
 
       <FilterSection title="Country" defaultOpen={false}>
         <div className="space-y-2 max-h-48 overflow-y-auto">
-          {countryOptions.map((country) => (
+          {countryOptions.map((opt) => (
             <Checkbox
-              key={country}
-              label={country}
-              checked={selectedCountries.includes(country.toLowerCase())}
+              key={opt.value}
+              label={opt.label}
+              checked={selectedCountries.includes(opt.value)}
               onCheckedChange={() =>
-                toggleArrayFilter('country', country.toLowerCase(), selectedCountries)
+                toggleArrayFilter('country', opt.value, selectedCountries)
               }
             />
           ))}
@@ -528,26 +582,44 @@ export default function SearchPage() {
   );
 
   // ---------------------------------------------------------------------------
-  // Active filter chips
+  // Active filter chips — show display labels, not raw values
   // ---------------------------------------------------------------------------
   const activeFilterChips: { label: string; onRemove: () => void }[] = [];
 
   selectedCategories.forEach((cat) => {
     activeFilterChips.push({
-      label: `Category: ${cat}`,
+      label: `Category: ${findLabel(categoryOptions, cat)}`,
       onRemove: () => toggleArrayFilter('category', cat, selectedCategories),
     });
   });
   selectedBrands.forEach((brand) => {
     activeFilterChips.push({
-      label: `Brand: ${brand}`,
+      label: `Brand: ${findLabel(brandOptions, brand)}`,
       onRemove: () => toggleArrayFilter('brand', brand, selectedBrands),
     });
   });
   selectedConditions.forEach((cond) => {
     activeFilterChips.push({
-      label: `Condition: ${cond}`,
+      label: `Condition: ${findLabel(conditionOptions, cond)}`,
       onRemove: () => toggleArrayFilter('condition', cond, selectedConditions),
+    });
+  });
+  selectedFuelTypes.forEach((fuel) => {
+    activeFilterChips.push({
+      label: `Fuel: ${findLabel(fuelTypeOptions, fuel)}`,
+      onRemove: () => toggleArrayFilter('fuelType', fuel, selectedFuelTypes),
+    });
+  });
+  selectedTransmissions.forEach((trans) => {
+    activeFilterChips.push({
+      label: `Transmission: ${findLabel(transmissionOptions, trans)}`,
+      onRemove: () => toggleArrayFilter('transmission', trans, selectedTransmissions),
+    });
+  });
+  selectedCountries.forEach((country) => {
+    activeFilterChips.push({
+      label: `Country: ${findLabel(countryOptions, country)}`,
+      onRemove: () => toggleArrayFilter('country', country, selectedCountries),
     });
   });
   if (priceMin || priceMax) {
@@ -557,6 +629,18 @@ export default function SearchPage() {
         const params = new URLSearchParams(searchParams.toString());
         params.delete('priceMin');
         params.delete('priceMax');
+        params.delete('page');
+        router.push(`/search?${params.toString()}`, { scroll: false });
+      },
+    });
+  }
+  if (yearMin || yearMax) {
+    activeFilterChips.push({
+      label: `Year: ${yearMin || '...'} - ${yearMax || '...'}`,
+      onRemove: () => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete('yearMin');
+        params.delete('yearMax');
         params.delete('page');
         router.push(`/search?${params.toString()}`, { scroll: false });
       },

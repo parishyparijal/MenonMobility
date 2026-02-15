@@ -1,21 +1,25 @@
 'use client';
 
-import { useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Search, SlidersHorizontal, Grid3X3, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { ListingCard, type ListingCardData } from '@/components/listings/listing-card';
+import { ListingCardSkeleton } from '@/components/listings/listing-card-skeleton';
 import { Pagination } from '@/components/common/pagination';
 import { cn } from '@/lib/utils';
 import { getImagesForListing, CATEGORY_HERO_IMAGES } from '@/lib/images';
+import { api } from '@/lib/api';
 
+// ---------------------------------------------------------------------------
+// Static category metadata (used for hero section, subcategories, top brands)
+// ---------------------------------------------------------------------------
 const categoryData: Record<string, {
   name: string;
   description: string;
   subcategories: { name: string; slug: string }[];
-  topBrands: string[];
+  topBrands: { name: string; slug: string }[];
   listingCount: number;
 }> = {
   trucks: {
@@ -31,7 +35,15 @@ const categoryData: Record<string, {
       { name: 'Curtainside Trucks', slug: 'curtainside' },
       { name: 'Recovery Trucks', slug: 'recovery' },
     ],
-    topBrands: ['Mercedes-Benz', 'Volvo', 'Scania', 'MAN', 'DAF', 'Iveco', 'Renault'],
+    topBrands: [
+      { name: 'Mercedes-Benz', slug: 'mercedes-benz' },
+      { name: 'Volvo', slug: 'volvo' },
+      { name: 'Scania', slug: 'scania' },
+      { name: 'MAN', slug: 'man' },
+      { name: 'DAF', slug: 'daf' },
+      { name: 'Iveco', slug: 'iveco' },
+      { name: 'Renault', slug: 'renault' },
+    ],
     listingCount: 45230,
   },
   trailers: {
@@ -45,7 +57,13 @@ const categoryData: Record<string, {
       { name: 'Low Loaders', slug: 'low-loaders' },
       { name: 'Box Trailers', slug: 'box' },
     ],
-    topBrands: ['Schmitz Cargobull', 'Krone', 'Kögel', 'Lamberet', 'Wielton'],
+    topBrands: [
+      { name: 'Schmitz Cargobull', slug: 'schmitz-cargobull' },
+      { name: 'Krone', slug: 'krone' },
+      { name: 'Kogel', slug: 'kogel' },
+      { name: 'Lamberet', slug: 'lamberet' },
+      { name: 'Wielton', slug: 'wielton' },
+    ],
     listingCount: 28150,
   },
   construction: {
@@ -59,7 +77,14 @@ const categoryData: Record<string, {
       { name: 'Dump Trucks', slug: 'dump-trucks' },
       { name: 'Concrete Equipment', slug: 'concrete' },
     ],
-    topBrands: ['Caterpillar', 'Komatsu', 'Liebherr', 'Volvo CE', 'CASE', 'JCB'],
+    topBrands: [
+      { name: 'Caterpillar', slug: 'caterpillar' },
+      { name: 'Komatsu', slug: 'komatsu' },
+      { name: 'Liebherr', slug: 'liebherr' },
+      { name: 'Volvo CE', slug: 'volvo-ce' },
+      { name: 'CASE', slug: 'case' },
+      { name: 'JCB', slug: 'jcb' },
+    ],
     listingCount: 18700,
   },
   vans: {
@@ -71,7 +96,14 @@ const categoryData: Record<string, {
       { name: 'Box Vans', slug: 'box' },
       { name: 'Refrigerated Vans', slug: 'refrigerated' },
     ],
-    topBrands: ['Mercedes-Benz', 'Ford', 'Volkswagen', 'Iveco', 'Renault', 'Peugeot'],
+    topBrands: [
+      { name: 'Mercedes-Benz', slug: 'mercedes-benz' },
+      { name: 'Ford', slug: 'ford' },
+      { name: 'Volkswagen', slug: 'volkswagen' },
+      { name: 'Iveco', slug: 'iveco' },
+      { name: 'Renault', slug: 'renault' },
+      { name: 'Peugeot', slug: 'peugeot' },
+    ],
     listingCount: 12400,
   },
   cars: {
@@ -84,7 +116,14 @@ const categoryData: Record<string, {
       { name: 'Electric Cars', slug: 'electric' },
       { name: 'Company Cars', slug: 'company' },
     ],
-    topBrands: ['BMW', 'Audi', 'Mercedes-Benz', 'Volkswagen', 'Toyota', 'Volvo'],
+    topBrands: [
+      { name: 'BMW', slug: 'bmw' },
+      { name: 'Audi', slug: 'audi' },
+      { name: 'Mercedes-Benz', slug: 'mercedes-benz' },
+      { name: 'Volkswagen', slug: 'volkswagen' },
+      { name: 'Toyota', slug: 'toyota' },
+      { name: 'Volvo', slug: 'volvo' },
+    ],
     listingCount: 8200,
   },
   containers: {
@@ -96,7 +135,11 @@ const categoryData: Record<string, {
       { name: 'Refrigerated Containers', slug: 'refrigerated' },
       { name: 'Tank Containers', slug: 'tank' },
     ],
-    topBrands: ['Maersk', 'CIMC', 'Singamas'],
+    topBrands: [
+      { name: 'Maersk', slug: 'maersk' },
+      { name: 'CIMC', slug: 'cimc' },
+      { name: 'Singamas', slug: 'singamas' },
+    ],
     listingCount: 4500,
   },
   parts: {
@@ -109,7 +152,13 @@ const categoryData: Record<string, {
       { name: 'Body Parts', slug: 'body' },
       { name: 'Tyres & Wheels', slug: 'tyres' },
     ],
-    topBrands: ['Bosch', 'Wabco', 'BPW', 'SAF-Holland', 'Continental'],
+    topBrands: [
+      { name: 'Bosch', slug: 'bosch' },
+      { name: 'Wabco', slug: 'wabco' },
+      { name: 'BPW', slug: 'bpw' },
+      { name: 'SAF-Holland', slug: 'saf-holland' },
+      { name: 'Continental', slug: 'continental' },
+    ],
     listingCount: 15600,
   },
 };
@@ -117,11 +166,38 @@ const categoryData: Record<string, {
 const defaultCategory = {
   name: 'Vehicles',
   description: 'Browse our wide selection of commercial vehicles and equipment.',
-  subcategories: [],
-  topBrands: [],
+  subcategories: [] as { name: string; slug: string }[],
+  topBrands: [] as { name: string; slug: string }[],
   listingCount: 5000,
 };
 
+// ---------------------------------------------------------------------------
+// Sort options
+// ---------------------------------------------------------------------------
+const sortOptions = [
+  { value: 'newest', label: 'Newest First' },
+  { value: 'oldest', label: 'Oldest First' },
+  { value: 'price-asc', label: 'Price: Low to High' },
+  { value: 'price-desc', label: 'Price: High to Low' },
+  { value: 'year-desc', label: 'Year: Newest' },
+  { value: 'year-asc', label: 'Year: Oldest' },
+];
+
+function mapSortParam(sort: string): string {
+  switch (sort) {
+    case 'newest': return 'date_desc';
+    case 'oldest': return 'date_asc';
+    case 'price-asc': return 'price_asc';
+    case 'price-desc': return 'price_desc';
+    case 'year-desc': return 'year_desc';
+    case 'year-asc': return 'year_asc';
+    default: return 'relevance';
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Fallback dummy listing data per category
+// ---------------------------------------------------------------------------
 const categoryListingData: Record<string, {
   titles: string[];
   prices: number[];
@@ -141,7 +217,7 @@ const categoryListingData: Record<string, {
     mileageBase: 120000,
   },
   trailers: {
-    titles: ['Schmitz Cargobull Curtainsider SCS 24/L', 'Krone Mega Liner SDC 27 eLTU', 'Kögel Flatbed SNCO 24 P90', 'Lamberet Reefer SR2 Thermo King'],
+    titles: ['Schmitz Cargobull Curtainsider SCS 24/L', 'Krone Mega Liner SDC 27 eLTU', 'Kogel Flatbed SNCO 24 P90', 'Lamberet Reefer SR2 Thermo King'],
     prices: [32000, 45000, 28500, 52000],
     fuelTypes: ['N/A', 'N/A', 'N/A', 'N/A'],
     sellers: ['TrailerPoint GmbH', 'Krone Center', 'FleetTrailers BV', 'CoolTransport NV'],
@@ -190,7 +266,7 @@ const categoryListingData: Record<string, {
     prices: [8500, 420, 1200, 85],
     fuelTypes: ['N/A', 'N/A', 'N/A', 'N/A'],
     sellers: ['EuroParts Direct', 'BrakeTech GmbH', 'TyrePro BV', 'FilterKing NL'],
-    cities: ['Düsseldorf', 'Stuttgart', 'Rotterdam', 'Amsterdam'],
+    cities: ['Dusseldorf', 'Stuttgart', 'Rotterdam', 'Amsterdam'],
     countries: ['Germany', 'Germany', 'Netherlands', 'Netherlands'],
     mileageBase: 0,
   },
@@ -218,14 +294,155 @@ function getDummyListings(categorySlug: string): ListingCardData[] {
   }));
 }
 
+// ---------------------------------------------------------------------------
+// Map API listing to frontend ListingCardData
+// ---------------------------------------------------------------------------
+function mapApiListing(listing: any): ListingCardData {
+  let images: string[] = [];
+  if (listing.images && Array.isArray(listing.images)) {
+    if (typeof listing.images[0] === 'string') {
+      images = listing.images;
+    } else {
+      images = listing.images
+        .map((img: any) => img.mediumUrl || img.thumbnailUrl || img.originalUrl)
+        .filter(Boolean);
+    }
+  }
+  if (images.length === 0) {
+    images = getImagesForListing(listing.title || '');
+  }
+
+  return {
+    id: listing.id,
+    slug: listing.slug,
+    title: listing.title,
+    price: listing.price ? Number(listing.price) : 0,
+    currency: listing.priceCurrency || 'EUR',
+    condition: listing.condition || 'USED',
+    images,
+    year: listing.year,
+    mileage: listing.mileageKm,
+    fuelType: listing.fuelType,
+    location: {
+      city: listing.city || listing.location?.city || '',
+      country: listing.countryCode || listing.location?.country || '',
+    },
+    seller: {
+      name: listing.sellerName || listing.seller?.name || listing.sellerCompany || 'Dealer',
+    },
+    isFeatured: listing.isFeatured,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// CategoryPage Component
+// ---------------------------------------------------------------------------
 export default function CategoryPage() {
   const params = useParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const categorySlug = params.category as string;
   const category = categoryData[categorySlug] || defaultCategory;
-  const [currentPage, setCurrentPage] = useState(1);
-  const [view, setView] = useState<'grid' | 'list'>('grid');
-  const dummyListings = getDummyListings(categorySlug);
 
+  // URL-driven state
+  const sort = searchParams.get('sort') || 'newest';
+  const page = parseInt(searchParams.get('page') || '1', 10);
+
+  // Data state — initialised with dummy data so listings always show
+  const [view, setView] = useState<'grid' | 'list'>('grid');
+  const [listings, setListings] = useState<ListingCardData[]>(() => getDummyListings(categorySlug));
+  const [totalResults, setTotalResults] = useState(category.listingCount);
+  const [totalPages, setTotalPages] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // ---------------------------------------------------------------------------
+  // Fetch listings from API with fallback to dummy data
+  // ---------------------------------------------------------------------------
+  const fetchListings = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const apiParams = new URLSearchParams();
+      apiParams.set('category', categorySlug);
+      apiParams.set('sort', mapSortParam(sort));
+      apiParams.set('page', String(page));
+      apiParams.set('limit', '12');
+
+      const response = await api.get<any>(`/search?${apiParams.toString()}`);
+
+      if (response?.success && response?.data?.listings) {
+        const apiListings = response.data.listings.map(mapApiListing);
+        // Only use API data if it returned results, otherwise keep dummy
+        if (apiListings.length > 0) {
+          setListings(apiListings);
+          setTotalResults(response.pagination?.total || apiListings.length);
+          setTotalPages(response.pagination?.totalPages || 1);
+          setCurrentPage(response.pagination?.page || page);
+        } else {
+          // API returned empty — use dummy data
+          const dummy = getDummyListings(categorySlug);
+          setListings(dummy);
+          setTotalResults(category.listingCount);
+          setTotalPages(10);
+          setCurrentPage(page);
+        }
+      } else {
+        throw new Error('Invalid response');
+      }
+    } catch {
+      // API unavailable — use dummy data
+      const dummy = getDummyListings(categorySlug);
+
+      // Apply sort to dummy data
+      switch (sort) {
+        case 'price-asc':
+          dummy.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+          break;
+        case 'price-desc':
+          dummy.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
+          break;
+        case 'year-desc':
+          dummy.sort((a, b) => b.year - a.year);
+          break;
+        case 'year-asc':
+          dummy.sort((a, b) => a.year - b.year);
+          break;
+      }
+
+      setListings(dummy);
+      setTotalResults(category.listingCount);
+      setTotalPages(10);
+      setCurrentPage(page);
+    } finally {
+      setIsLoading(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categorySlug, sort, page]);
+
+  useEffect(() => {
+    fetchListings();
+  }, [fetchListings]);
+
+  // ---------------------------------------------------------------------------
+  // URL handlers for sort & pagination
+  // ---------------------------------------------------------------------------
+  const handleSortChange = (newSort: string) => {
+    const p = new URLSearchParams(searchParams.toString());
+    p.set('sort', newSort);
+    p.delete('page');
+    router.push(`/${categorySlug}?${p.toString()}`, { scroll: false });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    const p = new URLSearchParams(searchParams.toString());
+    p.set('page', String(newPage));
+    router.push(`/${categorySlug}?${p.toString()}`, { scroll: false });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // ---------------------------------------------------------------------------
+  // Render
+  // ---------------------------------------------------------------------------
   return (
     <div className="bg-background min-h-screen">
       {/* Category Header with Background Image Overlay */}
@@ -249,7 +466,7 @@ export default function CategoryPage() {
           <h1 className="text-3xl md:text-4xl font-bold mb-3">{category.name}</h1>
           <p className="text-white/85 max-w-2xl text-lg">{category.description}</p>
           <p className="text-sm text-accent font-semibold mt-4 bg-white/10 inline-block px-3 py-1 rounded-full">
-            {category.listingCount.toLocaleString()} listings available
+            {totalResults.toLocaleString()} listings available
           </p>
         </div>
       </section>
@@ -273,18 +490,18 @@ export default function CategoryPage() {
           </div>
         )}
 
-        {/* Top Brands */}
+        {/* Top Brands — links now use slugs */}
         {category.topBrands.length > 0 && (
           <div className="mb-8">
             <h2 className="text-sm font-semibold text-foreground mb-3">Top Brands</h2>
             <div className="flex flex-wrap gap-2">
               {category.topBrands.map((brand) => (
                 <Link
-                  key={brand}
-                  href={`/search?category=${categorySlug}&brand=${encodeURIComponent(brand)}`}
+                  key={brand.slug}
+                  href={`/search?category=${categorySlug}&brand=${brand.slug}`}
                   className="px-4 py-2 rounded-lg bg-white border border-border text-sm text-foreground hover:border-accent hover:text-accent transition-colors"
                 >
-                  {brand}
+                  {brand.name}
                 </Link>
               ))}
             </div>
@@ -294,13 +511,19 @@ export default function CategoryPage() {
         {/* Results Controls */}
         <div className="flex items-center justify-between mb-6">
           <p className="text-sm text-muted-foreground">
-            Showing {dummyListings.length} of {category.listingCount.toLocaleString()} results
+            Showing {listings.length} of {totalResults.toLocaleString()} results
           </p>
           <div className="flex items-center gap-2">
-            <select className="h-9 px-3 rounded-lg border border-border bg-white text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
-              <option>Newest First</option>
-              <option>Price: Low to High</option>
-              <option>Price: High to Low</option>
+            <select
+              value={sort}
+              onChange={(e) => handleSortChange(e.target.value)}
+              className="h-9 px-3 rounded-lg border border-border bg-white text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              {sortOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
             </select>
             <div className="hidden sm:flex items-center border border-border rounded-lg overflow-hidden">
               <button
@@ -332,23 +555,37 @@ export default function CategoryPage() {
         </div>
 
         {/* Listing Grid */}
-        <div
-          className={cn(
-            view === 'grid'
-              ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
-              : 'space-y-4'
-          )}
-        >
-          {dummyListings.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} view={view} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div
+            className={cn(
+              view === 'grid'
+                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
+                : 'space-y-4'
+            )}
+          >
+            {Array.from({ length: 12 }).map((_, i) => (
+              <ListingCardSkeleton key={i} view={view} />
+            ))}
+          </div>
+        ) : (
+          <div
+            className={cn(
+              view === 'grid'
+                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
+                : 'space-y-4'
+            )}
+          >
+            {listings.map((listing) => (
+              <ListingCard key={listing.id} listing={listing} view={view} />
+            ))}
+          </div>
+        )}
 
         <div className="mt-8">
           <Pagination
             currentPage={currentPage}
-            totalPages={10}
-            onPageChange={setCurrentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
           />
         </div>
       </div>
