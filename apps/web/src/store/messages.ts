@@ -58,8 +58,8 @@ export const useMessagesStore = create<MessagesState>((set, get) => ({
   fetchThreads: async () => {
     set({ isLoading: true, error: null });
     try {
-      const response = await api.get<{ threads: MessageThread[] }>('/messages/threads');
-      set({ threads: response.threads, isLoading: false });
+      const response = await api.get<any>('/messages');
+      set({ threads: response.data || [], isLoading: false });
     } catch (error) {
       set({
         isLoading: false,
@@ -71,8 +71,8 @@ export const useMessagesStore = create<MessagesState>((set, get) => ({
   fetchMessages: async (threadId: string) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await api.get<{ messages: Message[] }>(`/messages/threads/${threadId}`);
-      set({ messages: response.messages, isLoading: false });
+      const response = await api.get<any>(`/messages/${threadId}`);
+      set({ messages: response.data || [], isLoading: false });
 
       // Mark thread as read locally
       set((state) => ({
@@ -91,11 +91,13 @@ export const useMessagesStore = create<MessagesState>((set, get) => ({
   sendMessage: async (threadId: string, body: string) => {
     set({ isSending: true, error: null });
     try {
-      const response = await api.post<{ message: Message }>(`/messages/threads/${threadId}`, {
+      const response = await api.post<any>('/messages', {
+        threadId,
         body,
       });
+      const newMessage = response.data;
       set((state) => ({
-        messages: [...state.messages, response.message],
+        messages: [...state.messages, newMessage],
         isSending: false,
         threads: state.threads.map((t) =>
           t.id === threadId
@@ -121,8 +123,8 @@ export const useMessagesStore = create<MessagesState>((set, get) => ({
 
   fetchUnreadCount: async () => {
     try {
-      const response = await api.get<{ count: number }>('/messages/unread-count');
-      set({ unreadCount: response.count });
+      const response = await api.get<any>('/messages/unread');
+      set({ unreadCount: response.data?.count ?? 0 });
     } catch {
       // silently fail
     }

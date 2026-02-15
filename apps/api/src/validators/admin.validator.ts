@@ -136,3 +136,70 @@ export const reviewIdParamsSchema = z.object({
 });
 
 export type ReviewIdParams = z.infer<typeof reviewIdParamsSchema>;
+
+// ---- Category Management ----
+
+export const categoryIdParamsSchema = z.object({
+  id: z.string().uuid("Invalid category ID"),
+});
+
+export const createCategoryBodySchema = z.object({
+  name: z.string().min(1, "Name is required").max(100).trim(),
+  slug: z.string().min(1, "Slug is required").max(100).trim(),
+  description: z.string().max(500).optional(),
+  icon: z.string().max(50).optional(),
+  imageUrl: z.string().url().optional().nullable(),
+  parentId: z.string().uuid().optional().nullable(),
+  sortOrder: z.number().int().min(0).default(0),
+  isActive: z.boolean().default(true),
+});
+
+export const updateCategoryBodySchema = z.object({
+  name: z.string().min(1).max(100).trim().optional(),
+  slug: z.string().min(1).max(100).trim().optional(),
+  description: z.string().max(500).optional().nullable(),
+  icon: z.string().max(50).optional().nullable(),
+  imageUrl: z.string().url().optional().nullable(),
+  parentId: z.string().uuid().optional().nullable(),
+  sortOrder: z.number().int().min(0).optional(),
+  isActive: z.boolean().optional(),
+});
+
+// ---- Brand Management ----
+
+export const brandIdParamsSchema = z.object({
+  id: z.string().uuid("Invalid brand ID"),
+});
+
+export const createBrandBodySchema = z.object({
+  name: z.string().min(1, "Name is required").max(100).trim(),
+  slug: z.string().min(1, "Slug is required").max(100).trim(),
+  logoUrl: z.string().url().optional().nullable(),
+  isActive: z.boolean().default(true),
+  categoryIds: z.array(z.string().uuid()).optional(),
+});
+
+export const updateBrandBodySchema = z.object({
+  name: z.string().min(1).max(100).trim().optional(),
+  slug: z.string().min(1).max(100).trim().optional(),
+  logoUrl: z.string().url().optional().nullable(),
+  isActive: z.boolean().optional(),
+  categoryIds: z.array(z.string().uuid()).optional(),
+});
+
+export const modelIdParamsSchema = z.object({
+  id: z.string().uuid("Invalid brand ID"),
+  modelId: z.string().uuid("Invalid model ID"),
+});
+
+export const createModelBodySchema = z.object({
+  name: z.string().min(1, "Name is required").max(100).trim(),
+  slug: z.string().min(1, "Slug is required").max(100).trim(),
+  isActive: z.boolean().default(true),
+});
+
+export const updateModelBodySchema = z.object({
+  name: z.string().min(1).max(100).trim().optional(),
+  slug: z.string().min(1).max(100).trim().optional(),
+  isActive: z.boolean().optional(),
+});
