@@ -348,7 +348,7 @@ export default function HomePage() {
       <section className="bg-white py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold text-foreground text-center mb-4">
-            Why Choose MenonTrucks?
+            Why Choose Menon Mobility?
           </h2>
           <p className="text-muted-foreground text-center mb-10 max-w-2xl mx-auto">
             The safest and most reliable way to buy and sell commercial vehicles in Europe
