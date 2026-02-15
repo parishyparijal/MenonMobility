@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { ListingCard, type ListingCardData } from '@/components/listings/listing-card';
-import { getImagesForListing, BRAND_IMAGES, CATEGORY_HERO_IMAGES } from '@/lib/images';
+import { getImagesForListing, BRAND_IMAGES } from '@/lib/images';
 
 const categories = [
   { name: 'Trucks', slug: 'trucks', icon: Truck },
@@ -201,10 +201,10 @@ export default function HomePage() {
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${CATEGORY_HERO_IMAGES.trucks})` }}
+          style={{ backgroundImage: `url('/hero-bg.jpg')` }}
         />
         {/* Dark Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/85 to-primary-950/80" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/85 via-primary/70 to-primary-950/75" />
         <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-4">
