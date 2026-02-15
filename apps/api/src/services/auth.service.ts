@@ -15,13 +15,13 @@ export interface TokenPayload {
 
 export const authService = {
   generateAccessToken(payload: TokenPayload): string {
-    return jwt.sign(payload, ACCESS_SECRET, {
+    return jwt.sign({ ...payload, jti: randomUUID() }, ACCESS_SECRET, {
       expiresIn: ACCESS_EXPIRY,
     });
   },
 
   generateRefreshToken(payload: TokenPayload): string {
-    return jwt.sign(payload, REFRESH_SECRET, {
+    return jwt.sign({ ...payload, jti: randomUUID() }, REFRESH_SECRET, {
       expiresIn: REFRESH_EXPIRY,
     });
   },
