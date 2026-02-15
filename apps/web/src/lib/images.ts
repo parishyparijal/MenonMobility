@@ -138,6 +138,91 @@ export const VAN_IMAGES = {
   ],
 };
 
+// ─── CAR IMAGES ──────────────────────────────────────────────────────────────
+
+export const CAR_IMAGES = {
+  'bmw': [
+    img('photo-1555215695-3004980ad54e'),     // Sports car on road
+    img('photo-1542362567-b07e54358753'),     // BMW coupe
+    img('photo-1580273916550-e323be2ae537'),  // White BMW sedan
+  ],
+  'audi': [
+    img('photo-1606611013016-969c19ba72f4'),  // Dark sedan
+    img('photo-1549317661-bd32c8ce0afa'),     // Audi on dark road
+    img('photo-1617531653332-bd46c24f2068'),  // Audi A4
+  ],
+  'mercedes-car': [
+    img('photo-1553440569-bcc63803a83d'),     // Modern sedan highway
+    img('photo-1544636331-e26879cd4d9b'),     // Luxury sedan
+    img('photo-1503376780353-7e6692767b70'),  // Premium car road
+  ],
+  'volkswagen-car': [
+    img('photo-1568844293986-8d0400f58968'),  // VW Golf
+    img('photo-1533473359331-0135ef1b58bf'),  // Compact SUV
+    img('photo-1552519507-da3b142c6e3d'),     // Red car
+  ],
+  'toyota': [
+    img('photo-1494976388531-d1058494cdd8'),  // Sedan driving
+    img('photo-1533473359331-0135ef1b58bf'),  // SUV
+    img('photo-1555215695-3004980ad54e'),     // Sporty car
+  ],
+  'generic-car': [
+    img('photo-1494976388531-d1058494cdd8'),  // Car driving on road
+    img('photo-1553440569-bcc63803a83d'),     // Modern sedan
+    img('photo-1552519507-da3b142c6e3d'),     // Red car
+  ],
+};
+
+// ─── CONTAINER IMAGES ────────────────────────────────────────────────────────
+
+export const CONTAINER_IMAGES = {
+  'shipping': [
+    img('photo-1570218023576-3a72f7e9c0db'),  // Colorful shipping containers
+    img('photo-1494412574643-ff11b0a5eb19'),  // Container yard
+    img('photo-1586528116311-ad8dd3c8310d'),  // Container port
+  ],
+  'storage': [
+    img('photo-1601584115197-04ecc0da31d7'),  // Stacked containers
+    img('photo-1570218023576-3a72f7e9c0db'),  // Container rows
+    img('photo-1494412574643-ff11b0a5eb19'),  // Container depot
+  ],
+  'reefer-container': [
+    img('photo-1577993759424-a6b51ca7f9a3'),  // Container dock
+    img('photo-1586528116311-ad8dd3c8310d'),  // Port containers
+    img('photo-1601584115197-04ecc0da31d7'),  // Stacked containers
+  ],
+  'tank-container': [
+    img('photo-1510414842594-a61c69b5ae57'),  // Container ship
+    img('photo-1577993759424-a6b51ca7f9a3'),  // Port dock
+    img('photo-1570218023576-3a72f7e9c0db'),  // Container yard
+  ],
+};
+
+// ─── PARTS & ACCESSORIES IMAGES ──────────────────────────────────────────────
+
+export const PARTS_IMAGES = {
+  'engine': [
+    img('photo-1486262715619-67b85e0b08d3'),  // Engine closeup
+    img('photo-1558618666-fcd25c85f82e'),     // Engine bay
+    img('photo-1580894894513-541e068a3e2b'),  // Mechanic working
+  ],
+  'brakes': [
+    img('photo-1580894894513-541e068a3e2b'),  // Mechanic at work
+    img('photo-1558618666-fcd25c85f82e'),     // Under the hood
+    img('photo-1486262715619-67b85e0b08d3'),  // Engine parts
+  ],
+  'tyres': [
+    img('photo-1619642751034-765dfdf7c58e'),  // Wheels and tyres
+    img('photo-1621993202323-f438eec934ff'),  // Auto parts
+    img('photo-1580894894513-541e068a3e2b'),  // Workshop
+  ],
+  'generic-parts': [
+    img('photo-1621993202323-f438eec934ff'),  // Auto spare parts
+    img('photo-1486262715619-67b85e0b08d3'),  // Engine closeup
+    img('photo-1619642751034-765dfdf7c58e'),  // Wheels
+  ],
+};
+
 // ─── HELPER: Get images by listing title ────────────────────────────────────
 // Matches listing title keywords to the most appropriate image set
 
@@ -189,7 +274,7 @@ export function getImagesForListing(title: string): string[] {
     return VAN_IMAGES['mercedes-sprinter'];
   if (t.includes('transit') || t.includes('ford'))
     return VAN_IMAGES['ford-transit'];
-  if (t.includes('crafter') || t.includes('vw') || t.includes('volkswagen'))
+  if (t.includes('crafter') || t.includes('transporter') || t.includes('caddy'))
     return VAN_IMAGES['vw-crafter'];
   if (t.includes('daily'))
     return VAN_IMAGES['iveco-daily'];
@@ -197,6 +282,40 @@ export function getImagesForListing(title: string): string[] {
     return VAN_IMAGES['renault-master'];
   if (t.includes('boxer') || t.includes('peugeot') || t.includes('ducato') || t.includes('fiat'))
     return VAN_IMAGES['generic'];
+
+  // Cars
+  if (t.includes('bmw') || t.includes('3 series') || t.includes('5 series') || t.includes('x5'))
+    return CAR_IMAGES['bmw'];
+  if (t.includes('audi') || t.includes('a4') || t.includes('a6') || t.includes('q7'))
+    return CAR_IMAGES['audi'];
+  if (t.includes('c-class') || t.includes('e-class') || t.includes('s-class') || t.includes('gle') || t.includes('glc'))
+    return CAR_IMAGES['mercedes-car'];
+  if (t.includes('golf') || t.includes('passat') || t.includes('tiguan') || t.includes('polo') || t.includes('vw') || t.includes('volkswagen'))
+    return CAR_IMAGES['volkswagen-car'];
+  if (t.includes('toyota') || t.includes('corolla') || t.includes('hilux') || t.includes('land cruiser'))
+    return CAR_IMAGES['toyota'];
+
+  // Containers
+  if (t.includes('shipping container') || t.includes('20ft') || t.includes('40ft') || t.includes('20 ft') || t.includes('40 ft'))
+    return CONTAINER_IMAGES['shipping'];
+  if (t.includes('storage container'))
+    return CONTAINER_IMAGES['storage'];
+  if (t.includes('reefer container') || t.includes('refrigerated container'))
+    return CONTAINER_IMAGES['reefer-container'];
+  if (t.includes('tank container') || t.includes('iso tank'))
+    return CONTAINER_IMAGES['tank-container'];
+  if (t.includes('container'))
+    return CONTAINER_IMAGES['shipping'];
+
+  // Parts & Accessories
+  if (t.includes('engine') || t.includes('motor') || t.includes('turbo') || t.includes('gearbox'))
+    return PARTS_IMAGES['engine'];
+  if (t.includes('brake') || t.includes('caliper') || t.includes('disc') || t.includes('pad'))
+    return PARTS_IMAGES['brakes'];
+  if (t.includes('tyre') || t.includes('tire') || t.includes('wheel') || t.includes('rim'))
+    return PARTS_IMAGES['tyres'];
+  if (t.includes('part') || t.includes('filter') || t.includes('gasket') || t.includes('bearing') || t.includes('alternator'))
+    return PARTS_IMAGES['generic-parts'];
 
   // Default: generic truck
   return TRUCK_IMAGES['mercedes-actros'];
@@ -209,6 +328,9 @@ export const CATEGORY_HERO_IMAGES = {
   trailers: img('photo-1724556271642-e9acaf03ac23', 1920, 600),
   construction: img('photo-1503708928676-1cb796a0891e', 1920, 600),
   vans: img('photo-1535655685871-dc8158ff167e', 1920, 600),
+  cars: img('photo-1494976388531-d1058494cdd8', 1920, 600),
+  containers: img('photo-1570218023576-3a72f7e9c0db', 1920, 600),
+  parts: img('photo-1621993202323-f438eec934ff', 1920, 600),
 };
 
 // ─── Brand logos (text-based placeholder with icon) ─────────────────────────
