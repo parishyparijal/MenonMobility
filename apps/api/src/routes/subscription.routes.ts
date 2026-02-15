@@ -19,7 +19,7 @@ router.get("/plans", subscriptionController.listPlans);
 // GET /api/subscriptions/current — Get current user's active subscription
 router.get("/current", authenticate, subscriptionController.getMySubscription);
 
-// POST /api/subscriptions/subscribe — Create a subscription
+// POST /api/subscriptions/subscribe — Create Stripe checkout session
 router.post(
   "/subscribe",
   authenticate,
@@ -37,5 +37,12 @@ router.post(
 
 // POST /api/subscriptions/cancel — Cancel current subscription
 router.post("/cancel", authenticate, subscriptionController.cancel);
+
+// POST /api/subscriptions/billing-portal — Stripe Customer Portal
+router.post(
+  "/billing-portal",
+  authenticate,
+  subscriptionController.billingPortal
+);
 
 export default router;

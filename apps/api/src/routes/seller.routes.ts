@@ -7,6 +7,9 @@ import { sellerListingController } from "@/controllers/seller-listing.controller
 import { sellerDashboardController } from "@/controllers/seller-dashboard.controller";
 import { sellerProfileController } from "@/controllers/seller-profile.controller";
 import { listingImageController, imageUpload } from "@/controllers/listing-image.controller";
+import { checkListingLimit } from "@/middleware/listingLimit";
+import { invalidateCacheAfter } from "@/middleware/cache";
+import { validateImageUploads } from "@/middleware/fileUploadValidation";
 import {
   sellerListingQuerySchema,
   idParamSchema,
@@ -54,6 +57,8 @@ router.get(
 // POST /api/seller/listings — Create a new listing
 router.post(
   "/listings",
+  checkListingLimit,
+  invalidateCacheAfter("/api/listings*", "/api/categories*"),
   validate({ body: createListingSchema }),
   sellerListingController.create
 );
@@ -105,6 +110,7 @@ router.post(
 // POST /api/seller/listings/:id/duplicate — Clone listing as draft
 router.post(
   "/listings/:id/duplicate",
+  checkListingLimit,
   validate({ params: idParamSchema }),
   sellerListingController.duplicate
 );
@@ -117,6 +123,7 @@ router.post(
   validate({ params: idParamSchema }),
   uploadLimiter,
   imageUpload.array("images", 10),
+  validateImageUploads,
   listingImageController.upload
 );
 

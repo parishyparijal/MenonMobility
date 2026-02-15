@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { optionalAuth } from "@/middleware/auth";
 import { validate } from "@/middleware/validate";
+import { cache } from "@/middleware/cache";
 import { listingController } from "@/controllers/listing.controller";
 import {
   listingQuerySchema,
@@ -17,6 +18,7 @@ const router = Router();
 router.get(
   "/",
   optionalAuth,
+  cache(60),
   validate({ query: listingQuerySchema }),
   listingController.list
 );
@@ -25,6 +27,7 @@ router.get(
 router.get(
   "/:slug",
   optionalAuth,
+  cache(120),
   validate({ params: slugParamSchema }),
   listingController.getBySlug
 );
@@ -33,6 +36,7 @@ router.get(
 router.get(
   "/:slug/related",
   optionalAuth,
+  cache(120),
   validate({ params: slugParamSchema }),
   listingController.getRelated
 );

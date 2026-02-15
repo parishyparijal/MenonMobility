@@ -7,6 +7,8 @@ import fs from "fs";
 import { s3Client, S3_BUCKET } from "@/config/s3";
 import { PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { elasticsearchService } from "@/services/elasticsearch.service";
+import { sendEmail } from "@/config/email";
+import { emailTemplates } from "@/templates/email";
 
 // ---------------------------------------------------------------------------
 // BullMQ Worker Entry Point
@@ -60,25 +62,65 @@ const emailWorker = createWorker("email", async (job: Job) => {
   console.log(`[Email Worker] Processing job ${job.id}: ${job.name}`);
 
   switch (job.name) {
-    case "send-welcome-email":
-      console.log(`  -> Sending welcome email to ${job.data.email}`);
+    case "send-welcome-email": {
+      const template = emailTemplates.welcome({ name: job.data.name });
+      await sendEmail({ to: job.data.email, subject: template.subject, html: template.html });
+      console.log(`  -> Welcome email sent to ${job.data.email}`);
       break;
+    }
 
-    case "send-password-reset":
-      console.log(`  -> Sending password reset email to ${job.data.email}`);
+    case "send-password-reset": {
+      const template = emailTemplates.passwordReset({ name: job.data.name, resetUrl: job.data.resetUrl });
+      await sendEmail({ to: job.data.email, subject: template.subject, html: template.html });
+      console.log(`  -> Password reset email sent to ${job.data.email}`);
       break;
+    }
 
-    case "send-listing-approved":
-      console.log(`  -> Sending listing approved email to ${job.data.email}`);
+    case "send-listing-approved": {
+      const template = emailTemplates.listingApproved({
+        name: job.data.name, listingTitle: job.data.listingTitle, listingSlug: job.data.listingSlug,
+      });
+      await sendEmail({ to: job.data.email, subject: template.subject, html: template.html });
+      console.log(`  -> Listing approved email sent to ${job.data.email}`);
       break;
+    }
 
-    case "send-listing-rejected":
-      console.log(`  -> Sending listing rejected email to ${job.data.email}`);
+    case "send-listing-rejected": {
+      const template = emailTemplates.listingRejected({
+        name: job.data.name, listingTitle: job.data.listingTitle, reason: job.data.reason,
+      });
+      await sendEmail({ to: job.data.email, subject: template.subject, html: template.html });
+      console.log(`  -> Listing rejected email sent to ${job.data.email}`);
       break;
+    }
 
-    case "send-contact-form":
-      console.log(`  -> Forwarding contact form from ${job.data.email}`);
+    case "send-new-message": {
+      const template = emailTemplates.newMessage({
+        name: job.data.name, senderName: job.data.senderName,
+        listingTitle: job.data.listingTitle, messagePreview: job.data.messagePreview,
+      });
+      await sendEmail({ to: job.data.email, subject: template.subject, html: template.html });
+      console.log(`  -> New message email sent to ${job.data.email}`);
       break;
+    }
+
+    case "send-subscription-confirmed": {
+      const template = emailTemplates.subscriptionConfirmed({ name: job.data.name, planName: job.data.planName });
+      await sendEmail({ to: job.data.email, subject: template.subject, html: template.html });
+      console.log(`  -> Subscription confirmed email sent to ${job.data.email}`);
+      break;
+    }
+
+    case "send-contact-form": {
+      const template = emailTemplates.contactForm({
+        name: job.data.name, email: job.data.email,
+        subject: job.data.subject, message: job.data.message,
+      });
+      const adminEmail = process.env.ADMIN_EMAIL || "admin@menontrucks.com";
+      await sendEmail({ to: adminEmail, subject: template.subject, html: template.html });
+      console.log(`  -> Contact form forwarded from ${job.data.email}`);
+      break;
+    }
 
     default:
       console.log(`  -> Unknown email job: ${job.name}`);
