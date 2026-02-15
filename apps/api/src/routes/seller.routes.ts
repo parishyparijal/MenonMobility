@@ -1,9 +1,11 @@
-import { Router, type Request, type Response } from "express";
+import { Router } from "express";
 import { authenticate } from "@/middleware/auth";
 import { ensureRole } from "@/middleware/roles";
 import { uploadLimiter } from "@/middleware/rateLimiter";
 import { validate } from "@/middleware/validate";
 import { sellerListingController } from "@/controllers/seller-listing.controller";
+import { sellerDashboardController } from "@/controllers/seller-dashboard.controller";
+import { sellerProfileController } from "@/controllers/seller-profile.controller";
 import { listingImageController, imageUpload } from "@/controllers/listing-image.controller";
 import {
   sellerListingQuerySchema,
@@ -27,26 +29,18 @@ router.use(authenticate, ensureRole("SELLER", "ADMIN"));
 // ── Dashboard & Analytics ─────────────────────────────────────────────
 
 // GET /api/seller/dashboard — Seller dashboard stats
-router.get("/dashboard", (_req: Request, res: Response) => {
-  res.json({ success: true, data: null, message: "TODO: seller dashboard" });
-});
+router.get("/dashboard", sellerDashboardController.dashboard);
 
 // GET /api/seller/analytics — Seller analytics / insights
-router.get("/analytics", (_req: Request, res: Response) => {
-  res.json({ success: true, data: null, message: "TODO: seller analytics" });
-});
+router.get("/analytics", sellerDashboardController.analytics);
 
 // ── Profile ───────────────────────────────────────────────────────────
 
 // GET /api/seller/profile — Seller profile
-router.get("/profile", (_req: Request, res: Response) => {
-  res.json({ success: true, data: null, message: "TODO: get seller profile" });
-});
+router.get("/profile", sellerProfileController.getMyProfile);
 
 // PUT /api/seller/profile — Update seller profile
-router.put("/profile", (_req: Request, res: Response) => {
-  res.json({ success: true, data: null, message: "TODO: update seller profile" });
-});
+router.put("/profile", sellerProfileController.updateMyProfile);
 
 // ── Listing CRUD ──────────────────────────────────────────────────────
 
