@@ -177,24 +177,24 @@ export const CAR_IMAGES = {
 
 export const CONTAINER_IMAGES = {
   'shipping': [
-    img('photo-1570218023576-3a72f7e9c0db'),  // Colorful shipping containers
-    img('photo-1494412574643-ff11b0a5eb19'),  // Container yard
+    img('photo-1611117775350-ac3950990985'),  // Colorful shipping containers
+    img('photo-1578575437130-527eed3abbec'),  // Container yard
     img('photo-1586528116311-ad8dd3c8310d'),  // Container port
   ],
   'storage': [
     img('photo-1601584115197-04ecc0da31d7'),  // Stacked containers
-    img('photo-1570218023576-3a72f7e9c0db'),  // Container rows
-    img('photo-1494412574643-ff11b0a5eb19'),  // Container depot
+    img('photo-1611117775350-ac3950990985'),  // Container rows
+    img('photo-1578575437130-527eed3abbec'),  // Container depot
   ],
   'reefer-container': [
-    img('photo-1577993759424-a6b51ca7f9a3'),  // Container dock
+    img('photo-1605745341112-85968b19335b'),  // Container dock
     img('photo-1586528116311-ad8dd3c8310d'),  // Port containers
     img('photo-1601584115197-04ecc0da31d7'),  // Stacked containers
   ],
   'tank-container': [
     img('photo-1510414842594-a61c69b5ae57'),  // Container ship
-    img('photo-1577993759424-a6b51ca7f9a3'),  // Port dock
-    img('photo-1570218023576-3a72f7e9c0db'),  // Container yard
+    img('photo-1605745341112-85968b19335b'),  // Port dock
+    img('photo-1611117775350-ac3950990985'),  // Container yard
   ],
 };
 
@@ -335,7 +335,7 @@ export const CATEGORY_HERO_IMAGES = {
   construction: img('photo-1503708928676-1cb796a0891e', 1920, 600),
   vans: img('photo-1535655685871-dc8158ff167e', 1920, 600),
   cars: img('photo-1494976388531-d1058494cdd8', 1920, 600),
-  containers: img('photo-1570218023576-3a72f7e9c0db', 1920, 600),
+  containers: img('photo-1611117775350-ac3950990985', 1920, 600),
   parts: img('photo-1621993202323-f438eec934ff', 1920, 600),
 };
 
