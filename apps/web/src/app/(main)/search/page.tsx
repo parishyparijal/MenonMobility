@@ -22,24 +22,31 @@ import { getImagesForListing } from '@/lib/images';
 import { api } from '@/lib/api';
 
 // ---------------------------------------------------------------------------
-// Static filter options (used when API aggregations are unavailable)
+// Country code → display name mapping
 // ---------------------------------------------------------------------------
-const categoryOptions = [
-  'Trucks', 'Trailers', 'Construction', 'Vans', 'Cars', 'Containers', 'Parts', 'Agricultural',
-];
+const COUNTRY_NAMES: Record<string, string> = {
+  NL: 'Netherlands', DE: 'Germany', BE: 'Belgium', FR: 'France',
+  PL: 'Poland', ES: 'Spain', IT: 'Italy', GB: 'United Kingdom',
+  CZ: 'Czech Republic', AT: 'Austria', SE: 'Sweden', DK: 'Denmark',
+  PT: 'Portugal', IE: 'Ireland', FI: 'Finland', NO: 'Norway',
+  CH: 'Switzerland', HU: 'Hungary', RO: 'Romania', BG: 'Bulgaria',
+  SK: 'Slovakia', HR: 'Croatia', LT: 'Lithuania', LV: 'Latvia',
+  EE: 'Estonia', SI: 'Slovenia', LU: 'Luxembourg',
+};
 
-const brandOptions = [
-  'Mercedes-Benz', 'Volvo', 'Scania', 'MAN', 'DAF', 'Iveco', 'Renault', 'Caterpillar',
-  'Komatsu', 'Liebherr', 'CASE', 'John Deere',
-];
-
-const conditionOptions = ['New', 'Used'];
-const fuelTypeOptions = ['Diesel', 'Electric', 'Hybrid', 'LNG', 'CNG', 'Petrol'];
-const transmissionOptions = ['Manual', 'Automatic', 'Semi-automatic'];
-const countryOptions = [
-  'Netherlands', 'Germany', 'Belgium', 'France', 'Poland', 'Spain', 'Italy', 'United Kingdom',
-  'Czech Republic', 'Austria', 'Sweden', 'Denmark',
-];
+// ---------------------------------------------------------------------------
+// Enum display labels
+// ---------------------------------------------------------------------------
+const CONDITION_LABELS: Record<string, string> = {
+  NEW: 'New', USED: 'Used', REFURBISHED: 'Refurbished',
+};
+const FUEL_LABELS: Record<string, string> = {
+  DIESEL: 'Diesel', PETROL: 'Petrol', ELECTRIC: 'Electric',
+  HYBRID: 'Hybrid', LPG: 'LPG', CNG: 'CNG', HYDROGEN: 'Hydrogen',
+};
+const TRANSMISSION_LABELS: Record<string, string> = {
+  MANUAL: 'Manual', AUTOMATIC: 'Automatic', SEMI_AUTOMATIC: 'Semi-automatic',
+};
 
 const sortOptions = [
   { value: 'newest', label: 'Newest First' },
@@ -51,49 +58,7 @@ const sortOptions = [
 ];
 
 // ---------------------------------------------------------------------------
-// Fallback dummy data (when API is not available)
-// ---------------------------------------------------------------------------
-const dummyListings: ListingCardData[] = Array.from({ length: 24 }, (_, i) => ({
-  id: String(i + 1),
-  slug: `listing-${i + 1}`,
-  title: [
-    'Mercedes-Benz Actros 2545 LS 6x2',
-    'Volvo FH 500 4x2 Globetrotter XL',
-    'Scania R 450 A4x2NA Highline',
-    'MAN TGX 18.510 4x2 BLS',
-    'DAF XF 480 FT Space Cab',
-    'Iveco S-Way AS440S48T/P',
-    'Renault T480 High Sleeper Cab',
-    'Caterpillar 320 GC Excavator',
-  ][i % 8],
-  price: [89500, 125000, 78900, 115000, 92000, 98000, 76500, 165000][i % 8],
-  currency: 'EUR',
-  condition: (i % 5 === 0 ? 'NEW' : 'USED') as 'NEW' | 'USED',
-  images: getImagesForListing([
-    'Mercedes-Benz Actros 2545 LS 6x2',
-    'Volvo FH 500 4x2 Globetrotter XL',
-    'Scania R 450 A4x2NA Highline',
-    'MAN TGX 18.510 4x2 BLS',
-    'DAF XF 480 FT Space Cab',
-    'Iveco S-Way AS440S48T/P',
-    'Renault T480 High Sleeper Cab',
-    'Caterpillar 320 GC Excavator',
-  ][i % 8]),
-  year: 2019 + (i % 5),
-  mileage: i % 5 === 0 ? 0 : 50000 + i * 25000,
-  fuelType: 'Diesel',
-  location: {
-    city: ['Rotterdam', 'Hamburg', 'Antwerp', 'Munich', 'Eindhoven', 'Warsaw', 'Paris', 'Madrid'][i % 8],
-    country: ['Netherlands', 'Germany', 'Belgium', 'Germany', 'Netherlands', 'Poland', 'France', 'Spain'][i % 8],
-  },
-  seller: {
-    name: ['TransEuropa BV', 'Nordic Trucks GmbH', 'FleetPro NV', 'BavariaTruck AG', 'DutchFleet BV', 'EuroBuild Sp.', 'FleetFrance SA', 'IberiaTruck SL'][i % 8],
-  },
-  isFeatured: i < 3,
-}));
-
-// ---------------------------------------------------------------------------
-// Map API sort param name to backend expected format
+// Map frontend sort param to backend expected format
 // ---------------------------------------------------------------------------
 function mapSortParam(sort: string): string {
   switch (sort) {
@@ -111,7 +76,6 @@ function mapSortParam(sort: string): string {
 // Map API listing response to frontend ListingCardData
 // ---------------------------------------------------------------------------
 function mapApiListing(listing: any): ListingCardData {
-  // Handle images — API returns objects, frontend expects string[]
   let images: string[] = [];
   if (listing.images && Array.isArray(listing.images)) {
     if (typeof listing.images[0] === 'string') {
@@ -122,7 +86,6 @@ function mapApiListing(listing: any): ListingCardData {
         .filter(Boolean);
     }
   }
-  // If no API images, use our image mapping based on title
   if (images.length === 0) {
     images = getImagesForListing(listing.title || '');
   }
@@ -137,16 +100,27 @@ function mapApiListing(listing: any): ListingCardData {
     images,
     year: listing.year,
     mileage: listing.mileageKm,
-    fuelType: listing.fuelType,
+    fuelType: listing.fuelType ? FUEL_LABELS[listing.fuelType] || listing.fuelType : undefined,
     location: {
-      city: listing.city || listing.location?.city || '',
-      country: listing.countryCode || listing.location?.country || '',
+      city: listing.city || '',
+      country: COUNTRY_NAMES[listing.countryCode] || listing.countryCode || '',
     },
     seller: {
       name: listing.sellerName || listing.seller?.name || listing.sellerCompany || 'Dealer',
     },
     isFeatured: listing.isFeatured,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Aggregation types from API
+// ---------------------------------------------------------------------------
+interface Aggregations {
+  categories: { id: string; name: any; slug: string; count: number }[];
+  brands: { id: string; name: string; slug: string; count: number }[];
+  conditions: { value: string; count: number }[];
+  fuelTypes: { value: string; count: number }[];
+  countries: { value: string; count: number }[];
 }
 
 // ---------------------------------------------------------------------------
@@ -175,6 +149,15 @@ function FilterSection({ title, defaultOpen = true, children }: FilterSectionPro
 }
 
 // ---------------------------------------------------------------------------
+// Helper: extract category display name (may be JSON {en: "..."} or string)
+// ---------------------------------------------------------------------------
+function getCategoryName(name: any): string {
+  if (typeof name === 'string') return name;
+  if (name && typeof name === 'object') return name.en || name.de || Object.values(name)[0] || '';
+  return '';
+}
+
+// ---------------------------------------------------------------------------
 // SearchPage Component
 // ---------------------------------------------------------------------------
 export default function SearchPage() {
@@ -183,20 +166,28 @@ export default function SearchPage() {
 
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [brandSearch, setBrandSearch] = useState('');
 
   // Data state
-  const [listings, setListings] = useState<ListingCardData[]>(dummyListings);
-  const [totalResults, setTotalResults] = useState(186);
-  const [totalPages, setTotalPages] = useState(8);
+  const [listings, setListings] = useState<ListingCardData[]>([]);
+  const [totalResults, setTotalResults] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
-  const [usingApi, setUsingApi] = useState(false);
+
+  // Dynamic filter options from API aggregations
+  const [agg, setAgg] = useState<Aggregations>({
+    categories: [],
+    brands: [],
+    conditions: [],
+    fuelTypes: [],
+    countries: [],
+  });
 
   // Debounce timer for search input
   const searchTimer = useRef<NodeJS.Timeout | null>(null);
 
-  // Read filters from URL
+  // Read filters from URL — values are slugs/enum values
   const query = searchParams.get('q') || '';
   const selectedCategories = searchParams.getAll('category');
   const selectedBrands = searchParams.getAll('brand');
@@ -212,20 +203,20 @@ export default function SearchPage() {
   const page = parseInt(searchParams.get('page') || '1', 10);
 
   // ---------------------------------------------------------------------------
-  // Fetch data from API (with fallback to dummy data)
+  // Fetch data from API
   // ---------------------------------------------------------------------------
   const fetchSearchResults = useCallback(async () => {
     setIsLoading(true);
 
     try {
-      // Build API query params
+      // Build API query params — values are already slugs/enums from URL
       const params = new URLSearchParams();
       if (query) params.set('q', query);
       if (selectedCategories.length > 0) params.set('category', selectedCategories[0]);
       if (selectedBrands.length > 0) params.set('brand', selectedBrands[0]);
-      if (selectedConditions.length > 0) params.set('condition', selectedConditions[0].toUpperCase());
-      if (selectedFuelTypes.length > 0) params.set('fuelType', selectedFuelTypes[0].toUpperCase());
-      if (selectedTransmissions.length > 0) params.set('transmission', selectedTransmissions[0].toUpperCase().replace('-', '_'));
+      if (selectedConditions.length > 0) params.set('condition', selectedConditions[0]);
+      if (selectedFuelTypes.length > 0) params.set('fuelType', selectedFuelTypes[0]);
+      if (selectedTransmissions.length > 0) params.set('transmission', selectedTransmissions[0]);
       if (selectedCountries.length > 0) params.set('countryCode', selectedCountries[0]);
       if (priceMin) params.set('minPrice', priceMin);
       if (priceMax) params.set('maxPrice', priceMax);
@@ -239,75 +230,24 @@ export default function SearchPage() {
 
       if (response?.success && response?.data?.listings) {
         const apiListings = response.data.listings.map(mapApiListing);
-        setListings(apiListings.length > 0 ? apiListings : dummyListings);
+        setListings(apiListings);
         setTotalResults(response.pagination?.total || apiListings.length);
         setTotalPages(response.pagination?.totalPages || 1);
         setCurrentPage(response.pagination?.page || page);
-        setUsingApi(true);
+
+        // Update filter aggregations from API response
+        if (response.data.aggregations) {
+          setAgg(response.data.aggregations);
+        }
       } else {
-        throw new Error('Invalid response');
+        setListings([]);
+        setTotalResults(0);
+        setTotalPages(1);
       }
     } catch {
-      // API unavailable — use filtered dummy data
-      let filtered = [...dummyListings];
-
-      if (query) {
-        const q = query.toLowerCase();
-        filtered = filtered.filter((l) =>
-          l.title.toLowerCase().includes(q) ||
-          l.seller.name.toLowerCase().includes(q)
-        );
-      }
-      if (selectedCategories.length > 0) {
-        // Simple category matching based on title keywords
-        filtered = filtered.filter((l) =>
-          selectedCategories.some((c) => l.title.toLowerCase().includes(c.toLowerCase()))
-        );
-      }
-      if (selectedBrands.length > 0) {
-        filtered = filtered.filter((l) =>
-          selectedBrands.some((b) => l.title.toLowerCase().includes(b.toLowerCase()))
-        );
-      }
-      if (selectedConditions.length > 0) {
-        filtered = filtered.filter((l) =>
-          selectedConditions.some((c) => l.condition.toLowerCase() === c.toLowerCase())
-        );
-      }
-      if (priceMin) {
-        filtered = filtered.filter((l) => (l.price ?? 0) >= Number(priceMin));
-      }
-      if (priceMax) {
-        filtered = filtered.filter((l) => (l.price ?? 0) <= Number(priceMax));
-      }
-      if (yearMin) {
-        filtered = filtered.filter((l) => l.year >= Number(yearMin));
-      }
-      if (yearMax) {
-        filtered = filtered.filter((l) => l.year <= Number(yearMax));
-      }
-
-      // Sort
-      switch (sort) {
-        case 'price-asc':
-          filtered.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
-          break;
-        case 'price-desc':
-          filtered.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
-          break;
-        case 'year-desc':
-          filtered.sort((a, b) => b.year - a.year);
-          break;
-        case 'year-asc':
-          filtered.sort((a, b) => a.year - b.year);
-          break;
-      }
-
-      setListings(filtered);
-      setTotalResults(filtered.length);
-      setTotalPages(Math.ceil(filtered.length / 24) || 1);
-      setCurrentPage(page);
-      setUsingApi(false);
+      setListings([]);
+      setTotalResults(0);
+      setTotalPages(1);
     } finally {
       setIsLoading(false);
     }
@@ -369,8 +309,9 @@ export default function SearchPage() {
     yearMin ||
     yearMax;
 
-  const filteredBrands = brandOptions.filter((b) =>
-    b.toLowerCase().includes(brandSearch.toLowerCase())
+  // Filter brands by search input
+  const displayBrands = agg.brands.filter((b) =>
+    b.name.toLowerCase().includes(brandSearch.toLowerCase())
   );
 
   const handlePageChange = (newPage: number) => {
@@ -393,19 +334,25 @@ export default function SearchPage() {
   // ---------------------------------------------------------------------------
   const filterContent = (
     <div className="space-y-0">
+      {/* Category Filter */}
       <FilterSection title="Category">
         <div className="space-y-2">
-          {categoryOptions.map((cat) => (
-            <Checkbox
-              key={cat}
-              label={cat}
-              checked={selectedCategories.includes(cat.toLowerCase())}
-              onCheckedChange={() => toggleArrayFilter('category', cat.toLowerCase(), selectedCategories)}
-            />
-          ))}
+          {agg.categories.length > 0 ? (
+            agg.categories.map((cat) => (
+              <Checkbox
+                key={cat.slug}
+                label={`${getCategoryName(cat.name)} (${cat.count})`}
+                checked={selectedCategories.includes(cat.slug)}
+                onCheckedChange={() => toggleArrayFilter('category', cat.slug, selectedCategories)}
+              />
+            ))
+          ) : (
+            <p className="text-xs text-muted-foreground">No categories found</p>
+          )}
         </div>
       </FilterSection>
 
+      {/* Brand Filter */}
       <FilterSection title="Brand">
         <Input
           placeholder="Search brands..."
@@ -414,17 +361,22 @@ export default function SearchPage() {
           className="mb-3 h-8 text-xs"
         />
         <div className="space-y-2 max-h-48 overflow-y-auto">
-          {filteredBrands.map((brand) => (
-            <Checkbox
-              key={brand}
-              label={brand}
-              checked={selectedBrands.includes(brand)}
-              onCheckedChange={() => toggleArrayFilter('brand', brand, selectedBrands)}
-            />
-          ))}
+          {displayBrands.length > 0 ? (
+            displayBrands.map((brand) => (
+              <Checkbox
+                key={brand.slug}
+                label={`${brand.name} (${brand.count})`}
+                checked={selectedBrands.includes(brand.slug)}
+                onCheckedChange={() => toggleArrayFilter('brand', brand.slug, selectedBrands)}
+              />
+            ))
+          ) : (
+            <p className="text-xs text-muted-foreground">No brands found</p>
+          )}
         </div>
       </FilterSection>
 
+      {/* Price Range */}
       <FilterSection title="Price Range">
         <div className="flex gap-2">
           <Input
@@ -444,6 +396,7 @@ export default function SearchPage() {
         </div>
       </FilterSection>
 
+      {/* Year Range */}
       <FilterSection title="Year Range">
         <div className="flex gap-2">
           <Input
@@ -463,59 +416,85 @@ export default function SearchPage() {
         </div>
       </FilterSection>
 
+      {/* Condition Filter */}
       <FilterSection title="Condition">
         <div className="space-y-2">
-          {conditionOptions.map((cond) => (
-            <Checkbox
-              key={cond}
-              label={cond}
-              checked={selectedConditions.includes(cond.toLowerCase())}
-              onCheckedChange={() => toggleArrayFilter('condition', cond.toLowerCase(), selectedConditions)}
-            />
-          ))}
+          {agg.conditions.length > 0 ? (
+            agg.conditions.map((c) => (
+              <Checkbox
+                key={c.value}
+                label={`${CONDITION_LABELS[c.value] || c.value} (${c.count})`}
+                checked={selectedConditions.includes(c.value)}
+                onCheckedChange={() => toggleArrayFilter('condition', c.value, selectedConditions)}
+              />
+            ))
+          ) : (
+            ['NEW', 'USED', 'REFURBISHED'].map((c) => (
+              <Checkbox
+                key={c}
+                label={CONDITION_LABELS[c]}
+                checked={selectedConditions.includes(c)}
+                onCheckedChange={() => toggleArrayFilter('condition', c, selectedConditions)}
+              />
+            ))
+          )}
         </div>
       </FilterSection>
 
+      {/* Fuel Type Filter */}
       <FilterSection title="Fuel Type" defaultOpen={false}>
         <div className="space-y-2">
-          {fuelTypeOptions.map((fuel) => (
-            <Checkbox
-              key={fuel}
-              label={fuel}
-              checked={selectedFuelTypes.includes(fuel.toLowerCase())}
-              onCheckedChange={() => toggleArrayFilter('fuelType', fuel.toLowerCase(), selectedFuelTypes)}
-            />
-          ))}
+          {agg.fuelTypes.length > 0 ? (
+            agg.fuelTypes.filter((f) => f.value).map((f) => (
+              <Checkbox
+                key={f.value}
+                label={`${FUEL_LABELS[f.value] || f.value} (${f.count})`}
+                checked={selectedFuelTypes.includes(f.value)}
+                onCheckedChange={() => toggleArrayFilter('fuelType', f.value, selectedFuelTypes)}
+              />
+            ))
+          ) : (
+            Object.entries(FUEL_LABELS).map(([value, label]) => (
+              <Checkbox
+                key={value}
+                label={label}
+                checked={selectedFuelTypes.includes(value)}
+                onCheckedChange={() => toggleArrayFilter('fuelType', value, selectedFuelTypes)}
+              />
+            ))
+          )}
         </div>
       </FilterSection>
 
+      {/* Transmission Filter */}
       <FilterSection title="Transmission" defaultOpen={false}>
         <div className="space-y-2">
-          {transmissionOptions.map((trans) => (
+          {Object.entries(TRANSMISSION_LABELS).map(([value, label]) => (
             <Checkbox
-              key={trans}
-              label={trans}
-              checked={selectedTransmissions.includes(trans.toLowerCase())}
-              onCheckedChange={() =>
-                toggleArrayFilter('transmission', trans.toLowerCase(), selectedTransmissions)
-              }
+              key={value}
+              label={label}
+              checked={selectedTransmissions.includes(value)}
+              onCheckedChange={() => toggleArrayFilter('transmission', value, selectedTransmissions)}
             />
           ))}
         </div>
       </FilterSection>
 
+      {/* Country Filter */}
       <FilterSection title="Country" defaultOpen={false}>
         <div className="space-y-2 max-h-48 overflow-y-auto">
-          {countryOptions.map((country) => (
-            <Checkbox
-              key={country}
-              label={country}
-              checked={selectedCountries.includes(country.toLowerCase())}
-              onCheckedChange={() =>
-                toggleArrayFilter('country', country.toLowerCase(), selectedCountries)
-              }
-            />
-          ))}
+          {agg.countries.length > 0 ? (
+            agg.countries.filter((c) => c.value).map((c) => (
+              <Checkbox
+                key={c.value}
+                label={`${COUNTRY_NAMES[c.value] || c.value} (${c.count})`}
+                checked={selectedCountries.includes(c.value)}
+                onCheckedChange={() => toggleArrayFilter('country', c.value, selectedCountries)}
+              />
+            ))
+          ) : (
+            <p className="text-xs text-muted-foreground">No country data</p>
+          )}
         </div>
       </FilterSection>
 
@@ -532,31 +511,65 @@ export default function SearchPage() {
   // ---------------------------------------------------------------------------
   const activeFilterChips: { label: string; onRemove: () => void }[] = [];
 
-  selectedCategories.forEach((cat) => {
+  selectedCategories.forEach((slug) => {
+    const cat = agg.categories.find((c) => c.slug === slug);
+    const label = cat ? getCategoryName(cat.name) : slug;
     activeFilterChips.push({
-      label: `Category: ${cat}`,
-      onRemove: () => toggleArrayFilter('category', cat, selectedCategories),
+      label: `Category: ${label}`,
+      onRemove: () => toggleArrayFilter('category', slug, selectedCategories),
     });
   });
-  selectedBrands.forEach((brand) => {
+  selectedBrands.forEach((slug) => {
+    const brand = agg.brands.find((b) => b.slug === slug);
+    const label = brand ? brand.name : slug;
     activeFilterChips.push({
-      label: `Brand: ${brand}`,
-      onRemove: () => toggleArrayFilter('brand', brand, selectedBrands),
+      label: `Brand: ${label}`,
+      onRemove: () => toggleArrayFilter('brand', slug, selectedBrands),
     });
   });
   selectedConditions.forEach((cond) => {
     activeFilterChips.push({
-      label: `Condition: ${cond}`,
+      label: `Condition: ${CONDITION_LABELS[cond] || cond}`,
       onRemove: () => toggleArrayFilter('condition', cond, selectedConditions),
+    });
+  });
+  selectedFuelTypes.forEach((ft) => {
+    activeFilterChips.push({
+      label: `Fuel: ${FUEL_LABELS[ft] || ft}`,
+      onRemove: () => toggleArrayFilter('fuelType', ft, selectedFuelTypes),
+    });
+  });
+  selectedTransmissions.forEach((tr) => {
+    activeFilterChips.push({
+      label: `Transmission: ${TRANSMISSION_LABELS[tr] || tr}`,
+      onRemove: () => toggleArrayFilter('transmission', tr, selectedTransmissions),
+    });
+  });
+  selectedCountries.forEach((cc) => {
+    activeFilterChips.push({
+      label: `Country: ${COUNTRY_NAMES[cc] || cc}`,
+      onRemove: () => toggleArrayFilter('country', cc, selectedCountries),
     });
   });
   if (priceMin || priceMax) {
     activeFilterChips.push({
-      label: `Price: ${priceMin || '0'} - ${priceMax || '...'}`,
+      label: `Price: €${priceMin || '0'} - €${priceMax || '...'}`,
       onRemove: () => {
         const params = new URLSearchParams(searchParams.toString());
         params.delete('priceMin');
         params.delete('priceMax');
+        params.delete('page');
+        router.push(`/search?${params.toString()}`, { scroll: false });
+      },
+    });
+  }
+  if (yearMin || yearMax) {
+    activeFilterChips.push({
+      label: `Year: ${yearMin || '...'} - ${yearMax || '...'}`,
+      onRemove: () => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete('yearMin');
+        params.delete('yearMax');
         params.delete('page');
         router.push(`/search?${params.toString()}`, { scroll: false });
       },
