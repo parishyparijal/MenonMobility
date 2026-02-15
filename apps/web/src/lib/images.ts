@@ -229,8 +229,42 @@ export const PARTS_IMAGES = {
 export function getImagesForListing(title: string): string[] {
   const t = title.toLowerCase();
 
-  // Trucks
-  if (t.includes('actros') || (t.includes('mercedes') && !t.includes('sprinter')))
+  // ── Containers (check first — "reefer container" must not match trailer "reefer")
+  if (t.includes('shipping container') || t.includes('20ft') || t.includes('40ft') || t.includes('20 ft') || t.includes('40 ft'))
+    return CONTAINER_IMAGES['shipping'];
+  if (t.includes('storage container'))
+    return CONTAINER_IMAGES['storage'];
+  if (t.includes('reefer container') || t.includes('refrigerated container'))
+    return CONTAINER_IMAGES['reefer-container'];
+  if (t.includes('tank container') || t.includes('iso tank'))
+    return CONTAINER_IMAGES['tank-container'];
+  if (t.includes('container') && !t.includes('chassis'))
+    return CONTAINER_IMAGES['shipping'];
+
+  // ── Parts & Accessories (check before trucks — "engine assembly" must not fall through)
+  if (t.includes('engine') || t.includes('motor') || t.includes('turbo') || t.includes('gearbox'))
+    return PARTS_IMAGES['engine'];
+  if (t.includes('brake') || t.includes('caliper') || t.includes('disc') || t.includes('pad'))
+    return PARTS_IMAGES['brakes'];
+  if (t.includes('tyre') || t.includes('tire') || t.includes('wheel') || t.includes('rim'))
+    return PARTS_IMAGES['tyres'];
+  if (t.includes('filter') || t.includes('gasket') || t.includes('bearing') || t.includes('alternator'))
+    return PARTS_IMAGES['generic-parts'];
+
+  // ── Cars (check before trucks — "Mercedes E-Class" must not match truck "mercedes")
+  if (t.includes('bmw') || t.includes('3 series') || t.includes('5 series') || t.includes('x5'))
+    return CAR_IMAGES['bmw'];
+  if (t.includes('audi') || t.includes('a4') || t.includes('a6') || t.includes('q7'))
+    return CAR_IMAGES['audi'];
+  if (t.includes('c-class') || t.includes('e-class') || t.includes('s-class') || t.includes('gle') || t.includes('glc'))
+    return CAR_IMAGES['mercedes-car'];
+  if (t.includes('golf') || t.includes('passat') || t.includes('tiguan') || t.includes('polo'))
+    return CAR_IMAGES['volkswagen-car'];
+  if (t.includes('toyota') || t.includes('corolla') || t.includes('hilux') || t.includes('land cruiser'))
+    return CAR_IMAGES['toyota'];
+
+  // ── Trucks
+  if (t.includes('actros') || t.includes('atego') || t.includes('arocs') || t.includes('axor'))
     return TRUCK_IMAGES['mercedes-actros'];
   if (t.includes('volvo fh') || t.includes('volvo fl') || t.includes('volvo fm'))
     return TRUCK_IMAGES['volvo-fh'];
@@ -245,7 +279,7 @@ export function getImagesForListing(title: string): string[] {
   if (t.includes('renault t') || t.includes('renault t480'))
     return TRUCK_IMAGES['renault'];
 
-  // Trailers
+  // ── Trailers
   if (t.includes('curtain') || t.includes('profi liner') || t.includes('mega'))
     return TRAILER_IMAGES['curtainsider'];
   if (t.includes('reefer') || t.includes('cool liner') || t.includes('thermo'))
@@ -257,19 +291,19 @@ export function getImagesForListing(title: string): string[] {
   if (t.includes('trailer') || t.includes('schmitz') || t.includes('krone') || t.includes('kögel'))
     return TRAILER_IMAGES['curtainsider'];
 
-  // Construction
-  if (t.includes('excavator') || t.includes('320') || t.includes('336') || t.includes('946'))
+  // ── Construction
+  if (t.includes('excavator') || t.includes('cat 320') || t.includes('pc210') || t.includes('ec220'))
     return CONSTRUCTION_IMAGES['excavator'];
-  if (t.includes('loader') || t.includes('950') || t.includes('l 566'))
+  if (t.includes('loader') || t.includes('l 566') || t.includes('950'))
     return CONSTRUCTION_IMAGES['wheel-loader'];
-  if (t.includes('bulldozer') || t.includes('d6') || t.includes('tractor') && t.includes('track'))
+  if (t.includes('bulldozer') || t.includes('d6'))
     return CONSTRUCTION_IMAGES['bulldozer'];
   if (t.includes('grader') || t.includes('140m'))
     return CONSTRUCTION_IMAGES['grader'];
   if (t.includes('dump') || t.includes('745') || t.includes('caterpillar'))
     return CONSTRUCTION_IMAGES['dump-truck'];
 
-  // Vans
+  // ── Vans
   if (t.includes('sprinter'))
     return VAN_IMAGES['mercedes-sprinter'];
   if (t.includes('transit') || t.includes('ford'))
@@ -283,39 +317,11 @@ export function getImagesForListing(title: string): string[] {
   if (t.includes('boxer') || t.includes('peugeot') || t.includes('ducato') || t.includes('fiat'))
     return VAN_IMAGES['generic'];
 
-  // Cars
-  if (t.includes('bmw') || t.includes('3 series') || t.includes('5 series') || t.includes('x5'))
-    return CAR_IMAGES['bmw'];
-  if (t.includes('audi') || t.includes('a4') || t.includes('a6') || t.includes('q7'))
-    return CAR_IMAGES['audi'];
-  if (t.includes('c-class') || t.includes('e-class') || t.includes('s-class') || t.includes('gle') || t.includes('glc'))
+  // ── Fallback: generic Mercedes or VW → car images
+  if (t.includes('mercedes'))
     return CAR_IMAGES['mercedes-car'];
-  if (t.includes('golf') || t.includes('passat') || t.includes('tiguan') || t.includes('polo') || t.includes('vw') || t.includes('volkswagen'))
+  if (t.includes('vw') || t.includes('volkswagen'))
     return CAR_IMAGES['volkswagen-car'];
-  if (t.includes('toyota') || t.includes('corolla') || t.includes('hilux') || t.includes('land cruiser'))
-    return CAR_IMAGES['toyota'];
-
-  // Containers
-  if (t.includes('shipping container') || t.includes('20ft') || t.includes('40ft') || t.includes('20 ft') || t.includes('40 ft'))
-    return CONTAINER_IMAGES['shipping'];
-  if (t.includes('storage container'))
-    return CONTAINER_IMAGES['storage'];
-  if (t.includes('reefer container') || t.includes('refrigerated container'))
-    return CONTAINER_IMAGES['reefer-container'];
-  if (t.includes('tank container') || t.includes('iso tank'))
-    return CONTAINER_IMAGES['tank-container'];
-  if (t.includes('container'))
-    return CONTAINER_IMAGES['shipping'];
-
-  // Parts & Accessories
-  if (t.includes('engine') || t.includes('motor') || t.includes('turbo') || t.includes('gearbox'))
-    return PARTS_IMAGES['engine'];
-  if (t.includes('brake') || t.includes('caliper') || t.includes('disc') || t.includes('pad'))
-    return PARTS_IMAGES['brakes'];
-  if (t.includes('tyre') || t.includes('tire') || t.includes('wheel') || t.includes('rim'))
-    return PARTS_IMAGES['tyres'];
-  if (t.includes('part') || t.includes('filter') || t.includes('gasket') || t.includes('bearing') || t.includes('alternator'))
-    return PARTS_IMAGES['generic-parts'];
 
   // Default: generic truck
   return TRUCK_IMAGES['mercedes-actros'];
