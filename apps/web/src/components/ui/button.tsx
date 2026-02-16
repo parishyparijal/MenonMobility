@@ -11,7 +11,7 @@ const buttonVariants = cva(
         default:
           'bg-primary text-white hover:bg-primary-600 active:bg-primary-700',
         accent:
-          'bg-accent text-white hover:bg-accent-600 active:bg-accent-700 shadow-sm',
+          'bg-gradient-to-b from-accent-400 to-accent-600 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_1px_3px_rgba(0,0,0,0.12)] border border-accent-300/40 hover:from-accent-300 hover:to-accent-500 active:from-accent-500 active:to-accent-700',
         outline:
           'border border-border bg-white hover:bg-muted hover:text-foreground',
         ghost: 'hover:bg-muted hover:text-foreground',

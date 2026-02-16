@@ -293,7 +293,7 @@ export default function ListingDetailPage() {
                   </>
                 )}
                 {dummyListing.isFeatured && (
-                  <Badge className="absolute top-3 left-3 bg-accent text-white border-0">Featured</Badge>
+                  <Badge className="absolute top-3 left-3 bg-gradient-to-b from-accent-400 to-accent-600 text-white border border-accent-300/40 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_1px_2px_rgba(0,0,0,0.1)]">Featured</Badge>
                 )}
               </div>
               {/* Thumbnails */}
