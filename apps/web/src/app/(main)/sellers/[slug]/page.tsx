@@ -64,7 +64,7 @@ const sellerListings: ListingCardData[] = Array.from({ length: 8 }, (_, i) => ({
     'Scania R 450 Highline',
   ][i % 4],
   price: [89500, 125000, 92000, 78900][i % 4],
-  currency: 'EUR',
+  currency: 'USD',
   condition: (i % 3 === 0 ? 'NEW' : 'USED') as 'NEW' | 'USED',
   images: getImagesForListing([
     'Mercedes-Benz Actros 2545 LS 6x2',

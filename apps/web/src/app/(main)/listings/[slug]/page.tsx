@@ -55,7 +55,7 @@ Key highlights:
 
 The truck has been used primarily for long-haul transport within Western Europe and has been kept in top condition. Ideal for fleet operations or owner-operators looking for a reliable and fuel-efficient tractor unit.`,
   price: 89500,
-  currency: 'EUR',
+  currency: 'USD',
   condition: 'USED' as string,
   category: 'trucks',
   brand: 'Mercedes-Benz',
@@ -134,7 +134,7 @@ const relatedListings: ListingCardData[] = [
     slug: 'volvo-fh-500-2023',
     title: 'Volvo FH 500 4x2 Globetrotter XL',
     price: 125000,
-    currency: 'EUR',
+    currency: 'USD',
     condition: 'USED',
     images: getImagesForListing('Volvo FH 500 4x2 Globetrotter XL'),
     year: 2023,
@@ -149,7 +149,7 @@ const relatedListings: ListingCardData[] = [
     slug: 'scania-r450-2021',
     title: 'Scania R 450 A4x2NA Highline',
     price: 78900,
-    currency: 'EUR',
+    currency: 'USD',
     condition: 'USED',
     images: getImagesForListing('Scania R 450 A4x2NA Highline'),
     year: 2021,
@@ -164,7 +164,7 @@ const relatedListings: ListingCardData[] = [
     slug: 'man-tgx-18-510-2023',
     title: 'MAN TGX 18.510 4x2 BLS',
     price: 115000,
-    currency: 'EUR',
+    currency: 'USD',
     condition: 'NEW',
     images: getImagesForListing('MAN TGX 18.510 4x2 BLS'),
     year: 2023,
@@ -179,7 +179,7 @@ const relatedListings: ListingCardData[] = [
     slug: 'daf-xf-480-2022',
     title: 'DAF XF 480 FT Space Cab',
     price: 92000,
-    currency: 'EUR',
+    currency: 'USD',
     condition: 'USED',
     images: getImagesForListing('DAF XF 480 FT Space Cab'),
     year: 2022,
@@ -228,7 +228,7 @@ export default function ListingDetailPage() {
 
   const formattedPrice = new Intl.NumberFormat('de-DE', {
     style: 'currency',
-    currency: 'EUR',
+    currency: 'USD',
     maximumFractionDigits: 0,
   }).format(dummyListing.price);
 
@@ -527,7 +527,7 @@ export default function ListingDetailPage() {
                     <p className="text-2xl font-bold text-accent mt-1">
                       {new Intl.NumberFormat('de-DE', {
                         style: 'currency',
-                        currency: 'EUR',
+                        currency: 'USD',
                         maximumFractionDigits: 0,
                       }).format(monthlyPayment)}
                       <span className="text-sm font-normal text-muted-foreground">/mo</span>

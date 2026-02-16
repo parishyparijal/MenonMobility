@@ -1,36 +1,34 @@
+'use client';
+
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-
-type SupportedCurrency = 'EUR' | 'GBP' | 'USD';
-
-const currencyLocaleMap: Record<SupportedCurrency, string> = {
-  EUR: 'de-DE',
-  GBP: 'en-GB',
-  USD: 'en-US',
-};
+import { useCurrencyStore, CURRENCY_INFO } from '@/store/currency';
 
 interface CurrencyDisplayProps {
   amount: number;
-  currency?: SupportedCurrency;
+  currency?: string;
   showDecimals?: boolean;
   className?: string;
 }
 
 function CurrencyDisplay({
   amount,
-  currency = 'EUR',
+  currency = 'USD',
   showDecimals = true,
   className,
 }: CurrencyDisplayProps) {
+  const { selectedCurrency, convert } = useCurrencyStore();
+
   const formatted = React.useMemo(() => {
-    const locale = currencyLocaleMap[currency];
-    return new Intl.NumberFormat(locale, {
+    const converted = convert(amount, currency);
+    const info = CURRENCY_INFO[selectedCurrency] || CURRENCY_INFO.USD;
+    return new Intl.NumberFormat(info.locale, {
       style: 'currency',
-      currency,
+      currency: selectedCurrency,
       minimumFractionDigits: showDecimals ? 2 : 0,
       maximumFractionDigits: showDecimals ? 2 : 0,
-    }).format(amount);
-  }, [amount, currency, showDecimals]);
+    }).format(converted);
+  }, [amount, currency, selectedCurrency, convert, showDecimals]);
 
   return (
     <span className={cn('tabular-nums', className)}>
@@ -40,4 +38,4 @@ function CurrencyDisplay({
 }
 
 export { CurrencyDisplay };
-export type { CurrencyDisplayProps, SupportedCurrency };
+export type { CurrencyDisplayProps };

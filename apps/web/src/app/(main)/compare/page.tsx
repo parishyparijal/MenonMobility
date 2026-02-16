@@ -25,7 +25,7 @@ const dummyVehicles: CompareVehicle[] = [
     slug: 'mercedes-actros-2545-ls-2022',
     title: 'Mercedes-Benz Actros 2545 LS 6x2',
     price: 89500,
-    currency: 'EUR',
+    currency: 'USD',
     condition: 'Used',
     image: '',
     specs: {
@@ -52,7 +52,7 @@ const dummyVehicles: CompareVehicle[] = [
     slug: 'volvo-fh-500-2023',
     title: 'Volvo FH 500 4x2 Globetrotter XL',
     price: 125000,
-    currency: 'EUR',
+    currency: 'USD',
     condition: 'Used',
     image: '',
     specs: {
@@ -79,7 +79,7 @@ const dummyVehicles: CompareVehicle[] = [
     slug: 'scania-r450-2021',
     title: 'Scania R 450 A4x2NA Highline',
     price: 78900,
-    currency: 'EUR',
+    currency: 'USD',
     condition: 'Used',
     image: '',
     specs: {

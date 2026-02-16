@@ -18,8 +18,13 @@ import {
   MessageSquare,
   FileCheck,
   ArrowRight,
+  BarChart3,
+  Users,
+  Globe,
+  CalendarCheck,
   type LucideIcon,
 } from 'lucide-react';
+import { useCountUp } from '@/hooks/use-count-up';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -63,7 +68,7 @@ const featuredListings: ListingCardData[] = [
     slug: 'mercedes-actros-2545-ls-2022',
     title: 'Mercedes-Benz Actros 2545 LS 6x2',
     price: 89500,
-    currency: 'EUR',
+    currency: 'USD',
     condition: 'USED',
     images: getImagesForListing('Mercedes-Benz Actros 2545 LS 6x2'),
     year: 2022,
@@ -78,7 +83,7 @@ const featuredListings: ListingCardData[] = [
     slug: 'volvo-fh-500-2023',
     title: 'Volvo FH 500 4x2 Globetrotter XL',
     price: 125000,
-    currency: 'EUR',
+    currency: 'USD',
     condition: 'USED',
     images: getImagesForListing('Volvo FH 500 4x2 Globetrotter XL'),
     year: 2023,
@@ -93,7 +98,7 @@ const featuredListings: ListingCardData[] = [
     slug: 'scania-r450-2021',
     title: 'Scania R 450 A4x2NA Highline',
     price: 78900,
-    currency: 'EUR',
+    currency: 'USD',
     condition: 'USED',
     images: getImagesForListing('Scania R 450 A4x2NA Highline'),
     year: 2021,
@@ -108,7 +113,7 @@ const featuredListings: ListingCardData[] = [
     slug: 'man-tgx-18-510-2023',
     title: 'MAN TGX 18.510 4x2 BLS',
     price: 115000,
-    currency: 'EUR',
+    currency: 'USD',
     condition: 'NEW',
     images: getImagesForListing('MAN TGX 18.510 4x2 BLS'),
     year: 2023,
@@ -123,7 +128,7 @@ const featuredListings: ListingCardData[] = [
     slug: 'bmw-5-series-530d-2023',
     title: 'BMW 5 Series 530d xDrive Touring',
     price: 52000,
-    currency: 'EUR',
+    currency: 'USD',
     condition: 'USED',
     images: getImagesForListing('BMW 5 Series 530d xDrive Touring'),
     year: 2023,
@@ -138,7 +143,7 @@ const featuredListings: ListingCardData[] = [
     slug: 'caterpillar-320-2021',
     title: 'Caterpillar 320 GC Excavator',
     price: 165000,
-    currency: 'EUR',
+    currency: 'USD',
     condition: 'USED',
     images: getImagesForListing('Caterpillar 320 GC Excavator'),
     year: 2021,
@@ -153,7 +158,7 @@ const featuredListings: ListingCardData[] = [
     slug: 'schmitz-curtainsider-2022',
     title: 'Schmitz Cargobull Curtainsider SCS 24/L',
     price: 32000,
-    currency: 'EUR',
+    currency: 'USD',
     condition: 'USED',
     images: getImagesForListing('Schmitz Cargobull Curtainsider SCS 24/L'),
     year: 2022,
@@ -168,7 +173,7 @@ const featuredListings: ListingCardData[] = [
     slug: 'mercedes-sprinter-316-2023',
     title: 'Mercedes-Benz Sprinter 316 CDI L3H2',
     price: 38500,
-    currency: 'EUR',
+    currency: 'USD',
     condition: 'USED',
     images: getImagesForListing('Mercedes-Benz Sprinter 316 CDI L3H2'),
     year: 2023,
@@ -192,11 +197,29 @@ const popularBrands = [
 ];
 
 const stats = [
-  { label: 'Listings', value: '150K+' },
-  { label: 'Dealers', value: '5K+' },
-  { label: 'Countries', value: '20+' },
-  { label: 'Since', value: '2024' },
+  { label: 'Listings', value: 150000, suffix: '+', icon: BarChart3 },
+  { label: 'Dealers', value: 5000, suffix: '+', icon: Users },
+  { label: 'Countries', value: 50, suffix: '+', icon: Globe },
+  { label: 'Since', value: 2024, suffix: '', icon: CalendarCheck },
 ];
+
+function StatItem({ stat }: { stat: typeof stats[number] }) {
+  const { count, ref } = useCountUp(stat.value);
+  const Icon = stat.icon;
+  const display = stat.value >= 1000
+    ? `${Math.floor(count / 1000)}K${stat.suffix}`
+    : `${count}${stat.suffix}`;
+
+  return (
+    <div ref={ref} className="flex flex-col items-center gap-3 py-2">
+      <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/20">
+        <Icon className="w-6 h-6 text-white/90" />
+      </div>
+      <p className="text-3xl md:text-4xl font-bold text-white tabular-nums">{display}</p>
+      <p className="text-white/60 text-xs font-medium uppercase tracking-wider">{stat.label}</p>
+    </div>
+  );
+}
 
 export default function HomePage() {
   const router = useRouter();
@@ -350,13 +373,27 @@ export default function HomePage() {
       </section>
 
       {/* Stats Bar */}
-      <section className="bg-primary text-white">
-        <div className="container mx-auto px-4 py-10">
+      <section className="relative bg-gradient-to-r from-primary-800 via-primary to-primary-950 text-white overflow-hidden">
+        {/* Dot pattern overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.07]"
+          style={{
+            backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
+            backgroundSize: '24px 24px',
+          }}
+        />
+        <div className="container mx-auto px-4 py-14 relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {stats.map((stat) => (
-              <div key={stat.label}>
-                <p className="text-3xl md:text-4xl font-bold text-accent">{stat.value}</p>
-                <p className="text-white/70 mt-1 text-sm">{stat.label}</p>
+            {stats.map((stat, index) => (
+              <div
+                key={stat.label}
+                className={
+                  index < stats.length - 1
+                    ? 'md:border-r md:border-white/10'
+                    : ''
+                }
+              >
+                <StatItem stat={stat} />
               </div>
             ))}
           </div>

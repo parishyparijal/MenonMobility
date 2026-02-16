@@ -328,7 +328,7 @@ export default function AdminListingsPage() {
                         </td>
                         <td className="py-3 px-4 text-right">
                           <span className="text-sm font-medium text-foreground">
-                            {listing.priceCurrency || 'EUR'} {listing.price?.toLocaleString()}
+                            {listing.priceCurrency || 'USD'} {listing.price?.toLocaleString()}
                           </span>
                         </td>
                         <td className="py-3 px-4 text-right hidden md:table-cell">

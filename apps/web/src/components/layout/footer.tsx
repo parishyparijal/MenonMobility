@@ -64,11 +64,15 @@ const socialLinks = [
 
 const fallbackLanguages: SiteLanguage[] = [
   { id: '1', code: 'en', name: 'English', localName: 'Global | English', countryCode: 'us', isDefault: true, isActive: true, sortOrder: 0 },
-  { id: '2', code: 'es', name: 'Español', localName: 'Global | Español', countryCode: 'es', isDefault: false, isActive: true, sortOrder: 1 },
-  { id: '3', code: 'fr', name: 'Français', localName: 'Global | Français', countryCode: 'fr', isDefault: false, isActive: true, sortOrder: 2 },
-  { id: '4', code: 'de', name: 'Deutsch', localName: 'Global | Deutsch', countryCode: 'de', isDefault: false, isActive: true, sortOrder: 3 },
-  { id: '5', code: 'ar', name: 'العربية', localName: 'Global | العربية', countryCode: 'sa', isDefault: false, isActive: true, sortOrder: 4 },
-  { id: '6', code: 'zh', name: '中文', localName: 'Global | 中文', countryCode: 'cn', isDefault: false, isActive: true, sortOrder: 5 },
+  { id: '2', code: 'zh', name: '中文', localName: 'Global | 中文', countryCode: 'cn', isDefault: false, isActive: true, sortOrder: 1 },
+  { id: '3', code: 'hi', name: 'हिन्दी', localName: 'Global | हिन्दी', countryCode: 'in', isDefault: false, isActive: true, sortOrder: 2 },
+  { id: '4', code: 'es', name: 'Español', localName: 'Global | Español', countryCode: 'es', isDefault: false, isActive: true, sortOrder: 3 },
+  { id: '5', code: 'fr', name: 'Français', localName: 'Global | Français', countryCode: 'fr', isDefault: false, isActive: true, sortOrder: 4 },
+  { id: '6', code: 'ar', name: 'العربية', localName: 'Global | العربية', countryCode: 'sa', isDefault: false, isActive: true, sortOrder: 5 },
+  { id: '7', code: 'bn', name: 'বাংলা', localName: 'Global | বাংলা', countryCode: 'bd', isDefault: false, isActive: true, sortOrder: 6 },
+  { id: '8', code: 'pt', name: 'Português', localName: 'Global | Português', countryCode: 'br', isDefault: false, isActive: true, sortOrder: 7 },
+  { id: '9', code: 'ru', name: 'Русский', localName: 'Global | Русский', countryCode: 'ru', isDefault: false, isActive: true, sortOrder: 8 },
+  { id: '10', code: 'ja', name: '日本語', localName: 'Global | 日本語', countryCode: 'jp', isDefault: false, isActive: true, sortOrder: 9 },
 ];
 
 export function Footer() {

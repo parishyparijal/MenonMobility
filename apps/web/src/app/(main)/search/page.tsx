@@ -130,7 +130,7 @@ const dummyListings: ListingCardData[] = Array.from({ length: 24 }, (_, i) => ({
     'Caterpillar 320 GC Excavator',
   ][i % 8],
   price: [89500, 125000, 78900, 115000, 92000, 98000, 76500, 165000][i % 8],
-  currency: 'EUR',
+  currency: 'USD',
   condition: (i % 5 === 0 ? 'NEW' : 'USED') as 'NEW' | 'USED',
   images: getImagesForListing([
     'Mercedes-Benz Actros 2545 LS 6x2',
@@ -195,7 +195,7 @@ function mapApiListing(listing: any): ListingCardData {
     slug: listing.slug,
     title: listing.title,
     price: listing.price ? Number(listing.price) : 0,
-    currency: listing.priceCurrency || 'EUR',
+    currency: listing.priceCurrency || 'USD',
     condition: listing.condition || 'USED',
     images,
     year: listing.year,

@@ -69,7 +69,7 @@ export default function AdminSettingsPage() {
     siteDescription: 'The world\'s premier marketplace for trucks, trailers, and commercial vehicles',
     contactEmail: 'info@menonmobility.com',
     supportEmail: 'support@menonmobility.com',
-    defaultCurrency: 'EUR',
+    defaultCurrency: 'USD',
     defaultLanguage: 'en',
     listingsPerPage: '20',
     listingExpiryDays: '90',

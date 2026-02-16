@@ -20,12 +20,23 @@ import featuredListingRoutes from "./featured-listing.routes";
 import paymentRoutes from "./payment.routes";
 import sitemapRoutes from "./sitemap.routes";
 import prisma from "@/config/database";
+import { getExchangeRates } from "@/services/exchange-rate.service";
 
 // ---------------------------------------------------------------------------
 // Main API Router
 // ---------------------------------------------------------------------------
 
 export const router = Router();
+
+// ---- Public: Exchange rates ----
+router.get("/exchange-rates", async (_req, res, next) => {
+  try {
+    const rates = await getExchangeRates();
+    res.json({ success: true, data: { base: "USD", rates } });
+  } catch (error) {
+    next(error);
+  }
+});
 
 // ---- Public: Active languages ----
 router.get("/languages", async (_req, res, next) => {

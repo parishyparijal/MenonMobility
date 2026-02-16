@@ -341,7 +341,7 @@ model Listing {
   slug              String            @unique
   description       String?
   price             Float?
-  priceCurrency     String            @default("EUR")
+  priceCurrency     String            @default("USD")
   priceOnRequest    Boolean           @default(false)
   priceNegotiable   Boolean           @default(false)
   condition         VehicleCondition  @default(USED)
@@ -688,7 +688,7 @@ model Payment {
   userId                String        @db.Uuid
   stripePaymentIntentId String?       @unique
   amount                Float
-  currency              String        @default("EUR")
+  currency              String        @default("USD")
   status                PaymentStatus @default(PENDING)
   type                  PaymentType
   metadata              Json?

@@ -46,7 +46,7 @@ export function ListingCard({ listing, view = 'grid' }: ListingCardProps) {
   const formattedPrice = listing.price
     ? new Intl.NumberFormat('en-EU', {
         style: 'currency',
-        currency: listing.currency || 'EUR',
+        currency: listing.currency || 'USD',
         maximumFractionDigits: 0,
       }).format(listing.price)
     : null;

@@ -532,7 +532,7 @@ async function main() {
           slug: listingSlug,
           description: `${condition === "NEW" ? "Brand new" : "Well-maintained"} ${title}. ${condition === "NEW" ? "Full factory warranty." : `${mileage > 0 ? mileage.toLocaleString() + " km." : ""}`} Available for immediate delivery. Contact us for more details and inspection.`,
           price,
-          priceCurrency: "EUR",
+          priceCurrency: "USD",
           condition,
           status: "ACTIVE",
           year,
@@ -564,17 +564,16 @@ async function main() {
   // 8. Site Languages
   console.log("8. Seeding site languages...");
   const SITE_LANGUAGES = [
-    { code: "nl-BE", name: "Nederlands", localName: "België | Nederlands", countryCode: "be", isDefault: false, sortOrder: 0 },
-    { code: "fr-BE", name: "Français", localName: "Belgique | Français", countryCode: "be", isDefault: false, sortOrder: 1 },
-    { code: "en", name: "English", localName: "International | English", countryCode: "eu", isDefault: true, sortOrder: 2 },
-    { code: "de", name: "Deutsch", localName: "Deutschland | Deutsch", countryCode: "de", isDefault: false, sortOrder: 3 },
-    { code: "fr", name: "Français", localName: "France | Français", countryCode: "fr", isDefault: false, sortOrder: 4 },
-    { code: "pl", name: "Polski", localName: "Polska | Polski", countryCode: "pl", isDefault: false, sortOrder: 5 },
-    { code: "es", name: "Español", localName: "España | Español", countryCode: "es", isDefault: false, sortOrder: 6 },
-    { code: "it", name: "Italiano", localName: "Italia | Italiano", countryCode: "it", isDefault: false, sortOrder: 7 },
-    { code: "pt", name: "Português", localName: "Portugal | Português", countryCode: "pt", isDefault: false, sortOrder: 8 },
-    { code: "cs", name: "Čeština", localName: "Česká republika | Čeština", countryCode: "cz", isDefault: false, sortOrder: 9 },
-    { code: "ru", name: "Русский", localName: "Россия | Русский", countryCode: "ru", isDefault: false, sortOrder: 10 },
+    { code: "en", name: "English", localName: "Global | English", countryCode: "us", isDefault: true, sortOrder: 0 },
+    { code: "zh", name: "中文", localName: "Global | 中文", countryCode: "cn", isDefault: false, sortOrder: 1 },
+    { code: "hi", name: "हिन्दी", localName: "Global | हिन्दी", countryCode: "in", isDefault: false, sortOrder: 2 },
+    { code: "es", name: "Español", localName: "Global | Español", countryCode: "es", isDefault: false, sortOrder: 3 },
+    { code: "fr", name: "Français", localName: "Global | Français", countryCode: "fr", isDefault: false, sortOrder: 4 },
+    { code: "ar", name: "العربية", localName: "Global | العربية", countryCode: "sa", isDefault: false, sortOrder: 5 },
+    { code: "bn", name: "বাংলা", localName: "Global | বাংলা", countryCode: "bd", isDefault: false, sortOrder: 6 },
+    { code: "pt", name: "Português", localName: "Global | Português", countryCode: "br", isDefault: false, sortOrder: 7 },
+    { code: "ru", name: "Русский", localName: "Global | Русский", countryCode: "ru", isDefault: false, sortOrder: 8 },
+    { code: "ja", name: "日本語", localName: "Global | 日本語", countryCode: "jp", isDefault: false, sortOrder: 9 },
   ];
 
   for (const lang of SITE_LANGUAGES) {

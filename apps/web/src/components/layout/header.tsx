@@ -24,6 +24,7 @@ import { getLocalizedText } from '@/lib/i18n-helpers';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/store/auth';
+import { useCurrencyStore, SUPPORTED_CURRENCIES, CURRENCY_INFO } from '@/store/currency';
 import { MobileNav } from './mobile-nav';
 import { api } from '@/lib/api';
 
@@ -41,11 +42,15 @@ interface SiteLanguage {
 // Fallback languages in case API is unavailable
 const fallbackLanguages: SiteLanguage[] = [
   { id: '1', code: 'en', name: 'English', localName: 'Global | English', countryCode: 'us', isDefault: true, isActive: true, sortOrder: 0 },
-  { id: '2', code: 'es', name: 'Español', localName: 'Global | Español', countryCode: 'es', isDefault: false, isActive: true, sortOrder: 1 },
-  { id: '3', code: 'fr', name: 'Français', localName: 'Global | Français', countryCode: 'fr', isDefault: false, isActive: true, sortOrder: 2 },
-  { id: '4', code: 'de', name: 'Deutsch', localName: 'Global | Deutsch', countryCode: 'de', isDefault: false, isActive: true, sortOrder: 3 },
-  { id: '5', code: 'ar', name: 'العربية', localName: 'Global | العربية', countryCode: 'sa', isDefault: false, isActive: true, sortOrder: 4 },
-  { id: '6', code: 'zh', name: '中文', localName: 'Global | 中文', countryCode: 'cn', isDefault: false, isActive: true, sortOrder: 5 },
+  { id: '2', code: 'zh', name: '中文', localName: 'Global | 中文', countryCode: 'cn', isDefault: false, isActive: true, sortOrder: 1 },
+  { id: '3', code: 'hi', name: 'हिन्दी', localName: 'Global | हिन्दी', countryCode: 'in', isDefault: false, isActive: true, sortOrder: 2 },
+  { id: '4', code: 'es', name: 'Español', localName: 'Global | Español', countryCode: 'es', isDefault: false, isActive: true, sortOrder: 3 },
+  { id: '5', code: 'fr', name: 'Français', localName: 'Global | Français', countryCode: 'fr', isDefault: false, isActive: true, sortOrder: 4 },
+  { id: '6', code: 'ar', name: 'العربية', localName: 'Global | العربية', countryCode: 'sa', isDefault: false, isActive: true, sortOrder: 5 },
+  { id: '7', code: 'bn', name: 'বাংলা', localName: 'Global | বাংলা', countryCode: 'bd', isDefault: false, isActive: true, sortOrder: 6 },
+  { id: '8', code: 'pt', name: 'Português', localName: 'Global | Português', countryCode: 'br', isDefault: false, isActive: true, sortOrder: 7 },
+  { id: '9', code: 'ru', name: 'Русский', localName: 'Global | Русский', countryCode: 'ru', isDefault: false, isActive: true, sortOrder: 8 },
+  { id: '10', code: 'ja', name: '日本語', localName: 'Global | 日本語', countryCode: 'jp', isDefault: false, isActive: true, sortOrder: 9 },
 ];
 
 interface NavChild {
@@ -149,19 +154,27 @@ function buildNavItemsFromApi(categories: ApiCategory[]): NavItem[] {
 export function Header() {
   const pathname = usePathname();
   const { user, isAuthenticated, logout } = useAuthStore();
+  const { selectedCurrency, setSelectedCurrency, fetchRates } = useCurrencyStore();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const [currencyMenuOpen, setCurrencyMenuOpen] = useState(false);
   const [navItems, setNavItems] = useState<NavItem[]>(fallbackNavItems);
   const [languages, setLanguages] = useState<SiteLanguage[]>(fallbackLanguages);
   const [selectedLang, setSelectedLang] = useState<SiteLanguage>(fallbackLanguages[0]);
   const dropdownTimeout = useRef<NodeJS.Timeout | null>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const langMenuRef = useRef<HTMLDivElement>(null);
+  const currencyMenuRef = useRef<HTMLDivElement>(null);
 
   const favoritesCount = 0;
   const unreadMessages = 3;
+
+  // Fetch exchange rates on mount
+  useEffect(() => {
+    fetchRates();
+  }, [fetchRates]);
 
   // Fetch categories from API for dynamic nav
   useEffect(() => {
@@ -204,6 +217,12 @@ export function Header() {
         !langMenuRef.current.contains(event.target as Node)
       ) {
         setLangMenuOpen(false);
+      }
+      if (
+        currencyMenuRef.current &&
+        !currencyMenuRef.current.contains(event.target as Node)
+      ) {
+        setCurrencyMenuOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -266,6 +285,42 @@ export function Header() {
                       <span>{lang.localName}</span>
                     </button>
                   ))}
+                </div>
+              )}
+            </div>
+
+            {/* Currency Selector */}
+            <div className="relative" ref={currencyMenuRef}>
+              <button
+                onClick={() => setCurrencyMenuOpen(!currencyMenuOpen)}
+                className="flex items-center gap-1.5 hover:text-accent transition-colors"
+              >
+                <span>{CURRENCY_INFO[selectedCurrency]?.symbol || '$'}</span>
+                <span>{selectedCurrency}</span>
+                <ChevronDown className="w-3 h-3" />
+              </button>
+              {currencyMenuOpen && (
+                <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-lg border border-border z-50 py-2 min-w-[200px] max-h-[400px] overflow-y-auto">
+                  {SUPPORTED_CURRENCIES.map((code) => {
+                    const info = CURRENCY_INFO[code];
+                    return (
+                      <button
+                        key={code}
+                        onClick={() => {
+                          setSelectedCurrency(code);
+                          setCurrencyMenuOpen(false);
+                        }}
+                        className={cn(
+                          'flex items-center gap-3 w-full px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors',
+                          selectedCurrency === code && 'bg-muted font-medium'
+                        )}
+                      >
+                        <span className="w-8 text-right font-mono text-xs">{info?.symbol}</span>
+                        <span>{code}</span>
+                        <span className="text-muted-foreground text-xs ml-auto">{info?.name}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
