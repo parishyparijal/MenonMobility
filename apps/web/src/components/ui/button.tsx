@@ -9,9 +9,9 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-primary text-white hover:bg-primary-600 active:bg-primary-700',
+          'bg-gradient-to-b from-primary-400 to-primary text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),inset_0_-1px_0_rgba(255,255,255,0.1),inset_4px_4px_10px_rgba(255,255,255,0.08),0_2px_8px_rgba(0,0,0,0.15)] border border-primary-300/30 hover:from-primary-300 hover:to-primary-600 active:from-primary active:to-primary-700 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_1px_2px_rgba(0,0,0,0.1)]',
         accent:
-          'bg-gradient-to-b from-accent-400 to-accent-600 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_1px_3px_rgba(0,0,0,0.12)] border border-accent-300/40 hover:from-accent-300 hover:to-accent-500 active:from-accent-500 active:to-accent-700',
+          'bg-gradient-to-b from-accent-400 to-accent-600 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.45),inset_0_-1px_0_rgba(255,255,255,0.15),inset_4px_4px_10px_rgba(255,255,255,0.1),0_2px_8px_rgba(0,0,0,0.2)] border border-accent-300/30 hover:from-accent-300 hover:to-accent-500 active:from-accent-500 active:to-accent-700 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_1px_2px_rgba(0,0,0,0.1)]',
         outline:
           'border border-border bg-white hover:bg-muted hover:text-foreground',
         ghost: 'hover:bg-muted hover:text-foreground',
