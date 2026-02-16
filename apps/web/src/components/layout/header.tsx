@@ -414,7 +414,7 @@ export function Header() {
 
                     {(user.role === 'SELLER' || user.role === 'ADMIN') && (
                       <Link
-                        href="/seller/dashboard"
+                        href="/seller"
                         onClick={() => setUserMenuOpen(false)}
                         className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors"
                       >

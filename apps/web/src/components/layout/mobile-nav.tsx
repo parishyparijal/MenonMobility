@@ -189,7 +189,7 @@ export function MobileNav({ isOpen, onClose, navItems }: MobileNavProps) {
 
               {(user.role === 'SELLER' || user.role === 'ADMIN') && (
                 <Link
-                  href="/seller/dashboard"
+                  href="/seller"
                   onClick={onClose}
                   className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors"
                 >
