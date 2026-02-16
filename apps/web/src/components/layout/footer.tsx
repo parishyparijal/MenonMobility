@@ -90,9 +90,9 @@ export function Footer() {
           <div className="sm:col-span-2 lg:col-span-1">
             <Link href="/" className="flex items-center mb-4">
               <img
-                src="/logo.png"
+                src="/logo-white.png"
                 alt="Menon Mobility"
-                className="h-10 w-auto object-contain bg-white rounded-lg px-3 py-1.5"
+                className="h-10 w-auto object-contain"
               />
             </Link>
             <p className="text-sm text-white/70 mb-6 max-w-[240px]">
