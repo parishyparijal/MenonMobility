@@ -5,26 +5,26 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'About Us | Menon Mobility',
-  description: 'Learn about Menon Mobility - Europe\'s premier marketplace for trucks, trailers, and commercial vehicles.',
+  description: 'Learn about Menon Mobility - the world\'s premier marketplace for trucks, trailers, and commercial vehicles.',
 };
 
 const stats = [
   { label: 'Active Listings', value: '50,000+' },
   { label: 'Verified Dealers', value: '5,000+' },
-  { label: 'Countries', value: '30+' },
+  { label: 'Countries', value: '50+' },
   { label: 'Monthly Visitors', value: '2M+' },
 ];
 
 const values = [
   { icon: Shield, title: 'Trust & Transparency', description: 'Every listing is verified. We ensure accurate descriptions and fair pricing to build trust between buyers and sellers.' },
-  { icon: Globe, title: 'Global Reach', description: 'Connect with buyers and sellers across 30+ countries. Our platform breaks down borders in the commercial vehicle market.' },
+  { icon: Globe, title: 'Global Reach', description: 'Connect with buyers and sellers across 50+ countries. Our platform breaks down borders in the commercial vehicle market.' },
   { icon: Users, title: 'Community First', description: 'We build tools that empower our community of dealers, fleet operators, and individual buyers to do business efficiently.' },
   { icon: Award, title: 'Quality Standards', description: 'We maintain high quality standards for all listings, ensuring buyers can shop with confidence on our platform.' },
 ];
 
 const team = [
   { name: 'Menon Group', role: 'Parent Company', description: 'A diversified business group with decades of experience in logistics and transportation.' },
-  { name: 'European Operations', role: 'Headquarters', description: 'Our European headquarters coordinates operations across the continent, ensuring seamless service delivery.' },
+  { name: 'Global Operations', role: 'Headquarters', description: 'Our global headquarters coordinates operations across continents, ensuring seamless service delivery.' },
   { name: 'Technology Team', role: 'Engineering', description: 'Our technology team builds and maintains the platform, ensuring a fast, reliable, and secure experience.' },
 ];
 
@@ -39,7 +39,7 @@ export default function AboutPage() {
               Connecting the Commercial Vehicle World
             </h1>
             <p className="text-lg text-white/80 mb-8 leading-relaxed">
-              Menon Mobility is Europe&apos;s fastest-growing marketplace for trucks, trailers,
+              Menon Mobility is the world&apos;s fastest-growing marketplace for trucks, trailers,
               construction equipment, and commercial vehicles. We connect buyers and sellers
               across borders, making it easier than ever to find the right vehicle for your business.
             </p>
@@ -72,7 +72,7 @@ export default function AboutPage() {
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-foreground mb-4">Our Mission</h2>
           <p className="text-lg text-muted-foreground leading-relaxed">
-            To become the most trusted and comprehensive marketplace for commercial vehicles in Europe.
+            To become the most trusted and comprehensive marketplace for commercial vehicles worldwide.
             We aim to simplify the buying and selling process, provide transparent pricing,
             and connect our global community of dealers and buyers.
           </p>

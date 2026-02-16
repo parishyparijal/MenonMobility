@@ -3,15 +3,15 @@ import type { Metadata } from 'next';
 const categoryMeta: Record<string, { title: string; description: string }> = {
   trucks: {
     title: 'Trucks for Sale | New & Used Trucks',
-    description: 'Find the best deals on trucks from verified dealers across Europe. Tractor units, box trucks, flatbeds, refrigerated trucks and more.',
+    description: 'Find the best deals on trucks from verified dealers worldwide. Tractor units, box trucks, flatbeds, refrigerated trucks and more.',
   },
   trailers: {
     title: 'Trailers for Sale | Semi-Trailers & Flatbeds',
-    description: 'Browse thousands of trailers including semi-trailers, flatbeds, refrigerated trailers and more from top European dealers.',
+    description: 'Browse thousands of trailers including semi-trailers, flatbeds, refrigerated trailers and more from top dealers worldwide.',
   },
   construction: {
     title: 'Construction Equipment for Sale | Excavators & Loaders',
-    description: 'Excavators, loaders, cranes and all types of construction equipment from trusted dealers across Europe.',
+    description: 'Excavators, loaders, cranes and all types of construction equipment from trusted dealers worldwide.',
   },
   vans: {
     title: 'Vans for Sale | Cargo & Delivery Vans',
@@ -19,7 +19,7 @@ const categoryMeta: Record<string, { title: string; description: string }> = {
   },
   cars: {
     title: 'Cars for Sale | Commercial Vehicles',
-    description: 'Browse commercial cars and vehicles from verified European dealers.',
+    description: 'Browse commercial cars and vehicles from verified dealers worldwide.',
   },
   containers: {
     title: 'Containers for Sale | Shipping & Storage',
@@ -27,7 +27,7 @@ const categoryMeta: Record<string, { title: string; description: string }> = {
   },
   parts: {
     title: 'Parts & Accessories | Truck & Trailer Parts',
-    description: 'Shop for truck parts, trailer parts, and commercial vehicle accessories from European suppliers.',
+    description: 'Shop for truck parts, trailer parts, and commercial vehicle accessories from global suppliers.',
   },
 };
 

@@ -26,9 +26,9 @@ const dummySeller = {
   id: 'seller-1',
   slug: 'transeuropa-bv',
   name: 'TransEuropa BV',
-  description: `TransEuropa BV is one of the leading commercial vehicle dealers in the Netherlands, specializing in trucks and tractor units from all major European manufacturers. With over 15 years of experience in the industry, we pride ourselves on offering high-quality, thoroughly inspected vehicles at competitive prices.
+  description: `TransEuropa BV is one of the leading commercial vehicle dealers in the Netherlands, specializing in trucks and tractor units from major manufacturers worldwide. With over 15 years of experience in the industry, we pride ourselves on offering high-quality, thoroughly inspected vehicles at competitive prices.
 
-Our team of expert mechanics performs a comprehensive 150-point inspection on every vehicle before it goes on sale. We offer flexible financing options and can arrange international delivery to most European countries.
+Our team of expert mechanics performs a comprehensive 150-point inspection on every vehicle before it goes on sale. We offer flexible financing options and can arrange international delivery to countries worldwide.
 
 We are an authorized dealer for Mercedes-Benz, Volvo, and DAF commercial vehicles.`,
   logo: '',

@@ -13,15 +13,15 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Menon Mobility - Europe\'s Premier Commercial Vehicle Marketplace',
+    default: 'Menon Mobility - The World\'s Premier Commercial Vehicle Marketplace',
     template: '%s | Menon Mobility',
   },
   description:
-    'Buy and sell trucks, trailers, construction equipment, and commercial vehicles on Europe\'s most trusted marketplace. 50,000+ listings from verified dealers in 30+ countries.',
+    'Buy and sell trucks, trailers, construction equipment, and commercial vehicles on the world\'s most trusted marketplace. 50,000+ listings from verified dealers in 50+ countries.',
   keywords: [
     'trucks for sale',
     'commercial vehicles',
-    'buy trucks Europe',
+    'buy trucks worldwide',
     'sell trucks online',
     'used trucks marketplace',
     'Menon Mobility',
@@ -39,12 +39,12 @@ export const metadata: Metadata = {
     locale: 'en_US',
     siteName: 'Menon Mobility',
     title: 'Menon Mobility - Commercial Vehicle Marketplace',
-    description: 'Europe\'s most trusted marketplace for trucks, trailers, and commercial vehicles. 50,000+ listings from 5,000+ verified dealers.',
+    description: 'The world\'s most trusted marketplace for trucks, trailers, and commercial vehicles. 50,000+ listings from 5,000+ verified dealers.',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Menon Mobility - Commercial Vehicle Marketplace',
-    description: 'Europe\'s most trusted marketplace for trucks, trailers, and commercial vehicles.',
+    description: 'The world\'s most trusted marketplace for trucks, trailers, and commercial vehicles.',
   },
   robots: {
     index: true,

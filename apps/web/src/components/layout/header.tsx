@@ -40,9 +40,12 @@ interface SiteLanguage {
 
 // Fallback languages in case API is unavailable
 const fallbackLanguages: SiteLanguage[] = [
-  { id: '1', code: 'en', name: 'English', localName: 'International | English', countryCode: 'eu', isDefault: true, isActive: true, sortOrder: 0 },
-  { id: '2', code: 'nl-BE', name: 'Nederlands', localName: 'België | Nederlands', countryCode: 'be', isDefault: false, isActive: true, sortOrder: 1 },
-  { id: '3', code: 'de', name: 'Deutsch', localName: 'Deutschland | Deutsch', countryCode: 'de', isDefault: false, isActive: true, sortOrder: 2 },
+  { id: '1', code: 'en', name: 'English', localName: 'Global | English', countryCode: 'us', isDefault: true, isActive: true, sortOrder: 0 },
+  { id: '2', code: 'es', name: 'Español', localName: 'Global | Español', countryCode: 'es', isDefault: false, isActive: true, sortOrder: 1 },
+  { id: '3', code: 'fr', name: 'Français', localName: 'Global | Français', countryCode: 'fr', isDefault: false, isActive: true, sortOrder: 2 },
+  { id: '4', code: 'de', name: 'Deutsch', localName: 'Global | Deutsch', countryCode: 'de', isDefault: false, isActive: true, sortOrder: 3 },
+  { id: '5', code: 'ar', name: 'العربية', localName: 'Global | العربية', countryCode: 'sa', isDefault: false, isActive: true, sortOrder: 4 },
+  { id: '6', code: 'zh', name: '中文', localName: 'Global | 中文', countryCode: 'cn', isDefault: false, isActive: true, sortOrder: 5 },
 ];
 
 interface NavChild {

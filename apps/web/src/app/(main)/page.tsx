@@ -248,11 +248,11 @@ export default function HomePage() {
         <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-4">
-              Europe&apos;s Leading Commercial Vehicle Marketplace
+              The World&apos;s Leading Commercial Vehicle Marketplace
             </h1>
             <p className="text-lg md:text-xl text-white/80 mb-8">
               Buy and sell trucks, trailers, construction equipment and more from trusted dealers
-              across 20+ countries.
+              across 50+ countries worldwide.
             </p>
 
             {/* Search Bar */}
@@ -394,7 +394,7 @@ export default function HomePage() {
             Why Choose Menon Mobility?
           </h2>
           <p className="text-muted-foreground text-center mb-10 max-w-2xl mx-auto">
-            The safest and most reliable way to buy and sell commercial vehicles in Europe
+            The safest and most reliable way to buy and sell commercial vehicles worldwide
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="text-center border-0 shadow-none bg-background">
@@ -443,7 +443,7 @@ export default function HomePage() {
           <div className="text-white text-center md:text-left">
             <h2 className="text-2xl md:text-3xl font-bold mb-2">Are you a dealer?</h2>
             <p className="text-white/90 text-lg">
-              Start selling today and reach thousands of buyers across Europe.
+              Start selling today and reach thousands of buyers worldwide.
             </p>
           </div>
           <Button

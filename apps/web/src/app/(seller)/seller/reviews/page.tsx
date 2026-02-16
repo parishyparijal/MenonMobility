@@ -74,7 +74,7 @@ const dummyReviews: Review[] = [
     id: '5',
     buyer: { name: 'Johan Svensson', avatar: '' },
     rating: 5,
-    title: 'Best dealer in Europe!',
+    title: 'Best dealer worldwide!',
     body: 'Have bought 3 trucks from them now. Always reliable, always fair. They go above and beyond to make sure everything is perfect.',
     listingTitle: 'MAN TGX 18.510',
     createdAt: '2023-12-20',

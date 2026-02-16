@@ -57,7 +57,7 @@ const sellerSteps = [
   {
     icon: Globe,
     title: 'Reach Buyers Globally',
-    description: 'Your listings are visible to buyers across 30+ countries. Use featured listings to get even more visibility.',
+    description: 'Your listings are visible to buyers across 50+ countries. Use featured listings to get even more visibility.',
   },
   {
     icon: Star,
@@ -67,7 +67,7 @@ const sellerSteps = [
 ];
 
 const benefits = [
-  { icon: Globe, title: '30+ Countries', description: 'Reach buyers and sellers across Europe and beyond' },
+  { icon: Globe, title: '50+ Countries', description: 'Reach buyers and sellers across the globe' },
   { icon: Shield, title: 'Verified Dealers', description: 'All dealers are verified for your safety' },
   { icon: Clock, title: '24/7 Access', description: 'Browse and list vehicles anytime, anywhere' },
   { icon: CheckCircle, title: 'No Hidden Fees', description: 'Transparent pricing with no surprises' },
@@ -182,7 +182,7 @@ export default function HowItWorksPage() {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to get started?</h2>
           <p className="text-white/80 mb-8 max-w-md mx-auto">
-            Join the fastest-growing commercial vehicle marketplace in Europe.
+            Join the fastest-growing commercial vehicle marketplace worldwide.
           </p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <Button variant="accent" size="lg" asChild>

@@ -24,7 +24,7 @@ const categoryData: Record<string, {
 }> = {
   trucks: {
     name: 'Trucks',
-    description: 'Find the best deals on trucks from verified dealers across Europe. From box trucks to tractor units, we have the largest selection.',
+    description: 'Find the best deals on trucks from verified dealers worldwide. From box trucks to tractor units, we have the largest selection.',
     subcategories: [
       { name: 'Tractor Units', slug: 'tractor-units' },
       { name: 'Box Trucks', slug: 'box-trucks' },
@@ -48,7 +48,7 @@ const categoryData: Record<string, {
   },
   trailers: {
     name: 'Trailers',
-    description: 'Browse thousands of trailers including semi-trailers, flatbeds, refrigerated trailers and more from Europe\'s top dealers.',
+    description: 'Browse thousands of trailers including semi-trailers, flatbeds, refrigerated trailers and more from top dealers worldwide.',
     subcategories: [
       { name: 'Semi Trailers', slug: 'semi' },
       { name: 'Flatbed Trailers', slug: 'flatbed' },
@@ -108,7 +108,7 @@ const categoryData: Record<string, {
   },
   cars: {
     name: 'Cars',
-    description: 'Browse commercial cars and company vehicles from verified European dealers. Sedans, SUVs, and fleet vehicles.',
+    description: 'Browse commercial cars and company vehicles from verified dealers worldwide. Sedans, SUVs, and fleet vehicles.',
     subcategories: [
       { name: 'Sedans', slug: 'sedans' },
       { name: 'SUVs', slug: 'suvs' },
@@ -128,7 +128,7 @@ const categoryData: Record<string, {
   },
   containers: {
     name: 'Containers',
-    description: 'Shipping containers, storage containers, and specialized containers from trusted sellers across Europe.',
+    description: 'Shipping containers, storage containers, and specialized containers from trusted sellers worldwide.',
     subcategories: [
       { name: 'Shipping Containers', slug: 'shipping' },
       { name: 'Storage Containers', slug: 'storage' },
@@ -144,7 +144,7 @@ const categoryData: Record<string, {
   },
   parts: {
     name: 'Parts & Accessories',
-    description: 'Truck parts, trailer parts, and commercial vehicle accessories from European suppliers.',
+    description: 'Truck parts, trailer parts, and commercial vehicle accessories from global suppliers.',
     subcategories: [
       { name: 'Engine Parts', slug: 'engine' },
       { name: 'Brakes & Suspension', slug: 'brakes' },

@@ -66,7 +66,7 @@ export default function AdminSettingsPage() {
 
   const [settings, setSettings] = useState({
     siteName: 'Menon Mobility',
-    siteDescription: 'Europe\'s premier marketplace for trucks, trailers, and commercial vehicles',
+    siteDescription: 'The world\'s premier marketplace for trucks, trailers, and commercial vehicles',
     contactEmail: 'info@menonmobility.com',
     supportEmail: 'support@menonmobility.com',
     defaultCurrency: 'EUR',

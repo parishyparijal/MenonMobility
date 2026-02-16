@@ -15,7 +15,7 @@ const countryOptions = [
 export default function SellerProfilePage() {
   const [formData, setFormData] = useState({
     companyName: 'TransEuropa BV',
-    description: 'TransEuropa BV is one of the leading commercial vehicle dealers in the Netherlands, specializing in trucks and tractor units from all major European manufacturers.',
+    description: 'TransEuropa BV is one of the leading commercial vehicle dealers in the Netherlands, specializing in trucks and tractor units from major manufacturers worldwide.',
     website: 'https://transeuropa.nl',
     phone: '+31 10 123 4567',
     address: 'Industrieweg 45',
