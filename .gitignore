@@ -39,3 +39,11 @@ docker-data/
 .DS_Store
 Thumbs.db
 MenonTrucks_SRS_RedstoneCatalyst*
+
+# Plan/docs (local only)
+PLAN.md
+PLAN.html
+MenonTrucks_Development_Plan_v2.1.pdf
+
+# Claude
+CLAUDE.md
