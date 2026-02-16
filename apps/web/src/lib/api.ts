@@ -62,7 +62,8 @@ class ApiClient {
       }
 
       const data = await response.json();
-      this.setTokens(data.accessToken, data.refreshToken);
+      const tokens = data.data || data;
+      this.setTokens(tokens.accessToken, tokens.refreshToken);
       return true;
     } catch {
       this.clearTokens();
