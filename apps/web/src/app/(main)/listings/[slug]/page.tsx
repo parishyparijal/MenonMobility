@@ -440,7 +440,7 @@ export default function ListingDetailPage() {
                     Member since {dummyListing.seller.memberSince}
                   </p>
 
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     <Button
                       variant="outline"
                       className="w-full justify-start"
@@ -449,14 +449,16 @@ export default function ListingDetailPage() {
                       <Phone className="w-4 h-4 mr-2" />
                       {showPhone ? dummyListing.seller.phone : 'Show Phone Number'}
                     </Button>
-                    <Button className="w-full bg-green-600 hover:bg-green-700 text-white justify-start">
-                      <MessageSquare className="w-4 h-4 mr-2" />
-                      WhatsApp
-                    </Button>
-                    <Button variant="accent" className="w-full justify-start">
-                      <MessageSquare className="w-4 h-4 mr-2" />
-                      Send Message
-                    </Button>
+                    <div className="flex gap-2">
+                      <button className="flex-1 inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg text-sm font-medium text-white bg-gradient-to-b from-green-500 to-green-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_1px_3px_rgba(0,0,0,0.12)] border border-green-400/30 hover:from-green-400 hover:to-green-600 active:from-green-600 active:to-green-800 transition-all">
+                        <MessageSquare className="w-4 h-4" />
+                        WhatsApp
+                      </button>
+                      <button className="flex-1 inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg text-sm font-medium text-white bg-gradient-to-b from-accent-400 to-accent-600 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_1px_3px_rgba(0,0,0,0.12)] border border-accent-300/40 hover:from-accent-300 hover:to-accent-500 active:from-accent-500 active:to-accent-700 transition-all">
+                        <MessageSquare className="w-4 h-4" />
+                        Send Message
+                      </button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
