@@ -339,16 +339,18 @@ export const CATEGORY_HERO_IMAGES = {
   parts: img('photo-1621993202323-f438eec934ff', 1920, 600),
 };
 
-// ─── Brand logos (text-based placeholder with icon) ─────────────────────────
-// We use representative truck images for brand cards
+// ─── Brand logos (monochrome SVGs) ──────────────────────────────────────────
 
-export const BRAND_IMAGES: Record<string, string> = {
-  'Mercedes-Benz': img('photo-1616432043562-3671ea2e5242', 300, 200),
-  'Volvo': img('photo-1759763131646-f9dd08c8ebfe', 300, 200),
-  'Scania': img('photo-1656514981974-dd0762aad9f4', 300, 200),
-  'MAN': img('photo-1565730350847-293cbe3fa4a3', 300, 200),
-  'DAF': img('photo-1578857371787-189d8b9eda84', 300, 200),
-  'Caterpillar': img('photo-1503708928676-1cb796a0891e', 300, 200),
-  'Iveco': img('photo-1571989928541-674d0cf46c4a', 300, 200),
-  'Renault': img('photo-1629019896873-cc95f1a8845d', 300, 200),
+export const BRAND_LOGOS: Record<string, string> = {
+  'Mercedes-Benz': '/brands/mercedes-benz.svg',
+  'Volvo': '/brands/volvo.svg',
+  'Scania': '/brands/scania.svg',
+  'MAN': '/brands/man.svg',
+  'DAF': '/brands/daf.svg',
+  'Caterpillar': '/brands/caterpillar.svg',
+  'Iveco': '/brands/iveco.svg',
+  'Renault': '/brands/renault.svg',
 };
+
+// Legacy alias
+export const BRAND_IMAGES = BRAND_LOGOS;

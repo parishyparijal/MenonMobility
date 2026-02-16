@@ -24,7 +24,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { ListingCard, type ListingCardData } from '@/components/listings/listing-card';
-import { getImagesForListing, BRAND_IMAGES } from '@/lib/images';
+import { getImagesForListing, BRAND_LOGOS } from '@/lib/images';
 import { getLocalizedText } from '@/lib/i18n-helpers';
 import { api } from '@/lib/api';
 
@@ -371,14 +371,17 @@ export default function HomePage() {
             <Link
               key={brand}
               href={`/search?brand=${encodeURIComponent(brand)}`}
-              className="flex flex-col items-center justify-center h-24 bg-white rounded-xl border border-border hover:shadow-md hover:border-primary transition-all overflow-hidden relative group"
+              className="flex items-center justify-center h-20 bg-white rounded-xl border border-border hover:shadow-md hover:border-primary transition-all px-4 group"
             >
-              {BRAND_IMAGES[brand] && (
-                <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity">
-                  <img src={BRAND_IMAGES[brand]} alt={brand} className="w-full h-full object-cover" />
-                </div>
+              {BRAND_LOGOS[brand] ? (
+                <img
+                  src={BRAND_LOGOS[brand]}
+                  alt={brand}
+                  className="h-10 max-w-[90%] object-contain opacity-60 group-hover:opacity-100 transition-opacity"
+                />
+              ) : (
+                <span className="text-sm font-semibold text-foreground">{brand}</span>
               )}
-              <span className="text-sm font-semibold text-foreground relative z-10">{brand}</span>
             </Link>
           ))}
         </div>
