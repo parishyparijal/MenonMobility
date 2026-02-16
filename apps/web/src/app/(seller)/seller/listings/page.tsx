@@ -34,13 +34,13 @@ interface SellerListing {
   image: string;
 }
 
-const tabs = [
-  { key: 'all', label: 'All', count: 24 },
-  { key: 'DRAFT', label: 'Draft', count: 3 },
-  { key: 'PENDING_REVIEW', label: 'Pending', count: 2 },
-  { key: 'ACTIVE', label: 'Active', count: 15 },
-  { key: 'SOLD', label: 'Sold', count: 3 },
-  { key: 'EXPIRED', label: 'Expired', count: 1 },
+const tabDefinitions = [
+  { key: 'all', label: 'All' },
+  { key: 'DRAFT', label: 'Draft' },
+  { key: 'PENDING_REVIEW', label: 'Pending' },
+  { key: 'ACTIVE', label: 'Active' },
+  { key: 'SOLD', label: 'Sold' },
+  { key: 'EXPIRED', label: 'Expired' },
 ];
 
 const dummyListings: SellerListing[] = [
@@ -135,6 +135,13 @@ export default function SellerListingsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+
+  const tabs = tabDefinitions.map((tab) => ({
+    ...tab,
+    count: tab.key === 'all'
+      ? dummyListings.length
+      : dummyListings.filter((l) => l.status === tab.key).length,
+  }));
 
   const filteredListings = dummyListings.filter((listing) => {
     if (activeTab !== 'all' && listing.status !== activeTab) return false;
@@ -241,11 +248,7 @@ export default function SellerListingsPage() {
                     </td>
                     <td className="py-3 px-4 text-right">
                       <span className="text-sm font-semibold text-foreground">
-                        {new Intl.NumberFormat('de-DE', {
-                          style: 'currency',
-                          currency: listing.currency,
-                          maximumFractionDigits: 0,
-                        }).format(listing.price)}
+                        €{listing.price.toLocaleString('de-DE')}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-right hidden md:table-cell">
@@ -327,8 +330,14 @@ export default function SellerListingsPage() {
         </CardContent>
       </Card>
 
-      {/* Pagination */}
-      <Pagination currentPage={currentPage} totalPages={3} onPageChange={setCurrentPage} />
+      {/* Pagination - only show when more than 100 listings */}
+      {filteredListings.length > 100 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={Math.ceil(filteredListings.length / 100)}
+          onPageChange={setCurrentPage}
+        />
+      )}
     </div>
   );
 }
