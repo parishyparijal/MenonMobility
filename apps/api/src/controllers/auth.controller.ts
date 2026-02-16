@@ -79,6 +79,12 @@ export const authController = {
         code,
       });
 
+      // Queue welcome email
+      await emailQueue.add("send-welcome-email", {
+        email,
+        name,
+      });
+
       res.status(201).json({
         success: true,
         data: { user, ...tokens },
@@ -302,8 +308,13 @@ export const authController = {
           },
         });
 
-        // TODO: Send email with reset link
-        // await emailService.sendPasswordReset(email, token);
+        // Queue password reset email
+        const resetLink = `${process.env.FRONTEND_URL || "http://localhost:3001"}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+        await emailQueue.add("send-password-reset", {
+          email,
+          name: user.name,
+          resetLink,
+        });
       }
 
       res.json({

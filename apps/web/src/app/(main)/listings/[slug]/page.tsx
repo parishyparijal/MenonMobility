@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import {
@@ -28,6 +28,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { ListingCard, type ListingCardData } from '@/components/listings/listing-card';
 import { useFavoritesStore } from '@/store/favorites';
 import { cn } from '@/lib/utils';
@@ -194,9 +195,30 @@ export default function ListingDetailPage() {
   const params = useParams();
   const { toggleFavorite, isFavorited } = useFavoritesStore();
   const [currentImage, setCurrentImage] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [showPhone, setShowPhone] = useState(false);
   const [loanAmount, setLoanAmount] = useState(dummyListing.price);
   const [loanTerm, setLoanTerm] = useState(60);
+
+  const placeholderImages = dummyListing.images.length > 0 ? dummyListing.images : Array.from({ length: 6 }, (_, i) => '');
+
+  const goToPrev = useCallback(() => {
+    setCurrentImage((prev) => Math.max(0, prev - 1));
+  }, []);
+
+  const goToNext = useCallback(() => {
+    setCurrentImage((prev) => Math.min(placeholderImages.length - 1, prev + 1));
+  }, [placeholderImages.length]);
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'ArrowLeft') goToPrev();
+      else if (e.key === 'ArrowRight') goToNext();
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxOpen, goToPrev, goToNext]);
 
   const favorited = isFavorited(dummyListing.id);
   const interestRate = 5.9;
@@ -209,8 +231,6 @@ export default function ListingDetailPage() {
     currency: 'EUR',
     maximumFractionDigits: 0,
   }).format(dummyListing.price);
-
-  const placeholderImages = dummyListing.images.length > 0 ? dummyListing.images : Array.from({ length: 6 }, (_, i) => '');
 
   return (
     <div className="bg-background min-h-screen">
@@ -238,17 +258,22 @@ export default function ListingDetailPage() {
             {/* Image Gallery */}
             <div className="bg-white rounded-xl border border-border overflow-hidden">
               <div className="relative aspect-[16/10] bg-muted">
-                {dummyListing.images[currentImage] ? (
-                  <img
-                    src={dummyListing.images[currentImage]}
-                    alt={`${dummyListing.title} - Image ${currentImage + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                    <Gauge className="w-16 h-16" />
-                  </div>
-                )}
+                <button
+                  onClick={() => setLightboxOpen(true)}
+                  className="w-full h-full cursor-zoom-in"
+                >
+                  {dummyListing.images[currentImage] ? (
+                    <img
+                      src={dummyListing.images[currentImage]}
+                      alt={`${dummyListing.title} - Image ${currentImage + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                      <Gauge className="w-16 h-16" />
+                    </div>
+                  )}
+                </button>
                 {placeholderImages.length > 1 && (
                   <>
                     <button
@@ -525,6 +550,68 @@ export default function ListingDetailPage() {
           </div>
         </section>
       </div>
+
+      {/* Fullscreen Image Lightbox */}
+      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] w-auto h-auto p-0 border-0 bg-black/95 rounded-none sm:rounded-xl overflow-hidden" size="xl">
+          <div className="relative flex items-center justify-center w-full h-[85vh]">
+            {placeholderImages[currentImage] ? (
+              <img
+                src={placeholderImages[currentImage]}
+                alt={`${dummyListing.title} - Image ${currentImage + 1}`}
+                className="max-w-full max-h-full object-contain"
+              />
+            ) : (
+              <div className="flex items-center justify-center text-white/50">
+                <Gauge className="w-24 h-24" />
+              </div>
+            )}
+
+            {/* Navigation Arrows */}
+            {placeholderImages.length > 1 && (
+              <>
+                <button
+                  onClick={goToPrev}
+                  disabled={currentImage === 0}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-30 transition-all"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  onClick={goToNext}
+                  disabled={currentImage === placeholderImages.length - 1}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-30 transition-all"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+              </>
+            )}
+
+            {/* Image Counter */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-black/60 text-white text-sm">
+              {currentImage + 1} / {placeholderImages.length}
+            </div>
+          </div>
+
+          {/* Thumbnail Strip */}
+          <div className="flex gap-1.5 px-4 pb-3 overflow-x-auto justify-center bg-black/95">
+            {placeholderImages.map((imgUrl, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentImage(i)}
+                className={cn(
+                  'w-16 h-11 rounded flex-shrink-0 border-2 transition-all overflow-hidden',
+                  currentImage === i ? 'border-white opacity-100' : 'border-transparent opacity-50 hover:opacity-75'
+                )}
+              >
+                {imgUrl && (
+                  <img src={imgUrl} alt={`Thumbnail ${i + 1}`} className="w-full h-full object-cover" />
+                )}
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

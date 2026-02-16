@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import prisma from "@/config/database";
 import { AppError } from "@/middleware/errorHandler";
+import { emailQueue } from "@/config/queue";
 
 // ---------------------------------------------------------------------------
 // Message Controller
@@ -347,7 +348,12 @@ export const messageController = {
       // Increment contact count on the listing
       const thread = await prisma.messageThread.findUnique({
         where: { id: resolvedThreadId },
-        select: { listingId: true },
+        select: {
+          listingId: true,
+          buyerId: true,
+          sellerId: true,
+          listing: { select: { title: true, slug: true } },
+        },
       });
 
       if (thread) {
@@ -355,6 +361,24 @@ export const messageController = {
           where: { id: thread.listingId },
           data: { contactCount: { increment: 1 } },
         });
+
+        // Queue new message email to recipient
+        const recipientId = userId === thread.buyerId ? thread.sellerId : thread.buyerId;
+        const recipient = await prisma.user.findUnique({
+          where: { id: recipientId },
+          select: { name: true, email: true },
+        });
+
+        if (recipient) {
+          await emailQueue.add("send-new-message", {
+            email: recipient.email,
+            recipientName: recipient.name,
+            senderName: message.sender.name,
+            listingTitle: thread.listing.title,
+            messagePreview: body.substring(0, 200),
+            threadUrl: `${process.env.FRONTEND_URL || "http://localhost:3001"}/messages/${resolvedThreadId}`,
+          });
+        }
       }
 
       res.status(201).json({

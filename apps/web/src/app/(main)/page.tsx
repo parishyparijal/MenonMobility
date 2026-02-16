@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -18,14 +18,35 @@ import {
   MessageSquare,
   FileCheck,
   ArrowRight,
+  type LucideIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { ListingCard, type ListingCardData } from '@/components/listings/listing-card';
 import { getImagesForListing, BRAND_IMAGES } from '@/lib/images';
+import { getLocalizedText } from '@/lib/i18n-helpers';
+import { api } from '@/lib/api';
 
-const categories = [
+// Map category slugs to icons
+const categoryIconMap: Record<string, LucideIcon> = {
+  trucks: Truck,
+  trailers: Container,
+  construction: Building2,
+  vans: Car,
+  cars: Car,
+  containers: Package,
+  parts: Wrench,
+  agricultural: Tractor,
+};
+
+interface CategoryItem {
+  name: string;
+  slug: string;
+  icon: LucideIcon;
+}
+
+const fallbackCategories: CategoryItem[] = [
   { name: 'Trucks', slug: 'trucks', icon: Truck },
   { name: 'Trailers', slug: 'trailers', icon: Container },
   { name: 'Construction', slug: 'construction', icon: Building2 },
@@ -179,9 +200,28 @@ const stats = [
 
 export default function HomePage() {
   const router = useRouter();
+  const [categories, setCategories] = useState<CategoryItem[]>(fallbackCategories);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [carouselIndex, setCarouselIndex] = useState(0);
+
+  // Fetch categories from API
+  useEffect(() => {
+    api.get<{ success: boolean; data: Array<{ name: unknown; slug: string }> }>('/categories?flat=true')
+      .then((res) => {
+        if (res.data && res.data.length > 0) {
+          const mapped = res.data.map((cat) => ({
+            name: getLocalizedText(cat.name),
+            slug: cat.slug,
+            icon: categoryIconMap[cat.slug] || Package,
+          }));
+          setCategories(mapped);
+        }
+      })
+      .catch(() => {
+        // Keep fallback categories
+      });
+  }, []);
 
   const visibleCount = 4;
   const maxIndex = Math.max(0, featuredListings.length - visibleCount);

@@ -20,6 +20,7 @@ import {
   Bookmark,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getLocalizedText } from '@/lib/i18n-helpers';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/store/auth';
@@ -56,7 +57,8 @@ interface NavItem {
   brands?: string[];
 }
 
-const navItems: NavItem[] = [
+// Fallback navItems in case API is unavailable
+const fallbackNavItems: NavItem[] = [
   {
     label: 'Trucks',
     href: '/trucks',
@@ -114,6 +116,33 @@ const navItems: NavItem[] = [
   { label: 'Parts', href: '/parts' },
 ];
 
+interface ApiCategory {
+  id: string;
+  name: unknown;
+  slug: string;
+  children?: ApiCategory[];
+}
+
+function buildNavItemsFromApi(categories: ApiCategory[]): NavItem[] {
+  return categories.map((cat) => {
+    const label = getLocalizedText(cat.name);
+    const href = `/${cat.slug}`;
+    const item: NavItem = { label, href };
+
+    if (cat.children && cat.children.length > 0) {
+      item.children = [
+        { label: `All ${label}`, href },
+        ...cat.children.map((child) => ({
+          label: getLocalizedText(child.name),
+          href: `/search?category=${cat.slug}&subcategory=${child.slug}`,
+        })),
+      ];
+    }
+
+    return item;
+  });
+}
+
 export function Header() {
   const pathname = usePathname();
   const { user, isAuthenticated, logout } = useAuthStore();
@@ -121,6 +150,7 @@ export function Header() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const [navItems, setNavItems] = useState<NavItem[]>(fallbackNavItems);
   const [languages, setLanguages] = useState<SiteLanguage[]>(fallbackLanguages);
   const [selectedLang, setSelectedLang] = useState<SiteLanguage>(fallbackLanguages[0]);
   const dropdownTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -129,6 +159,19 @@ export function Header() {
 
   const favoritesCount = 0;
   const unreadMessages = 3;
+
+  // Fetch categories from API for dynamic nav
+  useEffect(() => {
+    api.get<{ success: boolean; data: ApiCategory[] }>('/categories')
+      .then((res) => {
+        if (res.data && res.data.length > 0) {
+          setNavItems(buildNavItemsFromApi(res.data));
+        }
+      })
+      .catch(() => {
+        // Keep fallback nav items
+      });
+  }, []);
 
   // Fetch languages from API
   useEffect(() => {

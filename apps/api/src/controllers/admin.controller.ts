@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import prisma from "@/config/database";
 import { AppError } from "@/middleware/errorHandler";
+import { emailQueue } from "@/config/queue";
 
 // ---------------------------------------------------------------------------
 // Admin Controller
@@ -466,7 +467,18 @@ export const adminController = {
           slug: true,
           status: true,
           publishedAt: true,
+          seller: {
+            select: { name: true, email: true },
+          },
         },
+      });
+
+      // Queue listing approved email to seller
+      await emailQueue.add("send-listing-approved", {
+        email: updated.seller.email,
+        name: updated.seller.name,
+        listingTitle: updated.title,
+        listingUrl: `${process.env.FRONTEND_URL || "http://localhost:3001"}/listings/${updated.slug}`,
       });
 
       res.json({
@@ -516,7 +528,18 @@ export const adminController = {
           slug: true,
           status: true,
           rejectedReason: true,
+          seller: {
+            select: { name: true, email: true },
+          },
         },
+      });
+
+      // Queue listing rejected email to seller
+      await emailQueue.add("send-listing-rejected", {
+        email: updated.seller.email,
+        name: updated.seller.name,
+        listingTitle: updated.title,
+        rejectedReason: rejectedReason || "No reason provided",
       });
 
       res.json({
