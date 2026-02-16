@@ -297,7 +297,7 @@ export default function HomePage() {
 
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] mb-6 tracking-tight">
               Find Your Next
-              <span className="block bg-gradient-to-r from-accent via-amber-300 to-accent bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-orange-400 via-accent to-orange-400 bg-clip-text text-transparent">
                 Commercial Vehicle
               </span>
             </h1>
@@ -306,13 +306,13 @@ export default function HomePage() {
               and commercial vehicles from verified dealers.
             </p>
 
-            {/* Search Bar - Glassmorphism */}
-            <form onSubmit={handleSearch} className="bg-white/[0.12] backdrop-blur-xl rounded-2xl p-2 sm:p-2.5 flex flex-col sm:flex-row gap-2 shadow-2xl max-w-2xl mx-auto border border-white/20 ring-1 ring-white/10">
+            {/* Search Bar */}
+            <form onSubmit={handleSearch} className="bg-white rounded-2xl p-2 sm:p-2.5 flex flex-col sm:flex-row gap-2 shadow-2xl max-w-2xl mx-auto">
               <div className="relative min-w-[160px]">
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="h-12 w-full px-4 rounded-xl bg-white text-foreground text-sm font-medium focus:outline-none focus:ring-2 focus:ring-accent appearance-none cursor-pointer"
+                  className="h-12 w-full px-4 rounded-xl bg-gray-50 border border-gray-100 text-foreground text-sm font-medium focus:outline-none focus:ring-2 focus:ring-accent appearance-none cursor-pointer"
                 >
                   <option value="">All Categories</option>
                   {categories.map((cat) => (
@@ -330,7 +330,7 @@ export default function HomePage() {
                   placeholder="Search by brand, model, or keyword..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-12 pl-11 pr-4 rounded-xl bg-white text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                  className="w-full h-12 pl-11 pr-4 rounded-xl bg-gray-50 border border-gray-100 text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
                 />
               </div>
               <Button type="submit" variant="accent" size="lg" className="h-12 px-8 rounded-xl font-semibold text-base shadow-lg shadow-accent/25">
