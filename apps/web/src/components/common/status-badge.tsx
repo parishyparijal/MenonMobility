@@ -29,7 +29,7 @@ const statusConfig: Record<
   },
   SOLD: {
     label: 'Sold',
-    className: 'bg-blue-50 text-blue-700 border-blue-200',
+    className: 'bg-primary-50 text-primary border-primary-200',
   },
   EXPIRED: {
     label: 'Expired',
