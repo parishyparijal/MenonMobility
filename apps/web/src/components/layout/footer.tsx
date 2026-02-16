@@ -82,7 +82,7 @@ export function Footer() {
   }, []);
 
   return (
-    <footer className="bg-primary-900 text-white">
+    <footer className="bg-gradient-to-b from-primary-800 to-primary-950 text-white">
       {/* Main Footer */}
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
