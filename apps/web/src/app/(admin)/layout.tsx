@@ -40,7 +40,7 @@ export default function AdminLayout({
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
           <p className="text-sm text-muted-foreground">Loading admin panel...</p>
         </div>
       </div>
@@ -78,18 +78,18 @@ export default function AdminLayout({
               {user.name}
             </span>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] uppercase tracking-wider font-semibold text-red-500 bg-red-50 px-2 py-0.5 rounded-full hidden sm:block">
+              <span className="text-[10px] uppercase tracking-wider font-semibold text-white bg-gradient-to-r from-accent-400 to-accent-600 px-2 py-0.5 rounded-full shadow-sm hidden sm:block">
                 Admin
               </span>
               {user.avatar ? (
                 <img
                   src={user.avatar}
                   alt={user.name}
-                  className="w-8 h-8 rounded-full object-cover ring-2 ring-red-200"
+                  className="w-8 h-8 rounded-full object-cover ring-2 ring-accent-200"
                 />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center ring-2 ring-red-200">
-                  <span className="text-sm font-semibold text-red-600">
+                <div className="w-8 h-8 rounded-full bg-accent-50 flex items-center justify-center ring-2 ring-accent-200">
+                  <span className="text-sm font-semibold text-accent">
                     {user.name.charAt(0).toUpperCase()}
                   </span>
                 </div>

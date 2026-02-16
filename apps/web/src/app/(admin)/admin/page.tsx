@@ -156,7 +156,7 @@ export default function AdminDashboardPage() {
                 <div key={day} className="flex-1 flex flex-col items-center gap-1">
                   <div className="w-full bg-muted rounded-t-md relative" style={{ height: '100%' }}>
                     <div
-                      className="absolute bottom-0 left-0 right-0 bg-primary/80 rounded-t-md transition-all"
+                      className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary-800 to-primary-400 rounded-t-md transition-all"
                       style={{ height: `${(newListingsData[i] / maxListings) * 100}%` }}
                     />
                   </div>
@@ -180,7 +180,7 @@ export default function AdminDashboardPage() {
                 <div key={day} className="flex-1 flex flex-col items-center gap-1">
                   <div className="w-full bg-muted rounded-t-md relative" style={{ height: '100%' }}>
                     <div
-                      className="absolute bottom-0 left-0 right-0 bg-green-500/80 rounded-t-md transition-all"
+                      className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-green-700 to-green-400 rounded-t-md transition-all"
                       style={{ height: `${(newUsersData[i] / maxUsers) * 100}%` }}
                     />
                   </div>
@@ -220,14 +220,14 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <Button variant="outline" size="sm" className="text-success border-success/30 hover:bg-success/10">
+                  <button className="inline-flex items-center h-9 px-3 text-xs font-medium rounded-lg text-white bg-gradient-to-b from-green-400 to-green-600 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_1px_2px_rgba(0,0,0,0.1)] border border-green-300/30 hover:from-green-300 hover:to-green-500 transition-all">
                     <CheckCircle className="w-3.5 h-3.5 mr-1" />
                     Approve
-                  </Button>
-                  <Button variant="outline" size="sm" className="text-destructive border-destructive/30 hover:bg-destructive/10">
+                  </button>
+                  <button className="inline-flex items-center h-9 px-3 text-xs font-medium rounded-lg text-white bg-gradient-to-b from-red-400 to-red-600 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_1px_2px_rgba(0,0,0,0.1)] border border-red-300/30 hover:from-red-300 hover:to-red-500 transition-all">
                     <XCircle className="w-3.5 h-3.5 mr-1" />
                     Reject
-                  </Button>
+                  </button>
                 </div>
               </div>
             ))}

@@ -67,7 +67,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 bg-primary text-white flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-auto',
+          'fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-primary-800 to-primary-950 text-white flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-auto',
           isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -79,7 +79,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
               alt="Menon Mobility"
               className="h-9 w-auto object-contain"
             />
-            <span className="text-[10px] uppercase tracking-wider text-accent-400 font-semibold bg-accent-500/20 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] uppercase tracking-wider text-white font-semibold bg-gradient-to-r from-accent-400 to-accent-600 px-1.5 py-0.5 rounded shadow-sm">
               Admin
             </span>
           </Link>
@@ -107,14 +107,14 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                     className={cn(
                       'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                       isActive
-                        ? 'bg-accent-500/20 text-white'
+                        ? 'bg-white/15 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] border border-white/10'
                         : 'text-white/70 hover:text-white hover:bg-white/10'
                     )}
                   >
                     <item.icon className="w-5 h-5 shrink-0" />
                     <span className="flex-1">{item.label}</span>
                     {item.badge !== undefined && item.badge > 0 && (
-                      <Badge className="bg-accent text-white border-0 text-[10px] h-5 min-w-[20px] justify-center">
+                      <Badge className="bg-gradient-to-b from-accent-400 to-accent-600 text-white border border-accent-300/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] text-[10px] h-5 min-w-[20px] justify-center">
                         {item.badge}
                       </Badge>
                     )}
