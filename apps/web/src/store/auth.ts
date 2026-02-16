@@ -12,14 +12,19 @@ interface User {
   createdAt: string;
 }
 
-interface AuthTokens {
-  accessToken: string;
-  refreshToken: string;
+interface AuthResponse {
+  success: boolean;
+  data: {
+    user: User;
+    accessToken: string;
+    refreshToken: string;
+  };
+  message?: string;
 }
 
-interface LoginResponse {
-  user: User;
-  tokens: AuthTokens;
+interface MeResponse {
+  success: boolean;
+  data: User;
 }
 
 interface AuthState {
@@ -48,15 +53,15 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: async (email: string, password: string) => {
     set({ isLoading: true });
     try {
-      const response = await api.post<LoginResponse>('/auth/login', {
+      const response = await api.post<AuthResponse>('/auth/login', {
         email,
         password,
       });
-      const { user, tokens } = response;
+      const { user, accessToken, refreshToken } = response.data;
 
       if (typeof window !== 'undefined') {
-        localStorage.setItem('access_token', tokens.accessToken);
-        localStorage.setItem('refresh_token', tokens.refreshToken);
+        localStorage.setItem('access_token', accessToken);
+        localStorage.setItem('refresh_token', refreshToken);
       }
 
       set({ user, isAuthenticated: true, isLoading: false });
@@ -74,17 +79,18 @@ export const useAuthStore = create<AuthState>((set) => ({
   ) => {
     set({ isLoading: true });
     try {
-      const response = await api.post<LoginResponse>('/auth/register', {
+      const response = await api.post<AuthResponse>('/auth/register', {
         name,
         email,
         password,
+        confirmPassword: password,
         role,
       });
-      const { user, tokens } = response;
+      const { user, accessToken, refreshToken } = response.data;
 
       if (typeof window !== 'undefined') {
-        localStorage.setItem('access_token', tokens.accessToken);
-        localStorage.setItem('refresh_token', tokens.refreshToken);
+        localStorage.setItem('access_token', accessToken);
+        localStorage.setItem('refresh_token', refreshToken);
       }
 
       set({ user, isAuthenticated: true, isLoading: false });
@@ -115,8 +121,8 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     set({ isLoading: true });
     try {
-      const user = await api.get<User>('/auth/me');
-      set({ user, isAuthenticated: true, isLoading: false });
+      const response = await api.get<MeResponse>('/auth/me');
+      set({ user: response.data, isAuthenticated: true, isLoading: false });
     } catch {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('access_token');
