@@ -22,6 +22,9 @@ import {
   Users,
   Globe,
   CalendarCheck,
+  MapPin,
+  Sparkles,
+  TrendingUp,
   type LucideIcon,
 } from 'lucide-react';
 import { useCountUp } from '@/hooks/use-count-up';
@@ -260,67 +263,116 @@ export default function HomePage() {
   return (
     <div className="bg-background">
       {/* Hero Section */}
-      <section className="relative text-white overflow-hidden">
+      <section className="relative text-white overflow-hidden min-h-[520px] md:min-h-[600px] flex items-center">
         {/* Background Image */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
           style={{ backgroundImage: `url('/hero-bg.jpg')` }}
         />
-        {/* Dark Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/70 via-primary/55 to-primary-950/45" />
-        <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-4">
-              The World&apos;s Leading Commercial Vehicle Marketplace
+        {/* Multi-layer overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-950/85 via-primary/70 to-primary-800/60" />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary-950/50 via-transparent to-transparent" />
+        {/* Dot pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
+            backgroundSize: '32px 32px',
+          }}
+        />
+        {/* Decorative gradient orbs */}
+        <div className="absolute top-20 -left-32 w-96 h-96 bg-accent/20 rounded-full blur-[128px]" />
+        <div className="absolute bottom-10 -right-32 w-80 h-80 bg-primary-300/20 rounded-full blur-[100px]" />
+
+        <div className="container mx-auto px-4 py-20 md:py-28 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            {/* Trust badge */}
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-4 py-2 mb-8">
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
+              </span>
+              <span className="text-sm text-white/90 font-medium">Trusted by 5,000+ dealers in 50+ countries</span>
+            </div>
+
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] mb-6 tracking-tight">
+              Find Your Next
+              <span className="block bg-gradient-to-r from-accent via-amber-300 to-accent bg-clip-text text-transparent">
+                Commercial Vehicle
+              </span>
             </h1>
-            <p className="text-lg md:text-xl text-white/80 mb-8">
-              Buy and sell trucks, trailers, construction equipment and more from trusted dealers
-              across 50+ countries worldwide.
+            <p className="text-lg md:text-xl text-white/70 mb-10 max-w-2xl mx-auto leading-relaxed">
+              The world&apos;s largest marketplace for trucks, trailers, construction equipment
+              and commercial vehicles from verified dealers.
             </p>
 
-            {/* Search Bar */}
-            <form onSubmit={handleSearch} className="bg-white rounded-xl p-2 flex flex-col sm:flex-row gap-2 shadow-xl max-w-2xl mx-auto">
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="h-12 px-4 rounded-lg border border-border bg-white text-foreground text-sm min-w-[160px] focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="">All Categories</option>
-                {categories.map((cat) => (
-                  <option key={cat.slug} value={cat.slug}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="text"
-                placeholder="Search by brand, model, or keyword..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 h-12 px-4 rounded-lg border border-border bg-white text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <Button type="submit" variant="accent" size="lg" className="h-12 px-8">
-                <Search className="w-4 h-4 mr-2" />
+            {/* Search Bar - Glassmorphism */}
+            <form onSubmit={handleSearch} className="bg-white/[0.12] backdrop-blur-xl rounded-2xl p-2 sm:p-2.5 flex flex-col sm:flex-row gap-2 shadow-2xl max-w-2xl mx-auto border border-white/20 ring-1 ring-white/10">
+              <div className="relative min-w-[160px]">
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="h-12 w-full px-4 rounded-xl bg-white text-foreground text-sm font-medium focus:outline-none focus:ring-2 focus:ring-accent appearance-none cursor-pointer"
+                >
+                  <option value="">All Categories</option>
+                  {categories.map((cat) => (
+                    <option key={cat.slug} value={cat.slug}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground rotate-90 pointer-events-none" />
+              </div>
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search by brand, model, or keyword..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full h-12 pl-11 pr-4 rounded-xl bg-white text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                />
+              </div>
+              <Button type="submit" variant="accent" size="lg" className="h-12 px-8 rounded-xl font-semibold text-base shadow-lg shadow-accent/25">
                 Search
               </Button>
             </form>
+
+            {/* Quick stats row */}
+            <div className="flex items-center justify-center gap-6 md:gap-10 mt-10 text-sm text-white/50">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-accent" />
+                <span><strong className="text-white/80">150K+</strong> listings</span>
+              </div>
+              <div className="hidden sm:flex items-center gap-2">
+                <Shield className="w-4 h-4 text-accent" />
+                <span><strong className="text-white/80">Verified</strong> dealers</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-accent" />
+                <span><strong className="text-white/80">50+</strong> countries</span>
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Bottom fade into category section */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent z-10" />
       </section>
 
       {/* Category Icons Grid */}
-      <section className="container mx-auto px-4 -mt-8 relative z-20">
+      <section className="container mx-auto px-4 -mt-12 relative z-20">
         <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
           {categories.map((cat) => (
             <Link
               key={cat.slug}
               href={`/search?category=${cat.slug}`}
-              className="flex flex-col items-center gap-2 p-4 bg-white rounded-xl border border-border hover:shadow-md hover:border-accent transition-all group"
+              className="flex flex-col items-center gap-2.5 p-4 bg-white rounded-2xl border border-border hover:shadow-lg hover:border-accent/50 hover:-translate-y-0.5 transition-all duration-200 group"
             >
-              <div className="w-12 h-12 rounded-full bg-primary-50 flex items-center justify-center group-hover:bg-accent/10 transition-colors">
-                <cat.icon className="w-6 h-6 text-primary group-hover:text-accent transition-colors" />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center group-hover:from-accent/10 group-hover:to-accent/20 transition-all duration-200 shadow-sm">
+                <cat.icon className="w-6 h-6 text-primary group-hover:text-accent transition-colors duration-200" />
               </div>
-              <span className="text-xs font-medium text-foreground text-center">{cat.name}</span>
+              <span className="text-xs font-semibold text-foreground text-center">{cat.name}</span>
             </Link>
           ))}
         </div>
