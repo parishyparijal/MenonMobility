@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 import {
   Truck,
   Container,
@@ -71,7 +72,7 @@ interface FormData {
   power: string;
   emissionClass: string;
   description: string;
-  images: string[];
+  images: File[];
   country: string;
   city: string;
   phone: string;
@@ -104,8 +105,35 @@ export default function NewListingPage() {
   });
   const [dragActive, setDragActive] = useState(false);
 
-  const updateField = (field: keyof FormData, value: string | string[]) => {
+  const updateField = (field: keyof FormData, value: string | string[] | File[]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = (files: FileList | null) => {
+    if (!files) return;
+    const validFiles: File[] = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (!file.type.startsWith('image/')) {
+        toast.error(`"${file.name}" is not an image file`);
+        continue;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error(`"${file.name}" exceeds 10MB limit`);
+        continue;
+      }
+      validFiles.push(file);
+    }
+    const remaining = 20 - formData.images.length;
+    if (validFiles.length > remaining) {
+      toast.error(`Only ${remaining} more image(s) can be added`);
+    }
+    const toAdd = validFiles.slice(0, remaining);
+    if (toAdd.length > 0) {
+      updateField('images', [...formData.images, ...toAdd]);
+    }
   };
 
   const canGoNext = () => {
@@ -134,12 +162,7 @@ export default function NewListingPage() {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    // In a real app, handle file uploads here
-    const fileCount = e.dataTransfer.files.length;
-    const newPlaceholders = Array.from({ length: fileCount }, (_, i) =>
-      `placeholder-${formData.images.length + i}`
-    );
-    updateField('images', [...formData.images, ...newPlaceholders].slice(0, 20));
+    handleFileSelect(e.dataTransfer.files);
   };
 
   const removeImage = (index: number) => {
@@ -399,14 +422,19 @@ export default function NewListingPage() {
                     ? 'border-accent bg-accent/5'
                     : 'border-border hover:border-primary/30'
                 )}
-                onClick={() => {
-                  // Simulate adding images
-                  const newPlaceholder = `placeholder-${formData.images.length}`;
-                  if (formData.images.length < 20) {
-                    updateField('images', [...formData.images, newPlaceholder]);
-                  }
-                }}
+                onClick={() => fileInputRef.current?.click()}
               >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => {
+                    handleFileSelect(e.target.files);
+                    e.target.value = '';
+                  }}
+                />
                 <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
                 <p className="text-sm font-medium text-foreground">
                   Drag & drop images here or click to browse
@@ -419,14 +447,16 @@ export default function NewListingPage() {
               {/* Image Preview Grid */}
               {formData.images.length > 0 && (
                 <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
-                  {formData.images.map((img, i) => (
+                  {formData.images.map((file, i) => (
                     <div
-                      key={i}
+                      key={`${file.name}-${i}`}
                       className="relative aspect-[4/3] bg-muted rounded-lg overflow-hidden group"
                     >
-                      <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
-                        {i + 1}
-                      </div>
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`Upload ${i + 1}`}
+                        className="w-full h-full object-cover"
+                      />
                       {i === 0 && (
                         <Badge className="absolute top-1 left-1 bg-accent text-white text-[9px] border-0 px-1.5 py-0">
                           Main
@@ -541,7 +571,7 @@ export default function NewListingPage() {
           )}
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="ghost" onClick={() => alert('Saved as draft!')}>
+          <Button variant="ghost" onClick={() => toast.success('Saved as draft!')}>
             <Save className="w-4 h-4 mr-1.5" />
             Save as Draft
           </Button>
@@ -554,7 +584,7 @@ export default function NewListingPage() {
             <Button
               variant="accent"
               onClick={() => {
-                alert('Listing submitted for review!');
+                toast.success('Listing submitted for review!');
                 router.push('/seller/listings');
               }}
             >
