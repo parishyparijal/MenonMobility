@@ -28,5 +28,18 @@ module.exports = {
         CORS_ORIGIN: 'https://menonmobility.byredstone.com',
       },
     },
+    {
+      name: 'menon-worker',
+      script: 'npx',
+      args: 'tsx src/worker.ts',
+      cwd: '/var/www/MenonMobility/apps/api',
+      exec_mode: 'fork',
+      instances: 1,
+      autorestart: true,
+      max_memory_restart: '256M',
+      env: {
+        NODE_ENV: 'production',
+      },
+    },
   ],
 };
