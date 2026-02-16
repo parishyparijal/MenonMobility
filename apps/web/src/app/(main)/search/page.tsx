@@ -104,6 +104,61 @@ const countryOptions: FilterOption[] = [
   { label: 'Denmark', value: 'DK' },
 ];
 
+const subcategoryMap: Record<string, FilterOption[]> = {
+  trucks: [
+    { label: 'Tractor Units', value: 'tractor-units' },
+    { label: 'Box Trucks', value: 'box-trucks' },
+    { label: 'Flatbed Trucks', value: 'flatbed' },
+    { label: 'Refrigerated Trucks', value: 'refrigerated' },
+    { label: 'Tanker Trucks', value: 'tanker' },
+    { label: 'Tipper Trucks', value: 'tipper' },
+    { label: 'Curtainside Trucks', value: 'curtainside' },
+    { label: 'Recovery Trucks', value: 'recovery' },
+  ],
+  trailers: [
+    { label: 'Semi Trailers', value: 'semi' },
+    { label: 'Flatbed Trailers', value: 'flatbed' },
+    { label: 'Refrigerated Trailers', value: 'refrigerated' },
+    { label: 'Curtain Side', value: 'curtain-side' },
+    { label: 'Low Loaders', value: 'low-loaders' },
+    { label: 'Box Trailers', value: 'box' },
+  ],
+  construction: [
+    { label: 'Excavators', value: 'excavators' },
+    { label: 'Wheel Loaders', value: 'wheel-loaders' },
+    { label: 'Cranes', value: 'cranes' },
+    { label: 'Bulldozers', value: 'bulldozers' },
+    { label: 'Dump Trucks', value: 'dump-trucks' },
+    { label: 'Concrete Equipment', value: 'concrete' },
+  ],
+  vans: [
+    { label: 'Cargo Vans', value: 'cargo' },
+    { label: 'Passenger Vans', value: 'passenger' },
+    { label: 'Box Vans', value: 'box' },
+    { label: 'Refrigerated Vans', value: 'refrigerated' },
+  ],
+  cars: [
+    { label: 'Sedans', value: 'sedans' },
+    { label: 'SUVs', value: 'suvs' },
+    { label: 'Estate Cars', value: 'estate' },
+    { label: 'Electric Cars', value: 'electric' },
+    { label: 'Company Cars', value: 'company' },
+  ],
+  containers: [
+    { label: 'Shipping Containers', value: 'shipping' },
+    { label: 'Storage Containers', value: 'storage' },
+    { label: 'Refrigerated Containers', value: 'refrigerated' },
+    { label: 'Tank Containers', value: 'tank' },
+  ],
+  parts: [
+    { label: 'Engine Parts', value: 'engine' },
+    { label: 'Brakes & Suspension', value: 'brakes' },
+    { label: 'Electrical', value: 'electrical' },
+    { label: 'Body Parts', value: 'body' },
+    { label: 'Tyres & Wheels', value: 'tyres' },
+  ],
+};
+
 const sortOptions = [
   { value: 'newest', label: 'Newest First' },
   { value: 'oldest', label: 'Oldest First' },
@@ -262,6 +317,7 @@ export default function SearchPage() {
   // This handles both new format (slugs) and legacy format (display names)
   const query = searchParams.get('q') || '';
   const selectedCategories = searchParams.getAll('category').map(toSlug);
+  const selectedSubcategories = searchParams.getAll('subcategory').map(toSlug);
   const selectedBrands = searchParams.getAll('brand').map(toSlug);
   const selectedConditions = searchParams.getAll('condition').map((v) => v.toUpperCase());
   const selectedFuelTypes = searchParams.getAll('fuelType').map((v) => v.toUpperCase());
@@ -285,6 +341,7 @@ export default function SearchPage() {
       const params = new URLSearchParams();
       if (query) params.set('q', query);
       if (selectedCategories.length > 0) params.set('category', selectedCategories[0]);
+      if (selectedSubcategories.length > 0) params.set('subcategory', selectedSubcategories[0]);
       if (selectedBrands.length > 0) params.set('brand', selectedBrands[0]);
       if (selectedConditions.length > 0) params.set('condition', selectedConditions[0]);
       if (selectedFuelTypes.length > 0) params.set('fuelType', selectedFuelTypes[0]);
@@ -419,6 +476,7 @@ export default function SearchPage() {
 
   const hasActiveFilters =
     selectedCategories.length > 0 ||
+    selectedSubcategories.length > 0 ||
     selectedBrands.length > 0 ||
     selectedConditions.length > 0 ||
     selectedFuelTypes.length > 0 ||
@@ -465,6 +523,21 @@ export default function SearchPage() {
           ))}
         </div>
       </FilterSection>
+
+      {selectedCategories.length === 1 && subcategoryMap[selectedCategories[0]] && (
+        <FilterSection title="Subcategory">
+          <div className="space-y-2">
+            {subcategoryMap[selectedCategories[0]].map((opt) => (
+              <Checkbox
+                key={opt.value}
+                label={opt.label}
+                checked={selectedSubcategories.includes(opt.value)}
+                onCheckedChange={() => toggleArrayFilter('subcategory', opt.value, selectedSubcategories)}
+              />
+            ))}
+          </div>
+        </FilterSection>
+      )}
 
       <FilterSection title="Brand">
         <Input
@@ -596,6 +669,13 @@ export default function SearchPage() {
     activeFilterChips.push({
       label: `Category: ${findLabel(categoryOptions, cat)}`,
       onRemove: () => toggleArrayFilter('category', cat, selectedCategories),
+    });
+  });
+  selectedSubcategories.forEach((sub) => {
+    const allSubs = Object.values(subcategoryMap).flat();
+    activeFilterChips.push({
+      label: `Type: ${findLabel(allSubs, sub)}`,
+      onRemove: () => toggleArrayFilter('subcategory', sub, selectedSubcategories),
     });
   });
   selectedBrands.forEach((brand) => {
@@ -745,7 +825,7 @@ export default function SearchPage() {
         <div className="flex gap-6">
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block w-64 flex-shrink-0">
-            <div className="bg-white rounded-xl border border-border p-4 sticky top-20">
+            <div className="bg-white rounded-xl border border-border p-4 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
               <h3 className="font-semibold text-foreground mb-4">Filters</h3>
               {filterContent}
             </div>
