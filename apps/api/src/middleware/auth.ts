@@ -7,7 +7,7 @@ import { AppError } from "./errorHandler";
 // JWT Authentication Middleware
 // ---------------------------------------------------------------------------
 
-const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || "access-secret-change-me";
+const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || "access-secret-dev";
 
 interface JwtPayload {
   userId: string;
