@@ -643,6 +643,134 @@ export const adminController = {
     }
   },
 
+  // ---- Language Management ----
+
+  /**
+   * GET /api/admin/languages
+   * All languages (active + inactive), sorted by sortOrder.
+   */
+  async listLanguages(_req: Request, res: Response, next: NextFunction) {
+    try {
+      const languages = await prisma.siteLanguage.findMany({
+        orderBy: { sortOrder: "asc" },
+      });
+      res.json({ success: true, data: languages });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * POST /api/admin/languages
+   * Create a new site language.
+   */
+  async createLanguage(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { code, name, localName, countryCode, isDefault, isActive, sortOrder } = req.body;
+
+      // If this is set as default, unset any existing default
+      if (isDefault) {
+        await prisma.siteLanguage.updateMany({
+          where: { isDefault: true },
+          data: { isDefault: false },
+        });
+      }
+
+      const language = await prisma.siteLanguage.create({
+        data: {
+          code,
+          name,
+          localName,
+          countryCode,
+          isDefault: isDefault || false,
+          isActive: isActive !== undefined ? isActive : true,
+          sortOrder: sortOrder || 0,
+        },
+      });
+
+      res.status(201).json({
+        success: true,
+        data: language,
+        message: "Language created successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * PUT /api/admin/languages/:id
+   * Update an existing site language.
+   */
+  async updateLanguage(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const { code, name, localName, countryCode, isDefault, isActive, sortOrder } = req.body;
+
+      const existing = await prisma.siteLanguage.findUnique({ where: { id } });
+      if (!existing) {
+        throw new AppError("Language not found", 404);
+      }
+
+      // If setting as default, unset others
+      if (isDefault && !existing.isDefault) {
+        await prisma.siteLanguage.updateMany({
+          where: { isDefault: true },
+          data: { isDefault: false },
+        });
+      }
+
+      const language = await prisma.siteLanguage.update({
+        where: { id },
+        data: {
+          ...(code !== undefined && { code }),
+          ...(name !== undefined && { name }),
+          ...(localName !== undefined && { localName }),
+          ...(countryCode !== undefined && { countryCode }),
+          ...(isDefault !== undefined && { isDefault }),
+          ...(isActive !== undefined && { isActive }),
+          ...(sortOrder !== undefined && { sortOrder }),
+        },
+      });
+
+      res.json({
+        success: true,
+        data: language,
+        message: "Language updated successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * DELETE /api/admin/languages/:id
+   * Delete a site language.
+   */
+  async deleteLanguage(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+
+      const existing = await prisma.siteLanguage.findUnique({ where: { id } });
+      if (!existing) {
+        throw new AppError("Language not found", 404);
+      }
+
+      if (existing.isDefault) {
+        throw new AppError("Cannot delete the default language", 400);
+      }
+
+      await prisma.siteLanguage.delete({ where: { id } });
+
+      res.json({
+        success: true,
+        message: `Language "${existing.name}" deleted`,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   /**
    * DELETE /api/admin/reviews/:id
    * Remove an inappropriate review. Recalculate seller rating and review count.

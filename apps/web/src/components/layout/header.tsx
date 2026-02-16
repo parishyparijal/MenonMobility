@@ -24,6 +24,25 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/store/auth';
 import { MobileNav } from './mobile-nav';
+import { api } from '@/lib/api';
+
+interface SiteLanguage {
+  id: string;
+  code: string;
+  name: string;
+  localName: string;
+  countryCode: string;
+  isDefault: boolean;
+  isActive: boolean;
+  sortOrder: number;
+}
+
+// Fallback languages in case API is unavailable
+const fallbackLanguages: SiteLanguage[] = [
+  { id: '1', code: 'en', name: 'English', localName: 'International | English', countryCode: 'eu', isDefault: true, isActive: true, sortOrder: 0 },
+  { id: '2', code: 'nl-BE', name: 'Nederlands', localName: 'België | Nederlands', countryCode: 'be', isDefault: false, isActive: true, sortOrder: 1 },
+  { id: '3', code: 'de', name: 'Deutsch', localName: 'Deutschland | Deutsch', countryCode: 'de', isDefault: false, isActive: true, sortOrder: 2 },
+];
 
 interface NavChild {
   label: string;
@@ -95,12 +114,6 @@ const navItems: NavItem[] = [
   { label: 'Parts', href: '/parts' },
 ];
 
-const languages = [
-  { code: 'en', label: 'EN', flag: '🇬🇧' },
-  { code: 'nl', label: 'NL', flag: '🇳🇱' },
-  { code: 'de', label: 'DE', flag: '🇩🇪' },
-];
-
 export function Header() {
   const pathname = usePathname();
   const { user, isAuthenticated, logout } = useAuthStore();
@@ -108,13 +121,29 @@ export function Header() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
-  const [selectedLang, setSelectedLang] = useState(languages[0]);
+  const [languages, setLanguages] = useState<SiteLanguage[]>(fallbackLanguages);
+  const [selectedLang, setSelectedLang] = useState<SiteLanguage>(fallbackLanguages[0]);
   const dropdownTimeout = useRef<NodeJS.Timeout | null>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const langMenuRef = useRef<HTMLDivElement>(null);
 
   const favoritesCount = 0;
   const unreadMessages = 3;
+
+  // Fetch languages from API
+  useEffect(() => {
+    api.get<{ success: boolean; data: SiteLanguage[] }>('/languages')
+      .then((res) => {
+        if (res.data && res.data.length > 0) {
+          setLanguages(res.data);
+          const defaultLang = res.data.find((l) => l.isDefault) || res.data[0];
+          setSelectedLang(defaultLang);
+        }
+      })
+      .catch(() => {
+        // Keep fallback languages
+      });
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -161,12 +190,16 @@ export function Header() {
                 onClick={() => setLangMenuOpen(!langMenuOpen)}
                 className="flex items-center gap-1.5 hover:text-accent transition-colors"
               >
-                <span>{selectedLang.flag}</span>
-                <span>{selectedLang.label}</span>
+                <img
+                  src={`https://flagcdn.com/w40/${selectedLang.countryCode}.png`}
+                  alt={selectedLang.name}
+                  className="w-5 h-5 rounded-full object-cover"
+                />
+                <span>{selectedLang.code.split('-')[0].toUpperCase()}</span>
                 <ChevronDown className="w-3 h-3" />
               </button>
               {langMenuOpen && (
-                <div className="absolute top-full left-0 mt-1 bg-white rounded-md shadow-lg border border-border z-50 py-1 min-w-[100px]">
+                <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-lg border border-border z-50 py-2 min-w-[240px] max-h-[400px] overflow-y-auto">
                   {languages.map((lang) => (
                     <button
                       key={lang.code}
@@ -175,12 +208,16 @@ export function Header() {
                         setLangMenuOpen(false);
                       }}
                       className={cn(
-                        'flex items-center gap-2 w-full px-3 py-1.5 text-sm text-foreground hover:bg-muted transition-colors',
+                        'flex items-center gap-3 w-full px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors',
                         selectedLang.code === lang.code && 'bg-muted font-medium'
                       )}
                     >
-                      <span>{lang.flag}</span>
-                      <span>{lang.label}</span>
+                      <img
+                        src={`https://flagcdn.com/w40/${lang.countryCode}.png`}
+                        alt={lang.name}
+                        className="w-6 h-6 rounded-full object-cover shrink-0"
+                      />
+                      <span>{lang.localName}</span>
                     </button>
                   ))}
                 </div>

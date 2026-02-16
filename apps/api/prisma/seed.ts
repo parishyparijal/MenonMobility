@@ -561,7 +561,36 @@ async function main() {
   }
   console.log(`   Created ${listingCount} listings`);
 
-  // 8. Summary
+  // 8. Site Languages
+  console.log("8. Seeding site languages...");
+  const SITE_LANGUAGES = [
+    { code: "nl-BE", name: "Nederlands", localName: "België | Nederlands", countryCode: "be", isDefault: false, sortOrder: 0 },
+    { code: "fr-BE", name: "Français", localName: "Belgique | Français", countryCode: "be", isDefault: false, sortOrder: 1 },
+    { code: "en", name: "English", localName: "International | English", countryCode: "eu", isDefault: true, sortOrder: 2 },
+    { code: "de", name: "Deutsch", localName: "Deutschland | Deutsch", countryCode: "de", isDefault: false, sortOrder: 3 },
+    { code: "fr", name: "Français", localName: "France | Français", countryCode: "fr", isDefault: false, sortOrder: 4 },
+    { code: "pl", name: "Polski", localName: "Polska | Polski", countryCode: "pl", isDefault: false, sortOrder: 5 },
+    { code: "es", name: "Español", localName: "España | Español", countryCode: "es", isDefault: false, sortOrder: 6 },
+    { code: "it", name: "Italiano", localName: "Italia | Italiano", countryCode: "it", isDefault: false, sortOrder: 7 },
+    { code: "pt", name: "Português", localName: "Portugal | Português", countryCode: "pt", isDefault: false, sortOrder: 8 },
+    { code: "cs", name: "Čeština", localName: "Česká republika | Čeština", countryCode: "cz", isDefault: false, sortOrder: 9 },
+    { code: "ru", name: "Русский", localName: "Россия | Русский", countryCode: "ru", isDefault: false, sortOrder: 10 },
+  ];
+
+  for (const lang of SITE_LANGUAGES) {
+    await prisma.siteLanguage.upsert({
+      where: { code: lang.code },
+      update: {},
+      create: {
+        id: randomUUID(),
+        ...lang,
+        isActive: true,
+      },
+    });
+  }
+  console.log(`   Created ${SITE_LANGUAGES.length} site languages`);
+
+  // 9. Summary
   console.log("\n========================================");
   console.log("Seed completed successfully!");
   console.log("========================================");
@@ -571,6 +600,7 @@ async function main() {
   console.log(`Subscription Plans: ${SUBSCRIPTION_PLANS.length}`);
   console.log(`Sellers:            ${SELLERS.length}`);
   console.log(`Listings:           ${listingCount}`);
+  console.log(`Site Languages:     ${SITE_LANGUAGES.length}`);
   console.log("");
   console.log("Admin login: admin@menonmobility.com / Admin2026!");
   console.log("========================================\n");

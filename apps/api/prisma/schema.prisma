@@ -749,7 +749,24 @@ model Faq {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 29. BulkImport
+// 29. SiteLanguage
+// ─────────────────────────────────────────────────────────────
+
+model SiteLanguage {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique          // "nl-BE", "en", "de"
+  name        String                    // "Nederlands", "English"
+  localName   String                    // "België | Nederlands"
+  countryCode String                    // "be", "de", "gb" (lowercase for flagcdn)
+  isDefault   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────────────────────
+// 30. BulkImport
 // ─────────────────────────────────────────────────────────────
 
 model BulkImport {

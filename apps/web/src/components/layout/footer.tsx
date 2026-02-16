@@ -1,5 +1,20 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
+import { api } from '@/lib/api';
+
+interface SiteLanguage {
+  id: string;
+  code: string;
+  name: string;
+  localName: string;
+  countryCode: string;
+  isDefault: boolean;
+  isActive: boolean;
+  sortOrder: number;
+}
 
 const footerLinks = {
   transport: {
@@ -47,7 +62,25 @@ const socialLinks = [
   { icon: Instagram, href: 'https://instagram.com/menontrucks', label: 'Instagram' },
 ];
 
+const fallbackLanguages: SiteLanguage[] = [
+  { id: '1', code: 'en', name: 'English', localName: 'International | English', countryCode: 'eu', isDefault: true, isActive: true, sortOrder: 0 },
+  { id: '2', code: 'nl-BE', name: 'Nederlands', localName: 'België | Nederlands', countryCode: 'be', isDefault: false, isActive: true, sortOrder: 1 },
+  { id: '3', code: 'de', name: 'Deutsch', localName: 'Deutschland | Deutsch', countryCode: 'de', isDefault: false, isActive: true, sortOrder: 2 },
+];
+
 export function Footer() {
+  const [languages, setLanguages] = useState<SiteLanguage[]>(fallbackLanguages);
+
+  useEffect(() => {
+    api.get<{ success: boolean; data: SiteLanguage[] }>('/languages')
+      .then((res) => {
+        if (res.data && res.data.length > 0) {
+          setLanguages(res.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <footer className="bg-primary text-white">
       {/* Main Footer */}
@@ -111,18 +144,20 @@ export function Footer() {
           <p className="text-sm text-white/50">
             &copy; {new Date().getFullYear()} Menon Mobility. All rights reserved.
           </p>
-          <div className="flex items-center gap-4">
-            <button className="text-sm text-white/50 hover:text-white transition-colors">
-              EN
-            </button>
-            <span className="text-white/20">|</span>
-            <button className="text-sm text-white/50 hover:text-white transition-colors">
-              NL
-            </button>
-            <span className="text-white/20">|</span>
-            <button className="text-sm text-white/50 hover:text-white transition-colors">
-              DE
-            </button>
+          <div className="flex items-center gap-3 flex-wrap">
+            {languages.map((lang, index) => (
+              <span key={lang.code} className="flex items-center gap-3">
+                {index > 0 && <span className="text-white/20">|</span>}
+                <button className="flex items-center gap-1.5 text-sm text-white/50 hover:text-white transition-colors">
+                  <img
+                    src={`https://flagcdn.com/w20/${lang.countryCode}.png`}
+                    alt={lang.name}
+                    className="w-4 h-4 rounded-full object-cover"
+                  />
+                  {lang.code.split('-')[0].toUpperCase()}
+                </button>
+              </span>
+            ))}
           </div>
         </div>
       </div>

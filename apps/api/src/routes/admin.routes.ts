@@ -24,6 +24,9 @@ import {
   modelIdParamsSchema,
   createModelBodySchema,
   updateModelBodySchema,
+  languageIdParamsSchema,
+  createLanguageBodySchema,
+  updateLanguageBodySchema,
 } from "@/validators/admin.validator";
 import {
   createPageBodySchema,
@@ -164,6 +167,27 @@ router.delete(
   "/brands/:id",
   validate({ params: brandIdParamsSchema }),
   brandController.remove
+);
+
+// ---- Language Management ----
+router.get("/languages", adminController.listLanguages);
+
+router.post(
+  "/languages",
+  validate({ body: createLanguageBodySchema }),
+  adminController.createLanguage
+);
+
+router.put(
+  "/languages/:id",
+  validate({ params: languageIdParamsSchema, body: updateLanguageBodySchema }),
+  adminController.updateLanguage
+);
+
+router.delete(
+  "/languages/:id",
+  validate({ params: languageIdParamsSchema }),
+  adminController.deleteLanguage
 );
 
 // ---- Brand Model Management ----

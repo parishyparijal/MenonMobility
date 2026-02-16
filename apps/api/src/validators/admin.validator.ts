@@ -203,3 +203,29 @@ export const updateModelBodySchema = z.object({
   slug: z.string().min(1).max(100).trim().optional(),
   isActive: z.boolean().optional(),
 });
+
+// ---- Language Management ----
+
+export const languageIdParamsSchema = z.object({
+  id: z.string().uuid("Invalid language ID"),
+});
+
+export const createLanguageBodySchema = z.object({
+  code: z.string().min(2, "Code is required").max(10).trim(),
+  name: z.string().min(1, "Name is required").max(100).trim(),
+  localName: z.string().min(1, "Local name is required").max(200).trim(),
+  countryCode: z.string().min(2).max(5).trim(),
+  isDefault: z.boolean().default(false),
+  isActive: z.boolean().default(true),
+  sortOrder: z.number().int().min(0).default(0),
+});
+
+export const updateLanguageBodySchema = z.object({
+  code: z.string().min(2).max(10).trim().optional(),
+  name: z.string().min(1).max(100).trim().optional(),
+  localName: z.string().min(1).max(200).trim().optional(),
+  countryCode: z.string().min(2).max(5).trim().optional(),
+  isDefault: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+  sortOrder: z.number().int().min(0).optional(),
+});

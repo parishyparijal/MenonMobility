@@ -19,12 +19,26 @@ import recentlyViewedRoutes from "./recently-viewed.routes";
 import featuredListingRoutes from "./featured-listing.routes";
 import paymentRoutes from "./payment.routes";
 import sitemapRoutes from "./sitemap.routes";
+import prisma from "@/config/database";
 
 // ---------------------------------------------------------------------------
 // Main API Router
 // ---------------------------------------------------------------------------
 
 export const router = Router();
+
+// ---- Public: Active languages ----
+router.get("/languages", async (_req, res, next) => {
+  try {
+    const languages = await prisma.siteLanguage.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: "asc" },
+    });
+    res.json({ success: true, data: languages });
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.use("/auth", authRoutes);
 router.use("/listings", listingRoutes);

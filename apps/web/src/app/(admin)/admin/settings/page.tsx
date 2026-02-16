@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Settings,
   Globe,
@@ -15,6 +15,18 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { api } from '@/lib/api';
+
+interface SiteLanguage {
+  id: string;
+  code: string;
+  name: string;
+  localName: string;
+  countryCode: string;
+  isDefault: boolean;
+  isActive: boolean;
+  sortOrder: number;
+}
 
 interface SettingsSection {
   id: string;
@@ -31,9 +43,26 @@ const sections: SettingsSection[] = [
   { id: 'notifications', label: 'Notifications', icon: Bell },
 ];
 
+const fallbackLanguages: SiteLanguage[] = [
+  { id: '1', code: 'en', name: 'English', localName: 'International | English', countryCode: 'eu', isDefault: true, isActive: true, sortOrder: 0 },
+  { id: '2', code: 'de', name: 'Deutsch', localName: 'Deutschland | Deutsch', countryCode: 'de', isDefault: false, isActive: true, sortOrder: 1 },
+  { id: '3', code: 'nl', name: 'Nederlands', localName: 'België | Nederlands', countryCode: 'be', isDefault: false, isActive: true, sortOrder: 2 },
+];
+
 export default function AdminSettingsPage() {
   const [activeSection, setActiveSection] = useState('general');
   const [saved, setSaved] = useState(false);
+  const [languages, setLanguages] = useState<SiteLanguage[]>(fallbackLanguages);
+
+  useEffect(() => {
+    api.get<{ success: boolean; data: SiteLanguage[] }>('/languages')
+      .then((res) => {
+        if (res.data && res.data.length > 0) {
+          setLanguages(res.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const [settings, setSettings] = useState({
     siteName: 'Menon Mobility',
@@ -189,11 +218,11 @@ export default function AdminSettingsPage() {
                       onChange={(e) => handleChange('defaultLanguage', e.target.value)}
                       className="w-full h-9 px-3 rounded-lg border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                     >
-                      <option value="en">English</option>
-                      <option value="de">Deutsch</option>
-                      <option value="nl">Nederlands</option>
-                      <option value="fr">Francais</option>
-                      <option value="pl">Polski</option>
+                      {languages.map((lang) => (
+                        <option key={lang.code} value={lang.code}>
+                          {lang.name}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
