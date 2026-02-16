@@ -82,7 +82,7 @@ export function Footer() {
   }, []);
 
   return (
-    <footer className="bg-primary text-white">
+    <footer className="bg-primary-900 text-white">
       {/* Main Footer */}
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
@@ -139,7 +139,7 @@ export function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-white/10">
+      <div className="border-t border-white/10 bg-primary-950">
         <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-sm text-white/50">
             &copy; {new Date().getFullYear()} Menon Mobility. All rights reserved.
