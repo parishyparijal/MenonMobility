@@ -133,7 +133,7 @@ export default function ComparePage() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <h1 className="text-2xl font-heading font-bold text-foreground flex items-center gap-2">
               <BarChart3 className="w-6 h-6" />
               Compare Vehicles
             </h1>

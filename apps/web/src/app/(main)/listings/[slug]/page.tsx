@@ -394,7 +394,7 @@ export default function ListingDetailPage() {
                   <Badge variant={dummyListing.condition === 'NEW' ? 'success' : 'secondary'} className="mb-3">
                     {dummyListing.condition === 'NEW' ? 'New' : 'Used'}
                   </Badge>
-                  <h1 className="text-xl font-bold text-foreground leading-tight mb-2">
+                  <h1 className="text-xl font-heading font-bold text-foreground leading-tight mb-2">
                     {dummyListing.title}
                   </h1>
                   <p className="text-3xl font-bold text-accent">{formattedPrice}</p>
@@ -544,7 +544,7 @@ export default function ListingDetailPage() {
 
         {/* Related Listings */}
         <section className="mt-12">
-          <h2 className="text-xl font-bold text-foreground mb-6">Related Listings</h2>
+          <h2 className="text-xl font-heading font-bold text-foreground mb-6">Related Listings</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {relatedListings.map((listing) => (
               <ListingCard key={listing.id} listing={listing} />

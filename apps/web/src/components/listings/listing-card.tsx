@@ -78,7 +78,7 @@ export function ListingCard({ listing, view = 'grid' }: ListingCardProps) {
           </div>
           <div className="flex-1 flex flex-col justify-between py-1">
             <div>
-              <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1 text-base">
+              <h3 className="font-heading font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1 text-base">
                 {listing.title}
               </h3>
               <div className="flex items-center gap-3 mt-2 text-sm text-muted-foreground">
@@ -174,7 +174,7 @@ export function ListingCard({ listing, view = 'grid' }: ListingCardProps) {
           </button>
         </div>
         <div className="p-4 flex flex-col flex-1">
-          <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 text-sm leading-snug">
+          <h3 className="font-heading font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 text-sm leading-snug">
             {listing.title}
           </h3>
           <div className="text-lg font-bold text-accent mt-2">

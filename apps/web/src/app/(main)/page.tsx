@@ -218,7 +218,7 @@ function StatItem({ stat }: { stat: typeof stats[number] }) {
       <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/20">
         <Icon className="w-6 h-6 text-white/90" />
       </div>
-      <p className="text-3xl md:text-4xl font-bold text-white tabular-nums">{display}</p>
+      <p className="text-3xl md:text-4xl font-heading font-bold text-white tabular-nums">{display}</p>
       <p className="text-white/60 text-xs font-medium uppercase tracking-wider">{stat.label}</p>
     </div>
   );
@@ -295,7 +295,7 @@ export default function HomePage() {
               <span className="text-sm text-white/90 font-medium">Trusted by 5,000+ dealers in 50+ countries</span>
             </div>
 
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] mb-6 tracking-tight">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-extrabold leading-[1.1] mb-6 tracking-tight">
               Find Your Next
               <span className="block bg-gradient-to-r from-orange-400 via-accent to-orange-400 bg-clip-text text-transparent">
                 Commercial Vehicle
@@ -386,7 +386,7 @@ export default function HomePage() {
       <section className="container mx-auto px-4 py-16">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-bold text-foreground">Featured Listings</h2>
+            <h2 className="text-2xl font-heading font-bold text-foreground">Featured Listings</h2>
             <p className="text-muted-foreground mt-1">Hand-picked vehicles from verified dealers</p>
           </div>
           <div className="flex items-center gap-2">
@@ -458,7 +458,7 @@ export default function HomePage() {
 
       {/* Popular Brands */}
       <section className="container mx-auto px-4 py-16">
-        <h2 className="text-2xl font-bold text-foreground text-center mb-8">Popular Brands</h2>
+        <h2 className="text-2xl font-heading font-bold text-foreground text-center mb-8">Popular Brands</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
           {popularBrands.map((brand) => (
             <Link
@@ -483,7 +483,7 @@ export default function HomePage() {
       {/* Trust Section */}
       <section className="bg-white py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold text-foreground text-center mb-4">
+          <h2 className="text-2xl font-heading font-bold text-foreground text-center mb-4">
             Why Choose Menon Mobility?
           </h2>
           <p className="text-muted-foreground text-center mb-10 max-w-2xl mx-auto">
@@ -534,7 +534,7 @@ export default function HomePage() {
       <section className="container mx-auto px-4 py-16">
         <div className="bg-gradient-to-r from-accent to-accent-600 rounded-2xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-white text-center md:text-left">
-            <h2 className="text-2xl md:text-3xl font-bold mb-2">Are you a dealer?</h2>
+            <h2 className="text-2xl md:text-3xl font-heading font-bold mb-2">Are you a dealer?</h2>
             <p className="text-white/90 text-lg">
               Start selling today and reach thousands of buyers worldwide.
             </p>
