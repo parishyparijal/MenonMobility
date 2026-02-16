@@ -445,73 +445,82 @@ export default function CategoryPage() {
   // ---------------------------------------------------------------------------
   return (
     <div className="bg-background min-h-screen">
-      {/* Category Header with Background Image Overlay */}
-      <section className="relative text-white py-16 md:py-20 overflow-hidden">
-        {/* Background Image */}
+      {/* Category Header */}
+      <section className="relative text-white py-14 md:py-20 overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
           style={{
             backgroundImage: `url(${CATEGORY_HERO_IMAGES[categorySlug as keyof typeof CATEGORY_HERO_IMAGES] || CATEGORY_HERO_IMAGES.trucks})`,
           }}
         />
-        {/* Dark Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/70 via-primary/55 to-primary-950/45" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-950/85 via-primary/70 to-primary-800/60" />
+        <div
+          className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
+            backgroundSize: '32px 32px',
+          }}
+        />
 
         <div className="container mx-auto px-4 relative z-10">
-          <nav className="flex items-center gap-2 text-sm text-white/60 mb-4">
+          <nav className="flex items-center gap-2 text-sm text-white/50 mb-6">
             <Link href="/" className="hover:text-white transition-colors">Home</Link>
-            <span>/</span>
-            <span className="text-white">{category.name}</span>
+            <span className="text-white/30">/</span>
+            <span className="text-white/90 font-medium">{category.name}</span>
           </nav>
-          <h1 className="text-3xl md:text-4xl font-bold mb-3">{category.name}</h1>
-          <p className="text-white/85 max-w-2xl text-lg">{category.description}</p>
-          <p className="text-sm text-accent font-semibold mt-4 bg-white/10 inline-block px-3 py-1 rounded-full">
-            {totalResults.toLocaleString()} listings available
-          </p>
+          <h1 className="text-3xl md:text-5xl font-extrabold mb-3 tracking-tight">{category.name}</h1>
+          <p className="text-white/70 max-w-2xl text-lg leading-relaxed">{category.description}</p>
+          <div className="flex items-center gap-3 mt-6">
+            <span className="text-sm font-semibold bg-white/10 border border-white/20 px-4 py-1.5 rounded-full text-white/90">
+              {totalResults.toLocaleString()} listings available
+            </span>
+          </div>
         </div>
       </section>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Subcategory Chips */}
-        {category.subcategories.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-sm font-semibold text-foreground mb-3">Browse by Type</h2>
-            <div className="flex flex-wrap gap-2">
-              {category.subcategories.map((sub) => (
-                <Link
-                  key={sub.slug}
-                  href={`/search?category=${categorySlug}&subcategory=${sub.slug}`}
-                  className="px-4 py-2 rounded-full bg-white border border-border text-sm font-medium text-foreground hover:bg-primary hover:text-white hover:border-primary transition-colors"
-                >
-                  {sub.name}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Top Brands — links now use slugs */}
-        {category.topBrands.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-sm font-semibold text-foreground mb-3">Top Brands</h2>
-            <div className="flex flex-wrap gap-2">
-              {category.topBrands.map((brand) => (
-                <Link
-                  key={brand.slug}
-                  href={`/search?category=${categorySlug}&brand=${brand.slug}`}
-                  className="px-4 py-2 rounded-lg bg-white border border-border text-sm text-foreground hover:border-accent hover:text-accent transition-colors"
-                >
-                  {brand.name}
-                </Link>
-              ))}
-            </div>
+        {/* Subcategory & Brand Chips */}
+        {(category.subcategories.length > 0 || category.topBrands.length > 0) && (
+          <div className="bg-white rounded-2xl border border-border p-5 mb-8">
+            {category.subcategories.length > 0 && (
+              <div className="mb-5">
+                <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Browse by Type</h2>
+                <div className="flex flex-wrap gap-2">
+                  {category.subcategories.map((sub) => (
+                    <Link
+                      key={sub.slug}
+                      href={`/search?category=${categorySlug}&subcategory=${sub.slug}`}
+                      className="px-3.5 py-1.5 rounded-lg bg-gray-50 border border-gray-100 text-sm font-medium text-foreground hover:bg-primary hover:text-white hover:border-primary transition-all duration-150"
+                    >
+                      {sub.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+            {category.topBrands.length > 0 && (
+              <div>
+                <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Top Brands</h2>
+                <div className="flex flex-wrap gap-2">
+                  {category.topBrands.map((brand) => (
+                    <Link
+                      key={brand.slug}
+                      href={`/search?category=${categorySlug}&brand=${brand.slug}`}
+                      className="px-3.5 py-1.5 rounded-lg bg-gray-50 border border-gray-100 text-sm font-medium text-foreground hover:border-accent hover:text-accent transition-all duration-150"
+                    >
+                      {brand.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {/* Results Controls */}
         <div className="flex items-center justify-between mb-6">
           <p className="text-sm text-muted-foreground">
-            Showing {listings.length} of {totalResults.toLocaleString()} results
+            Showing <strong className="text-foreground">{listings.length}</strong> of {totalResults.toLocaleString()} results
           </p>
           <div className="flex items-center gap-2">
             <select
@@ -559,7 +568,7 @@ export default function CategoryPage() {
           <div
             className={cn(
               view === 'grid'
-                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
+                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'
                 : 'space-y-4'
             )}
           >
@@ -571,7 +580,7 @@ export default function CategoryPage() {
           <div
             className={cn(
               view === 'grid'
-                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
+                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'
                 : 'space-y-4'
             )}
           >
@@ -581,7 +590,7 @@ export default function CategoryPage() {
           </div>
         )}
 
-        <div className="mt-8">
+        <div className="mt-10">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
