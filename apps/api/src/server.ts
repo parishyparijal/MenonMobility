@@ -25,6 +25,11 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:3000";
 const app = express();
 
 // ---------------------------------------------------------------------------
+// Trust reverse proxy (Nginx) — required for rate limiting behind proxy
+// ---------------------------------------------------------------------------
+app.set("trust proxy", 1);
+
+// ---------------------------------------------------------------------------
 // Global middleware
 // ---------------------------------------------------------------------------
 app.use(requestId);
