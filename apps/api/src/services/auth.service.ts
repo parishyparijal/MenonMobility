@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { randomUUID } from "crypto";
+import { randomUUID, randomInt } from "crypto";
 
 const ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || "access-secret-dev";
 const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "refresh-secret-dev";
@@ -44,6 +44,10 @@ export const authService = {
 
   generateResetToken(): string {
     return randomUUID();
+  },
+
+  generateVerificationCode(): string {
+    return randomInt(100000, 999999).toString();
   },
 
   generateTokenPair(payload: TokenPayload) {

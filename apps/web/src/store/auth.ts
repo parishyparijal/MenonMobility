@@ -36,6 +36,8 @@ interface AuthState {
   logout: () => void;
   fetchUser: () => Promise<void>;
   setUser: (user: User | null) => void;
+  verifyEmail: (email: string, code: string) => Promise<void>;
+  resendVerificationCode: (email: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -126,5 +128,20 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   setUser: (user: User | null) => {
     set({ user, isAuthenticated: !!user });
+  },
+
+  verifyEmail: async (email: string, code: string) => {
+    set({ isLoading: true });
+    try {
+      await api.post('/auth/verify-email', { email, code });
+      set({ isLoading: false });
+    } catch (error) {
+      set({ isLoading: false });
+      throw error;
+    }
+  },
+
+  resendVerificationCode: async (email: string) => {
+    await api.post('/auth/resend-verification', { email });
   },
 }));

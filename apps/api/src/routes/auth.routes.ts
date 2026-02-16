@@ -11,6 +11,8 @@ import {
   changePasswordSchema,
   refreshTokenSchema,
   updateProfileSchema,
+  verifyEmailSchema,
+  resendVerificationSchema,
 } from "@/validators/auth.validator";
 
 // ---------------------------------------------------------------------------
@@ -55,6 +57,20 @@ router.put(
   authenticate,
   validate({ body: updateProfileSchema.shape.body }),
   authController.updateProfile
+);
+
+// POST /api/auth/verify-email
+router.post(
+  "/verify-email",
+  validate({ body: verifyEmailSchema.shape.body }),
+  authController.verifyEmail
+);
+
+// POST /api/auth/resend-verification
+router.post(
+  "/resend-verification",
+  validate({ body: resendVerificationSchema.shape.body }),
+  authController.resendVerificationCode
 );
 
 // POST /api/auth/forgot-password

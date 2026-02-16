@@ -74,6 +74,22 @@ export const updateProfileSchema = z.object({
   }),
 });
 
+export const verifyEmailSchema = z.object({
+  body: z.object({
+    email: z.string().email("Invalid email address").toLowerCase().trim(),
+    code: z
+      .string()
+      .length(6, "Verification code must be 6 digits")
+      .regex(/^\d{6}$/, "Verification code must be 6 digits"),
+  }),
+});
+
+export const resendVerificationSchema = z.object({
+  body: z.object({
+    email: z.string().email("Invalid email address").toLowerCase().trim(),
+  }),
+});
+
 export const refreshTokenSchema = z.object({
   body: z.object({
     refreshToken: z.string().min(1, "Refresh token is required"),

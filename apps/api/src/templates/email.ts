@@ -160,6 +160,24 @@ export const emailTemplates = {
     };
   },
 
+  emailVerificationCode(data: { name: string; code: string }) {
+    return {
+      subject: `${data.code} is your ${BRAND} verification code`,
+      html: layout(`
+        <h2 style="color:${PRIMARY};margin:0 0 16px;">Verify Your Email</h2>
+        <p style="color:#374151;line-height:1.6;margin:0 0 16px;">
+          Hi ${data.name}, please use the following code to verify your email address:
+        </p>
+        <div style="text-align:center;margin:24px 0;">
+          <span style="display:inline-block;background:#f3f4f6;border:2px dashed ${ACCENT};border-radius:8px;padding:16px 32px;font-size:32px;font-weight:700;letter-spacing:8px;color:${PRIMARY};">${data.code}</span>
+        </div>
+        <p style="color:#6b7280;font-size:13px;margin:16px 0 0;">
+          This code expires in 15 minutes. If you didn't create an account, you can safely ignore this email.
+        </p>
+      `),
+    };
+  },
+
   contactForm(data: { name: string; email: string; subject: string; message: string }) {
     return {
       subject: `[Contact Form] ${data.subject}`,

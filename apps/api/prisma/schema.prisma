@@ -178,6 +178,20 @@ model PasswordResetToken {
 }
 
 // ─────────────────────────────────────────────────────────────
+// 3b. EmailVerificationCode
+// ─────────────────────────────────────────────────────────────
+
+model EmailVerificationCode {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+// ─────────────────────────────────────────────────────────────
 // 4. SellerProfile
 // ─────────────────────────────────────────────────────────────
 

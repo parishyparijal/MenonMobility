@@ -62,6 +62,13 @@ const emailWorker = createWorker("email", async (job: Job) => {
   console.log(`[Email Worker] Processing job ${job.id}: ${job.name}`);
 
   switch (job.name) {
+    case "send-verification-code": {
+      const template = emailTemplates.emailVerificationCode({ name: job.data.name, code: job.data.code });
+      await sendEmail({ to: job.data.email, subject: template.subject, html: template.html });
+      console.log(`  -> Verification code email sent to ${job.data.email}`);
+      break;
+    }
+
     case "send-welcome-email": {
       const template = emailTemplates.welcome({ name: job.data.name });
       await sendEmail({ to: job.data.email, subject: template.subject, html: template.html });

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import prisma from "@/config/database";
 import { authService } from "@/services/auth.service";
 import { AppError } from "@/middleware/errorHandler";
+import { emailQueue } from "@/config/queue";
 
 export const authController = {
   async register(req: Request, res: Response, next: NextFunction) {
@@ -60,6 +61,22 @@ export const authController = {
           token: tokens.refreshToken,
           expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         },
+      });
+
+      // Generate and queue verification code email
+      const code = authService.generateVerificationCode();
+      await prisma.emailVerificationCode.deleteMany({ where: { email } });
+      await prisma.emailVerificationCode.create({
+        data: {
+          email,
+          code,
+          expiresAt: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
+        },
+      });
+      await emailQueue.add("send-verification-code", {
+        email,
+        name,
+        code,
       });
 
       res.status(201).json({
@@ -373,6 +390,88 @@ export const authController = {
       res.json({
         success: true,
         message: "Password changed successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async verifyEmail(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email, code } = req.body;
+
+      const record = await prisma.emailVerificationCode.findFirst({
+        where: { email },
+        orderBy: { createdAt: "desc" },
+      });
+
+      if (!record || record.code !== code || record.expiresAt < new Date()) {
+        throw new AppError("Invalid or expired verification code", 400);
+      }
+
+      // Mark email as verified
+      await prisma.user.updateMany({
+        where: { email, emailVerifiedAt: null },
+        data: { emailVerifiedAt: new Date() },
+      });
+
+      // Clean up used codes
+      await prisma.emailVerificationCode.deleteMany({ where: { email } });
+
+      res.json({
+        success: true,
+        message: "Email verified successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async resendVerificationCode(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email } = req.body;
+
+      // Check cooldown (60 seconds) — generic response to prevent enumeration
+      const recent = await prisma.emailVerificationCode.findFirst({
+        where: {
+          email,
+          createdAt: { gt: new Date(Date.now() - 60 * 1000) },
+        },
+      });
+
+      if (recent) {
+        throw new AppError("Please wait before requesting a new code", 429);
+      }
+
+      const user = await prisma.user.findUnique({
+        where: { email },
+        select: { name: true, emailVerifiedAt: true },
+      });
+
+      if (user && !user.emailVerifiedAt) {
+        const code = authService.generateVerificationCode();
+
+        // Delete old codes, create new one
+        await prisma.emailVerificationCode.deleteMany({ where: { email } });
+        await prisma.emailVerificationCode.create({
+          data: {
+            email,
+            code,
+            expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+          },
+        });
+
+        await emailQueue.add("send-verification-code", {
+          email,
+          name: user.name,
+          code,
+        });
+      }
+
+      // Always return success (no email enumeration)
+      res.json({
+        success: true,
+        message: "If the email exists, a new code has been sent",
       });
     } catch (error) {
       next(error);
