@@ -468,7 +468,7 @@ export default function CategoryPage() {
             <span className="text-white/30">/</span>
             <span className="text-white/90 font-medium">{category.name}</span>
           </nav>
-          <h1 className="text-3xl md:text-5xl font-heading font-extrabold mb-3 tracking-tight">{category.name}</h1>
+          <h1 className="text-3xl md:text-5xl font-extrabold mb-3 tracking-tight">{category.name}</h1>
           <p className="text-white/70 max-w-2xl text-lg leading-relaxed">{category.description}</p>
           <div className="flex items-center gap-3 mt-6">
             <span className="text-sm font-semibold bg-white/10 border border-white/20 px-4 py-1.5 rounded-full text-white/90">
