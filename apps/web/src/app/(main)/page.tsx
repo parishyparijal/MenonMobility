@@ -356,12 +356,16 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Bottom fade into category section */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent z-10" />
+        {/* Angled divider */}
+        <div className="absolute bottom-0 left-0 right-0 z-10">
+          <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" className="w-full h-[40px] md:h-[60px] block">
+            <path d="M0 60H1440V20C1440 20 1200 0 720 0C240 0 0 20 0 20V60Z" className="fill-background" />
+          </svg>
+        </div>
       </section>
 
       {/* Category Icons Grid */}
-      <section className="container mx-auto px-4 -mt-12 relative z-20">
+      <section className="container mx-auto px-4 -mt-6 relative z-20">
         <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
           {categories.map((cat) => (
             <Link
