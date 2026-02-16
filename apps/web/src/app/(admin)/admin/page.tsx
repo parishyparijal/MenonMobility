@@ -220,11 +220,11 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <button className="inline-flex items-center h-9 px-3 text-xs font-medium rounded-lg text-white bg-gradient-to-b from-green-400 to-green-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.45),inset_0_-1px_0_rgba(255,255,255,0.15),inset_4px_4px_10px_rgba(255,255,255,0.1),0_2px_8px_rgba(0,0,0,0.2)] border border-green-300/30 hover:from-green-300 hover:to-green-500 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_1px_2px_rgba(0,0,0,0.1)] transition-all">
+                  <button className="inline-flex items-center h-9 px-3 text-xs font-medium rounded-lg text-white bg-gradient-to-b from-green-400 to-green-600 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_1px_2px_rgba(0,0,0,0.1)] border border-green-300/30 hover:from-green-300 hover:to-green-500 transition-all">
                     <CheckCircle className="w-3.5 h-3.5 mr-1" />
                     Approve
                   </button>
-                  <button className="inline-flex items-center h-9 px-3 text-xs font-medium rounded-lg text-white bg-gradient-to-b from-red-400 to-red-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.45),inset_0_-1px_0_rgba(255,255,255,0.15),inset_4px_4px_10px_rgba(255,255,255,0.1),0_2px_8px_rgba(0,0,0,0.2)] border border-red-300/30 hover:from-red-300 hover:to-red-500 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_1px_2px_rgba(0,0,0,0.1)] transition-all">
+                  <button className="inline-flex items-center h-9 px-3 text-xs font-medium rounded-lg text-white bg-gradient-to-b from-red-400 to-red-600 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_1px_2px_rgba(0,0,0,0.1)] border border-red-300/30 hover:from-red-300 hover:to-red-500 transition-all">
                     <XCircle className="w-3.5 h-3.5 mr-1" />
                     Reject
                   </button>
