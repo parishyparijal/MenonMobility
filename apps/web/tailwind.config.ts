@@ -27,7 +27,7 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['var(--font-nunito-sans)', 'system-ui', '-apple-system', 'sans-serif'],
       },
       colors: {
         primary: {
