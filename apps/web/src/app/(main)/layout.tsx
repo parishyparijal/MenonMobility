@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import { ChatNotifier } from '@/components/chat/chat-notifier';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -71,6 +72,7 @@ export default function MainLayout({
       <main className="flex-1">{children}</main>
       <Footer />
       <CookieConsent />
+      <ChatNotifier />
     </div>
   );
 }

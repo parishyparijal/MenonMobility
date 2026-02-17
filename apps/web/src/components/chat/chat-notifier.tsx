@@ -4,16 +4,18 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { ChatWidget } from '@/components/chat/chat-widget';
 import { useMessagesStore } from '@/store/messages';
+import { useAuthStore } from '@/store/auth';
 
 const POLL_INTERVAL = 15000; // 15 seconds
 
 /**
- * ChatNotifier — wraps seller layout.
- * Polls for new unread messages. When unreadCount increases, auto-opens
- * the ChatWidget for the thread with the newest unread message.
+ * ChatNotifier — polls for new unread messages for any logged-in user.
+ * When unreadCount increases, auto-opens ChatWidget for the newest unread thread.
+ * Works in both seller layout (/seller/*) and main layout (anywhere).
  */
 export function ChatNotifier() {
   const pathname = usePathname();
+  const { isAuthenticated } = useAuthStore();
   const { unreadCount, fetchUnreadCount, threads, fetchThreads } = useMessagesStore();
 
   const lastKnownUnread = useRef(unreadCount);
@@ -24,15 +26,20 @@ export function ChatNotifier() {
   } | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
-  // Don't show widget if seller is already on the messages page
-  const isOnMessagesPage = pathname?.startsWith('/seller/messages');
+  // Don't show widget if user is already on any messages page
+  const isOnMessagesPage =
+    pathname?.startsWith('/seller/messages') || pathname?.startsWith('/messages');
 
-  // Poll unread count every 15s
+  // Determine correct messages href based on current context
+  const messagesHref = pathname?.startsWith('/seller') ? '/seller/messages' : '/messages';
+
+  // Poll unread count every 15s (only if authenticated)
   useEffect(() => {
+    if (!isAuthenticated) return;
     fetchUnreadCount();
     const interval = setInterval(fetchUnreadCount, POLL_INTERVAL);
     return () => clearInterval(interval);
-  }, [fetchUnreadCount]);
+  }, [isAuthenticated, fetchUnreadCount]);
 
   // When unread count increases, fetch threads to find the newest one
   useEffect(() => {
@@ -67,14 +74,14 @@ export function ChatNotifier() {
     setDismissed(false);
   }, [isOnMessagesPage]);
 
-  if (!openThread || isOnMessagesPage) return null;
+  if (!isAuthenticated || !openThread || isOnMessagesPage) return null;
 
   return (
     <ChatWidget
       threadId={openThread.id}
       listingTitle={openThread.listingTitle}
       participantName={openThread.participantName}
-      messagesHref="/seller/messages"
+      messagesHref={messagesHref}
       onClose={() => {
         setOpenThread(null);
         setDismissed(true);
