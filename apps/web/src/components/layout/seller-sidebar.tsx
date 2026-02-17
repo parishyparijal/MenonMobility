@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -20,6 +20,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/store/auth';
+import { useMessagesStore } from '@/store/messages';
 
 interface SellerSidebarProps {
   isOpen: boolean;
@@ -30,14 +31,13 @@ interface SidebarNavItem {
   label: string;
   href: string;
   icon: React.ElementType;
-  badge?: number;
 }
 
 const navItems: SidebarNavItem[] = [
   { label: 'Dashboard', href: '/seller', icon: LayoutDashboard },
   { label: 'My Listings', href: '/seller/listings', icon: List },
   { label: 'Add Listing', href: '/seller/listings/new', icon: Plus },
-  { label: 'Messages', href: '/seller/messages', icon: MessageSquare, badge: 5 },
+  { label: 'Messages', href: '/seller/messages', icon: MessageSquare },
   { label: 'Reviews', href: '/seller/reviews', icon: Star },
   { label: 'Company Profile', href: '/seller/profile', icon: Building },
   { label: 'Bulk Upload', href: '/seller/bulk-upload', icon: Upload },
@@ -48,6 +48,11 @@ const navItems: SidebarNavItem[] = [
 export function SellerSidebar({ isOpen, onClose }: SellerSidebarProps) {
   const pathname = usePathname();
   const { logout } = useAuthStore();
+  const { unreadCount, fetchUnreadCount } = useMessagesStore();
+
+  useEffect(() => {
+    fetchUnreadCount();
+  }, [fetchUnreadCount]);
 
   return (
     <>
@@ -106,9 +111,9 @@ export function SellerSidebar({ isOpen, onClose }: SellerSidebarProps) {
                   >
                     <item.icon className="w-5 h-5 shrink-0" />
                     <span className="flex-1">{item.label}</span>
-                    {item.badge !== undefined && item.badge > 0 && (
+                    {item.href === '/seller/messages' && unreadCount > 0 && (
                       <Badge className="bg-gradient-to-b from-accent-400 to-accent-600 text-white border border-accent-300/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] text-[10px] h-5 min-w-[20px] justify-center">
-                        {item.badge}
+                        {unreadCount}
                       </Badge>
                     )}
                   </Link>

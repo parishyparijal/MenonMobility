@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import {
   Heart,
   Share2,
@@ -22,6 +22,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Check,
+  Loader2,
+  Send,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -31,6 +33,8 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { ListingCard, type ListingCardData } from '@/components/listings/listing-card';
 import { useFavoritesStore } from '@/store/favorites';
+import { useMessagesStore } from '@/store/messages';
+import { useAuthStore } from '@/store/auth';
 import { cn } from '@/lib/utils';
 import { getImagesForListing, TRUCK_IMAGES } from '@/lib/images';
 
@@ -193,12 +197,38 @@ const relatedListings: ListingCardData[] = [
 
 export default function ListingDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const { toggleFavorite, isFavorited } = useFavoritesStore();
+  const { sendFirstMessage, isSending } = useMessagesStore();
+  const { isAuthenticated } = useAuthStore();
   const [currentImage, setCurrentImage] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [showPhone, setShowPhone] = useState(false);
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [messageText, setMessageText] = useState('');
+  const [messageSent, setMessageSent] = useState(false);
   const [loanAmount, setLoanAmount] = useState(dummyListing.price);
   const [loanTerm, setLoanTerm] = useState(60);
+
+  const handleSendMessage = async () => {
+    if (!messageText.trim() || isSending) return;
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
+    try {
+      await sendFirstMessage(dummyListing.id, messageText.trim());
+      setMessageSent(true);
+      setMessageText('');
+      setTimeout(() => {
+        setMessageDialogOpen(false);
+        setMessageSent(false);
+        router.push('/messages');
+      }, 1500);
+    } catch {
+      // error handled in store
+    }
+  };
 
   const placeholderImages = dummyListing.images.length > 0 ? dummyListing.images : Array.from({ length: 6 }, (_, i) => '');
 
@@ -454,7 +484,16 @@ export default function ListingDetailPage() {
                         <MessageSquare className="w-4 h-4" />
                         WhatsApp
                       </button>
-                      <button className="flex-1 inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg text-sm font-medium text-white bg-gradient-to-b from-accent-400 to-accent-600 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_1px_3px_rgba(0,0,0,0.12)] border border-accent-300/40 hover:from-accent-300 hover:to-accent-500 active:from-accent-500 active:to-accent-700 transition-all">
+                      <button
+                        onClick={() => {
+                          if (!isAuthenticated) {
+                            router.push('/login');
+                            return;
+                          }
+                          setMessageDialogOpen(true);
+                        }}
+                        className="flex-1 inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg text-sm font-medium text-white bg-gradient-to-b from-accent-400 to-accent-600 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_1px_3px_rgba(0,0,0,0.12)] border border-accent-300/40 hover:from-accent-300 hover:to-accent-500 active:from-accent-500 active:to-accent-700 transition-all"
+                      >
                         <MessageSquare className="w-4 h-4" />
                         Send Message
                       </button>
@@ -552,6 +591,61 @@ export default function ListingDetailPage() {
           </div>
         </section>
       </div>
+
+      {/* Send Message Dialog */}
+      <Dialog open={messageDialogOpen} onOpenChange={setMessageDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-lg font-semibold text-foreground">Send Message</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Message to {dummyListing.seller.name} about {dummyListing.title}
+              </p>
+            </div>
+            {messageSent ? (
+              <div className="flex flex-col items-center py-6">
+                <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-3">
+                  <Check className="w-6 h-6 text-green-600" />
+                </div>
+                <p className="text-sm font-medium text-foreground">Message sent!</p>
+                <p className="text-xs text-muted-foreground mt-1">Redirecting to messages...</p>
+              </div>
+            ) : (
+              <>
+                <textarea
+                  value={messageText}
+                  onChange={(e) => setMessageText(e.target.value)}
+                  placeholder={`Hi, I'm interested in your ${dummyListing.title}. Is it still available?`}
+                  rows={4}
+                  className="w-full rounded-lg border border-border bg-muted/30 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                />
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setMessageDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="accent"
+                    size="sm"
+                    onClick={handleSendMessage}
+                    disabled={!messageText.trim() || isSending}
+                  >
+                    {isSending ? (
+                      <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+                    ) : (
+                      <Send className="w-4 h-4 mr-1.5" />
+                    )}
+                    Send
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Fullscreen Image Lightbox */}
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>

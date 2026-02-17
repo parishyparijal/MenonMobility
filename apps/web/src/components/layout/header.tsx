@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuthStore } from '@/store/auth';
 import { useCurrencyStore, SUPPORTED_CURRENCIES, CURRENCY_INFO } from '@/store/currency';
+import { useMessagesStore } from '@/store/messages';
 import { MobileNav } from './mobile-nav';
 import { api } from '@/lib/api';
 
@@ -155,6 +156,7 @@ export function Header() {
   const pathname = usePathname();
   const { user, isAuthenticated, logout } = useAuthStore();
   const { selectedCurrency, setSelectedCurrency, fetchRates } = useCurrencyStore();
+  const { unreadCount, fetchUnreadCount } = useMessagesStore();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -169,12 +171,19 @@ export function Header() {
   const currencyMenuRef = useRef<HTMLDivElement>(null);
 
   const favoritesCount = 0;
-  const unreadMessages = 3;
 
   // Fetch exchange rates on mount
   useEffect(() => {
     fetchRates();
   }, [fetchRates]);
+
+  // Fetch unread message count on mount + poll every 60s (when authenticated)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    fetchUnreadCount();
+    const interval = setInterval(fetchUnreadCount, 60000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated, fetchUnreadCount]);
 
   // Fetch categories from API for dynamic nav
   useEffect(() => {
@@ -463,7 +472,7 @@ export function Header() {
               <Button variant="ghost" size="icon" className="relative hidden sm:flex" asChild>
                 <Link href="/notifications">
                   <Bell className="w-5 h-5" />
-                  {unreadMessages > 0 && (
+                  {unreadCount > 0 && (
                     <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-accent rounded-full" />
                   )}
                 </Link>
@@ -540,9 +549,9 @@ export function Header() {
                     >
                       <MessageSquare className="w-4 h-4" />
                       Messages
-                      {unreadMessages > 0 && (
+                      {unreadCount > 0 && (
                         <Badge variant="danger" className="ml-auto text-[10px] h-5">
-                          {unreadMessages}
+                          {unreadCount}
                         </Badge>
                       )}
                     </Link>
