@@ -362,6 +362,10 @@ model Listing {
   emissionClass     EmissionClass?
   wheelbaseMm       Int?
   suspensionType    String?
+  bodyType           String?           @db.VarChar(100)
+  driveConfiguration String?           @db.VarChar(20)
+  numberOfDoors      Int?
+  numberOfSeats      Int?
   containerSize     ContainerSize?
   containerType     String?
   countryCode       String?

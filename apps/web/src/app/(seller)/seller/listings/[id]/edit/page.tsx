@@ -50,17 +50,18 @@ type FieldKey =
   | 'year' | 'mileageKm' | 'operatingHours' | 'fuelType' | 'transmission'
   | 'powerHp' | 'powerKw' | 'emissionClass' | 'axleCount' | 'cabType'
   | 'gvwKg' | 'payloadKg' | 'wheelbaseMm' | 'suspensionType'
-  | 'containerSize' | 'containerType' | 'color' | 'vin';
+  | 'containerSize' | 'containerType' | 'color' | 'vin'
+  | 'bodyType' | 'driveConfiguration' | 'numberOfDoors' | 'numberOfSeats';
 
 const CATEGORY_FIELDS: Record<string, FieldKey[]> = {
-  trucks: ['year', 'mileageKm', 'fuelType', 'transmission', 'powerHp', 'powerKw', 'emissionClass', 'axleCount', 'cabType', 'gvwKg', 'payloadKg', 'wheelbaseMm', 'suspensionType', 'color', 'vin'],
-  trailers: ['year', 'mileageKm', 'axleCount', 'payloadKg', 'suspensionType', 'wheelbaseMm', 'color', 'vin'],
-  construction: ['year', 'operatingHours', 'powerHp', 'powerKw', 'fuelType', 'gvwKg', 'color', 'vin'],
-  vans: ['year', 'mileageKm', 'fuelType', 'transmission', 'powerHp', 'powerKw', 'emissionClass', 'color', 'vin'],
-  cars: ['year', 'mileageKm', 'fuelType', 'transmission', 'powerHp', 'powerKw', 'emissionClass', 'color', 'vin'],
+  trucks: ['bodyType', 'year', 'mileageKm', 'fuelType', 'transmission', 'powerHp', 'powerKw', 'emissionClass', 'driveConfiguration', 'cabType', 'gvwKg', 'payloadKg', 'wheelbaseMm', 'suspensionType', 'color', 'vin'],
+  trailers: ['bodyType', 'year', 'mileageKm', 'axleCount', 'payloadKg', 'suspensionType', 'wheelbaseMm', 'color', 'vin'],
+  construction: ['bodyType', 'year', 'operatingHours', 'powerHp', 'powerKw', 'fuelType', 'gvwKg', 'color', 'vin'],
+  vans: ['bodyType', 'year', 'mileageKm', 'fuelType', 'transmission', 'powerHp', 'powerKw', 'emissionClass', 'driveConfiguration', 'numberOfDoors', 'numberOfSeats', 'color', 'vin'],
+  cars: ['bodyType', 'year', 'mileageKm', 'fuelType', 'transmission', 'powerHp', 'powerKw', 'emissionClass', 'driveConfiguration', 'numberOfDoors', 'numberOfSeats', 'color', 'vin'],
   containers: ['year', 'containerSize', 'containerType', 'color'],
   parts: [],
-  agricultural: ['year', 'operatingHours', 'powerHp', 'powerKw', 'fuelType', 'transmission', 'color', 'vin'],
+  agricultural: ['bodyType', 'year', 'operatingHours', 'powerHp', 'powerKw', 'fuelType', 'transmission', 'color', 'vin'],
 };
 
 const conditionOptions = [
@@ -103,6 +104,139 @@ const axleOptions = [
   { label: '6 Axles', value: '6' },
   { label: '7 Axles', value: '7' },
   { label: '8 Axles', value: '8' },
+];
+
+const bodyTypeOptions: Record<string, { label: string; value: string }[]> = {
+  trucks: [
+    { label: 'Tractor Unit', value: 'Tractor Unit' },
+    { label: 'Box Truck', value: 'Box Truck' },
+    { label: 'Curtainside', value: 'Curtainside' },
+    { label: 'Flatbed', value: 'Flatbed' },
+    { label: 'Tipper / Dump Truck', value: 'Tipper' },
+    { label: 'Tanker', value: 'Tanker' },
+    { label: 'Refrigerated Truck', value: 'Refrigerated Truck' },
+    { label: 'Crane Truck', value: 'Crane Truck' },
+    { label: 'Concrete Mixer', value: 'Concrete Mixer' },
+    { label: 'Car Transporter', value: 'Car Transporter' },
+    { label: 'Hook Lift', value: 'Hook Lift' },
+    { label: 'Skip Loader', value: 'Skip Loader' },
+    { label: 'Swap Body', value: 'Swap Body' },
+    { label: 'Chassis Cab', value: 'Chassis Cab' },
+    { label: 'Logging Truck', value: 'Logging Truck' },
+    { label: 'Fire Truck', value: 'Fire Truck' },
+    { label: 'Municipal Vehicle', value: 'Municipal Vehicle' },
+    { label: 'Recovery Vehicle', value: 'Recovery Vehicle' },
+  ],
+  trailers: [
+    { label: 'Curtainside', value: 'Curtainside' },
+    { label: 'Box / Dry Van', value: 'Box' },
+    { label: 'Flatbed', value: 'Flatbed' },
+    { label: 'Lowloader', value: 'Lowloader' },
+    { label: 'Tipper', value: 'Tipper' },
+    { label: 'Tanker', value: 'Tanker' },
+    { label: 'Refrigerated', value: 'Refrigerated' },
+    { label: 'Container Chassis', value: 'Container Chassis' },
+    { label: 'Walking Floor', value: 'Walking Floor' },
+    { label: 'Car Transporter', value: 'Car Transporter' },
+    { label: 'Log Trailer', value: 'Log Trailer' },
+    { label: 'Silo / Bulk', value: 'Silo' },
+    { label: 'Platform', value: 'Platform' },
+    { label: 'Livestock', value: 'Livestock' },
+  ],
+  cars: [
+    { label: 'Sedan / Saloon', value: 'Sedan' },
+    { label: 'Hatchback', value: 'Hatchback' },
+    { label: 'Station Wagon / Estate', value: 'Station Wagon' },
+    { label: 'SUV / Crossover', value: 'SUV' },
+    { label: 'Coupe', value: 'Coupe' },
+    { label: 'Convertible / Cabriolet', value: 'Convertible' },
+    { label: 'Van / MPV', value: 'MPV' },
+    { label: 'Pickup Truck', value: 'Pickup' },
+    { label: 'Limousine', value: 'Limousine' },
+  ],
+  vans: [
+    { label: 'Panel Van', value: 'Panel Van' },
+    { label: 'Box Van', value: 'Box Van' },
+    { label: 'Curtainside Van', value: 'Curtainside Van' },
+    { label: 'Refrigerated Van', value: 'Refrigerated Van' },
+    { label: 'Tipper Van', value: 'Tipper Van' },
+    { label: 'Crew Van', value: 'Crew Van' },
+    { label: 'Minibus', value: 'Minibus' },
+    { label: 'Chassis Cab', value: 'Chassis Cab' },
+    { label: 'Dropside Van', value: 'Dropside Van' },
+    { label: 'Luton Van', value: 'Luton Van' },
+  ],
+  construction: [
+    { label: 'Mini Excavator', value: 'Mini Excavator' },
+    { label: 'Crawler Excavator', value: 'Crawler Excavator' },
+    { label: 'Wheel Excavator', value: 'Wheel Excavator' },
+    { label: 'Wheel Loader', value: 'Wheel Loader' },
+    { label: 'Skid Steer Loader', value: 'Skid Steer Loader' },
+    { label: 'Backhoe Loader', value: 'Backhoe Loader' },
+    { label: 'Bulldozer', value: 'Bulldozer' },
+    { label: 'Telehandler', value: 'Telehandler' },
+    { label: 'Mobile Crane', value: 'Mobile Crane' },
+    { label: 'Tower Crane', value: 'Tower Crane' },
+    { label: 'Crawler Crane', value: 'Crawler Crane' },
+    { label: 'Dumper', value: 'Dumper' },
+    { label: 'Compactor / Roller', value: 'Compactor' },
+    { label: 'Concrete Pump', value: 'Concrete Pump' },
+    { label: 'Piling Rig', value: 'Piling Rig' },
+    { label: 'Generator', value: 'Generator' },
+    { label: 'Aerial Platform / Cherry Picker', value: 'Aerial Platform' },
+    { label: 'Forklift', value: 'Forklift' },
+  ],
+  agricultural: [
+    { label: 'Tractor', value: 'Tractor' },
+    { label: 'Combine Harvester', value: 'Combine Harvester' },
+    { label: 'Sprayer', value: 'Sprayer' },
+    { label: 'Plough', value: 'Plough' },
+    { label: 'Seeder', value: 'Seeder' },
+    { label: 'Baler', value: 'Baler' },
+    { label: 'Mower', value: 'Mower' },
+    { label: 'Trailer', value: 'Trailer' },
+    { label: 'Loader', value: 'Loader' },
+    { label: 'Telehandler', value: 'Telehandler' },
+  ],
+};
+
+const truckDriveOptions = [
+  { label: '4x2', value: '4x2' },
+  { label: '4x4', value: '4x4' },
+  { label: '6x2', value: '6x2' },
+  { label: '6x4', value: '6x4' },
+  { label: '6x6', value: '6x6' },
+  { label: '8x2', value: '8x2' },
+  { label: '8x4', value: '8x4' },
+  { label: '8x6', value: '8x6' },
+  { label: '8x8', value: '8x8' },
+  { label: '10x4', value: '10x4' },
+  { label: '10x6', value: '10x6' },
+  { label: '10x8', value: '10x8' },
+];
+
+const carDriveOptions = [
+  { label: 'Front Wheel Drive (FWD)', value: 'FWD' },
+  { label: 'Rear Wheel Drive (RWD)', value: 'RWD' },
+  { label: 'All Wheel Drive (AWD)', value: 'AWD' },
+  { label: 'Four Wheel Drive (4WD)', value: '4WD' },
+];
+
+const doorsOptions = [
+  { label: '2', value: '2' },
+  { label: '3', value: '3' },
+  { label: '4', value: '4' },
+  { label: '5', value: '5' },
+];
+
+const seatsOptions = [
+  { label: '2', value: '2' },
+  { label: '4', value: '4' },
+  { label: '5', value: '5' },
+  { label: '6', value: '6' },
+  { label: '7', value: '7' },
+  { label: '8', value: '8' },
+  { label: '9+', value: '9' },
 ];
 
 const cabTypeOptions = [
@@ -184,6 +318,10 @@ interface FormData {
   powerHp: string;
   powerKw: string;
   emissionClass: string;
+  bodyType: string;
+  driveConfiguration: string;
+  numberOfDoors: string;
+  numberOfSeats: string;
   axleCount: string;
   cabType: string;
   gvwKg: string;
@@ -241,8 +379,9 @@ export default function EditListingPage() {
   const [formData, setFormData] = useState<FormData>({
     category: '', categoryId: '', title: '', brandId: '', brandName: '', modelId: '', modelName: '',
     condition: '', price: '', priceType: 'fixed', year: '', mileageKm: '', operatingHours: '',
-    fuelType: '', transmission: '', powerHp: '', powerKw: '', emissionClass: '', axleCount: '',
-    cabType: '', gvwKg: '', payloadKg: '', wheelbaseMm: '', suspensionType: '', containerSize: '',
+    fuelType: '', transmission: '', powerHp: '', powerKw: '', emissionClass: '',
+    bodyType: '', driveConfiguration: '', numberOfDoors: '', numberOfSeats: '',
+    axleCount: '', cabType: '', gvwKg: '', payloadKg: '', wheelbaseMm: '', suspensionType: '', containerSize: '',
     containerType: '', color: '', vin: '', description: '', existingImages: [], newImages: [],
     countryCode: '', city: '', contactPhone: '', contactEmail: '', contactWhatsapp: '',
   });
@@ -292,6 +431,10 @@ export default function EditListingPage() {
           powerHp: d.powerHp != null ? String(d.powerHp) : '',
           powerKw: d.powerKw != null ? String(d.powerKw) : '',
           emissionClass: d.emissionClass || '',
+          bodyType: d.bodyType || '',
+          driveConfiguration: d.driveConfiguration || '',
+          numberOfDoors: d.numberOfDoors != null ? String(d.numberOfDoors) : '',
+          numberOfSeats: d.numberOfSeats != null ? String(d.numberOfSeats) : '',
           axleCount: d.axleCount != null ? String(d.axleCount) : '',
           cabType: d.cabType || '',
           gvwKg: d.gvwKg != null ? String(d.gvwKg) : '',
@@ -437,6 +580,10 @@ export default function EditListingPage() {
       if (formData.powerHp) body.powerHp = parseInt(formData.powerHp, 10); else body.powerHp = null;
       if (formData.powerKw) body.powerKw = parseInt(formData.powerKw, 10); else body.powerKw = null;
       body.emissionClass = formData.emissionClass || null;
+      body.bodyType = formData.bodyType || null;
+      body.driveConfiguration = formData.driveConfiguration || null;
+      if (formData.numberOfDoors) body.numberOfDoors = parseInt(formData.numberOfDoors, 10); else body.numberOfDoors = null;
+      if (formData.numberOfSeats) body.numberOfSeats = parseInt(formData.numberOfSeats, 10); else body.numberOfSeats = null;
       if (formData.axleCount) body.axleCount = parseInt(formData.axleCount, 10); else body.axleCount = null;
       body.cabType = formData.cabType || null;
       if (formData.gvwKg) body.gvwKg = parseInt(formData.gvwKg, 10); else body.gvwKg = null;
@@ -634,6 +781,12 @@ export default function EditListingPage() {
                 <p className="text-sm text-muted-foreground">No additional specifications needed for parts.</p>
               ) : (
                 <>
+                  {showField('bodyType') && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <FormSelect label="Body Type" value={formData.bodyType} onChange={(v) => updateField('bodyType', v)} options={bodyTypeOptions[formData.category] || []} placeholder="Select body type..." />
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {showField('year') && <Input id="year" type="number" label="Year *" value={formData.year} onChange={(e) => updateField('year', e.target.value)} />}
                     {showField('mileageKm') && <Input id="mileageKm" type="number" label="Mileage (km)" value={formData.mileageKm} onChange={(e) => updateField('mileageKm', e.target.value)} />}
@@ -658,6 +811,19 @@ export default function EditListingPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {showField('emissionClass') && <FormSelect label="Emission Class" value={formData.emissionClass} onChange={(v) => updateField('emissionClass', v)} options={emissionOptions} />}
                       {showField('axleCount') && <FormSelect label="Axle Count" value={formData.axleCount} onChange={(v) => updateField('axleCount', v)} options={axleOptions} />}
+                    </div>
+                  )}
+
+                  {showField('driveConfiguration') && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <FormSelect label="Drive Configuration" value={formData.driveConfiguration} onChange={(v) => updateField('driveConfiguration', v)} options={['trucks'].includes(formData.category) ? truckDriveOptions : carDriveOptions} placeholder="Select drive..." />
+                    </div>
+                  )}
+
+                  {(showField('numberOfDoors') || showField('numberOfSeats')) && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {showField('numberOfDoors') && <FormSelect label="Number of Doors" value={formData.numberOfDoors} onChange={(v) => updateField('numberOfDoors', v)} options={doorsOptions} placeholder="Select..." />}
+                      {showField('numberOfSeats') && <FormSelect label="Number of Seats" value={formData.numberOfSeats} onChange={(v) => updateField('numberOfSeats', v)} options={seatsOptions} placeholder="Select..." />}
                     </div>
                   )}
 
@@ -789,6 +955,7 @@ export default function EditListingPage() {
                 <ReviewRow label="Model" value={formData.modelName || '-'} />
                 <ReviewRow label="Condition" value={conditionOptions.find((c) => c.value === formData.condition)?.label || '-'} />
                 <ReviewRow label="Price" value={formData.priceType === 'on-request' ? 'On request' : formData.price ? `EUR ${Number(formData.price).toLocaleString()}` : '-'} />
+                {showField('bodyType') && <ReviewRow label="Body Type" value={formData.bodyType || '-'} />}
                 {showField('year') && <ReviewRow label="Year" value={formData.year || '-'} />}
                 {showField('mileageKm') && <ReviewRow label="Mileage" value={formData.mileageKm ? `${Number(formData.mileageKm).toLocaleString()} km` : '-'} />}
                 {showField('operatingHours') && <ReviewRow label="Operating Hours" value={formData.operatingHours ? `${Number(formData.operatingHours).toLocaleString()} hrs` : '-'} />}
@@ -796,6 +963,9 @@ export default function EditListingPage() {
                 {showField('transmission') && <ReviewRow label="Transmission" value={transmissionOptions.find((t) => t.value === formData.transmission)?.label || '-'} />}
                 {showField('powerHp') && <ReviewRow label="Power" value={formData.powerHp ? `${formData.powerHp} HP (${formData.powerKw} kW)` : '-'} />}
                 {showField('emissionClass') && <ReviewRow label="Emission" value={emissionOptions.find((e) => e.value === formData.emissionClass)?.label || '-'} />}
+                {showField('driveConfiguration') && <ReviewRow label="Drive Configuration" value={formData.driveConfiguration || '-'} />}
+                {showField('numberOfDoors') && <ReviewRow label="Doors" value={formData.numberOfDoors || '-'} />}
+                {showField('numberOfSeats') && <ReviewRow label="Seats" value={formData.numberOfSeats || '-'} />}
                 {showField('axleCount') && <ReviewRow label="Axles" value={formData.axleCount || '-'} />}
                 {showField('cabType') && <ReviewRow label="Cab Type" value={formData.cabType || '-'} />}
                 {showField('gvwKg') && <ReviewRow label="GVW" value={formData.gvwKg ? `${Number(formData.gvwKg).toLocaleString()} kg` : '-'} />}

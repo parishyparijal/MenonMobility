@@ -134,6 +134,8 @@ export async function createIndex(): Promise<void> {
         powerHp: { type: "integer" },
         emissionClass: { type: "keyword" },
         color: { type: "keyword" },
+        bodyType: { type: "keyword" },
+        driveConfiguration: { type: "keyword" },
 
         // Location
         countryCode: { type: "keyword" },
@@ -221,6 +223,8 @@ function listingToDocument(listing: any): Record<string, any> {
     powerHp: listing.powerHp,
     emissionClass: listing.emissionClass,
     color: listing.color,
+    bodyType: listing.bodyType,
+    driveConfiguration: listing.driveConfiguration,
     countryCode: listing.countryCode,
     region: listing.region,
     city: listing.city,

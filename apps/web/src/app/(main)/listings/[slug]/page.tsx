@@ -147,12 +147,15 @@ function mapApiToListing(data: any): MappedListing {
       items: [
         data.brand?.name && { label: 'Brand', value: data.brand.name },
         data.model?.name && { label: 'Model', value: data.model.name },
+        data.bodyType && { label: 'Body Type', value: data.bodyType },
         data.condition && {
           label: 'Condition',
           value: data.condition === 'NEW' ? 'New' : data.condition === 'REFURBISHED' ? 'Refurbished' : 'Used',
         },
         data.year && { label: 'Year', value: String(data.year) },
         data.color && { label: 'Color', value: data.color },
+        data.numberOfDoors && { label: 'Doors', value: String(data.numberOfDoors) },
+        data.numberOfSeats && { label: 'Seats', value: String(data.numberOfSeats) },
       ].filter(Boolean) as { label: string; value: string }[],
     },
     {
@@ -162,6 +165,7 @@ function mapApiToListing(data: any): MappedListing {
         power && { label: 'Power', value: power },
         data.transmission && { label: 'Transmission', value: data.transmission },
         emission && { label: 'Emission Class', value: emission },
+        data.driveConfiguration && { label: 'Drive Configuration', value: data.driveConfiguration },
         data.axleCount && { label: 'Axles', value: String(data.axleCount) },
       ].filter(Boolean) as { label: string; value: string }[],
     },
