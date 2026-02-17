@@ -15,6 +15,7 @@ import {
   Settings,
   CreditCard,
   MessageSquare,
+  Mail,
   LogOut,
   X,
   Menu,
@@ -48,6 +49,7 @@ const navItems: SidebarNavItem[] = [
   { label: 'Ads', href: '/admin/ads', icon: Megaphone },
   { label: 'Pages', href: '/admin/pages', icon: FileText },
   { label: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
+  { label: 'Email Inbox', href: '/admin/email-inbox', icon: Mail },
   { label: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 

@@ -990,4 +990,75 @@ export const adminController = {
       next(error);
     }
   },
+
+  // ---- Email Testing / Verification Codes ----
+
+  /**
+   * GET /api/admin/email-inbox
+   * Proxy to Mailpit API — returns all caught emails for testing.
+   */
+  async emailInbox(req: Request, res: Response, next: NextFunction) {
+    try {
+      const limit = parseInt(req.query.limit as string, 10) || 50;
+      const mailpitUrl = `http://127.0.0.1:8025/api/v1/messages?limit=${limit}`;
+      const response = await fetch(mailpitUrl);
+      if (!response.ok) {
+        throw new AppError("Mailpit not reachable", 502);
+      }
+      const data = await response.json();
+      res.json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * GET /api/admin/email-inbox/:messageId
+   * Get a single email from Mailpit by ID.
+   */
+  async emailDetail(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { messageId } = req.params;
+      const mailpitUrl = `http://127.0.0.1:8025/api/v1/message/${messageId}`;
+      const response = await fetch(mailpitUrl);
+      if (!response.ok) {
+        throw new AppError("Email not found", 404);
+      }
+      const data = await response.json();
+      res.json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * GET /api/admin/verification-codes?email=xxx
+   * Read latest verification code from DB for testing.
+   */
+  async getVerificationCode(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email } = req.query;
+      const where: any = {};
+      if (email) {
+        where.email = email;
+      }
+
+      const codes = await prisma.emailVerificationCode.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        take: 20,
+        select: {
+          id: true,
+          email: true,
+          code: true,
+          expiresAt: true,
+          createdAt: true,
+        },
+      });
+
+      res.json({ success: true, data: codes });
+    } catch (error) {
+      next(error);
+    }
+  },
 };

@@ -213,4 +213,9 @@ router.delete(
   brandController.deleteModel
 );
 
+// ---- Email Testing (Mailpit + Verification Codes) ----
+router.get("/email-inbox", adminController.emailInbox);
+router.get("/email-inbox/:messageId", adminController.emailDetail);
+router.get("/verification-codes", adminController.getVerificationCode);
+
 export default router;
