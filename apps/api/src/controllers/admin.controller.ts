@@ -794,6 +794,157 @@ export const adminController = {
     }
   },
 
+  // ---- Message Oversight ----
+
+  /**
+   * GET /api/admin/messages
+   * List ALL message threads with buyer, seller, listing, and last message.
+   * Supports pagination + search (buyer name, seller name, listing title).
+   */
+  async listAllThreads(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { page, limit, search } = req.query as any;
+
+      const pageNum = parseInt(page as string, 10) || 1;
+      const limitNum = parseInt(limit as string, 10) || 20;
+      const skip = (pageNum - 1) * limitNum;
+
+      const where: any = {};
+
+      if (search) {
+        where.OR = [
+          { buyer: { name: { contains: search, mode: "insensitive" } } },
+          { seller: { name: { contains: search, mode: "insensitive" } } },
+          { listing: { title: { contains: search, mode: "insensitive" } } },
+        ];
+      }
+
+      const [threads, total] = await Promise.all([
+        prisma.messageThread.findMany({
+          where,
+          skip,
+          take: limitNum,
+          orderBy: { lastMessageAt: "desc" },
+          include: {
+            buyer: {
+              select: { id: true, name: true, email: true, avatarUrl: true },
+            },
+            seller: {
+              select: { id: true, name: true, email: true, avatarUrl: true },
+            },
+            listing: {
+              select: {
+                id: true,
+                title: true,
+                slug: true,
+                images: {
+                  take: 1,
+                  orderBy: { position: "asc" },
+                  select: { thumbnailUrl: true },
+                },
+              },
+            },
+            messages: {
+              take: 1,
+              orderBy: { createdAt: "desc" },
+              select: {
+                id: true,
+                body: true,
+                senderId: true,
+                isRead: true,
+                createdAt: true,
+              },
+            },
+          },
+        }),
+        prisma.messageThread.count({ where }),
+      ]);
+
+      const totalPages = Math.ceil(total / limitNum);
+
+      // Flatten last message
+      const data = threads.map((t) => ({
+        id: t.id,
+        buyer: t.buyer,
+        seller: t.seller,
+        listing: {
+          id: t.listing.id,
+          title: t.listing.title,
+          slug: t.listing.slug,
+          image: t.listing.images[0]?.thumbnailUrl || null,
+        },
+        lastMessage: t.messages[0] || null,
+        lastMessageAt: t.lastMessageAt,
+        createdAt: t.createdAt,
+      }));
+
+      res.json({
+        success: true,
+        data,
+        pagination: { page: pageNum, limit: limitNum, total, totalPages },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * GET /api/admin/messages/:threadId
+   * View all messages for any thread (admin oversight).
+   */
+  async getThreadMessages(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { threadId } = req.params;
+
+      const thread = await prisma.messageThread.findUnique({
+        where: { id: threadId },
+        include: {
+          buyer: {
+            select: { id: true, name: true, avatarUrl: true },
+          },
+          seller: {
+            select: { id: true, name: true, avatarUrl: true },
+          },
+          listing: {
+            select: { id: true, title: true, slug: true },
+          },
+        },
+      });
+
+      if (!thread) {
+        throw new AppError("Thread not found", 404);
+      }
+
+      const messages = await prisma.message.findMany({
+        where: { threadId },
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          senderId: true,
+          body: true,
+          isRead: true,
+          createdAt: true,
+        },
+      });
+
+      res.json({
+        success: true,
+        data: {
+          thread: {
+            id: thread.id,
+            buyer: thread.buyer,
+            seller: thread.seller,
+            listing: thread.listing,
+            createdAt: thread.createdAt,
+          },
+          messages,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   /**
    * DELETE /api/admin/reviews/:id
    * Remove an inappropriate review. Recalculate seller rating and review count.

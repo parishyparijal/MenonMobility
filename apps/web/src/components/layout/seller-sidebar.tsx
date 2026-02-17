@@ -52,6 +52,8 @@ export function SellerSidebar({ isOpen, onClose }: SellerSidebarProps) {
 
   useEffect(() => {
     fetchUnreadCount();
+    const interval = setInterval(fetchUnreadCount, 15000);
+    return () => clearInterval(interval);
   }, [fetchUnreadCount]);
 
   return (

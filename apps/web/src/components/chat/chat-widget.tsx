@@ -17,11 +17,12 @@ import { useAuthStore } from '@/store/auth';
 interface ChatWidgetProps {
   threadId: string;
   listingTitle: string;
-  sellerName: string;
+  participantName: string;
+  messagesHref?: string;
   onClose: () => void;
 }
 
-export function ChatWidget({ threadId, listingTitle, sellerName, onClose }: ChatWidgetProps) {
+export function ChatWidget({ threadId, listingTitle, participantName, messagesHref = '/messages', onClose }: ChatWidgetProps) {
   const { user } = useAuthStore();
   const { messages, isLoading, isSending, fetchMessages, sendMessage } = useMessagesStore();
 
@@ -66,14 +67,14 @@ export function ChatWidget({ threadId, listingTitle, sellerName, onClose }: Chat
         onClick={() => setMinimized((m) => !m)}
       >
         <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-          <span className="text-xs font-bold">{sellerName.charAt(0)}</span>
+          <span className="text-xs font-bold">{participantName.charAt(0)}</span>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold truncate">{sellerName}</p>
+          <p className="text-sm font-semibold truncate">{participantName}</p>
           <p className="text-[10px] text-white/70 truncate">{listingTitle}</p>
         </div>
         <Link
-          href="/messages"
+          href={messagesHref}
           onClick={(e) => e.stopPropagation()}
           className="p-1 rounded hover:bg-white/20 transition-colors"
           title="View all messages"

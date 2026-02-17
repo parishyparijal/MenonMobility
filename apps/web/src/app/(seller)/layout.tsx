@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Menu } from 'lucide-react';
 import { useAuthStore } from '@/store/auth';
 import { SellerSidebar } from '@/components/layout/seller-sidebar';
+import { ChatNotifier } from '@/components/chat/chat-notifier';
 
 export default function SellerLayout({
   children,
@@ -96,6 +97,9 @@ export default function SellerLayout({
         {/* Scrollable Content */}
         <main className="flex-1 overflow-y-auto p-4 lg:p-6">{children}</main>
       </div>
+
+      {/* Auto-popup chat widget for new messages */}
+      <ChatNotifier />
     </div>
   );
 }

@@ -1045,7 +1045,7 @@ export default function ListingDetailPage() {
         <ChatWidget
           threadId={chatThreadId}
           listingTitle={listing.title}
-          sellerName={listing.seller.name}
+          participantName={listing.seller.name}
           onClose={() => setChatThreadId(null)}
         />
       )}

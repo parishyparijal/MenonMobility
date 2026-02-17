@@ -97,6 +97,10 @@ router.delete(
   adminController.deleteListing
 );
 
+// ---- Message Oversight ----
+router.get("/messages", adminController.listAllThreads);
+router.get("/messages/:threadId", adminController.getThreadMessages);
+
 // ---- Review Management ----
 router.get(
   "/reviews",
