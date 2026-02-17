@@ -6,11 +6,11 @@ import rateLimit from "express-rate-limit";
 
 /**
  * General rate limiter — applied globally.
- * 100 requests per 15 minutes per IP.
+ * 1000 requests per 15 minutes per IP.
  */
 export const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  max: 1000,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -21,11 +21,11 @@ export const generalLimiter = rateLimit({
 
 /**
  * Auth rate limiter — applied to login, register, password reset, etc.
- * 10 requests per 15 minutes per IP.
+ * 30 requests per 15 minutes per IP.
  */
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10,
+  max: 30,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
