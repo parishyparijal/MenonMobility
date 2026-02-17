@@ -21,7 +21,6 @@ import {
   Star,
   ChevronLeft,
   ChevronRight,
-  Check,
   Loader2,
   Send,
 } from 'lucide-react';
@@ -32,6 +31,7 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { ListingCard, type ListingCardData } from '@/components/listings/listing-card';
+import { ChatWidget } from '@/components/chat/chat-widget';
 import { useFavoritesStore } from '@/store/favorites';
 import { useMessagesStore } from '@/store/messages';
 import { useAuthStore } from '@/store/auth';
@@ -447,7 +447,8 @@ export default function ListingDetailPage() {
   const [showPhone, setShowPhone] = useState(false);
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [messageText, setMessageText] = useState('');
-  const [messageSent, setMessageSent] = useState(false);
+  const [messageError, setMessageError] = useState('');
+  const [chatThreadId, setChatThreadId] = useState<string | null>(null);
 
   // Fetch listing detail + related
   useEffect(() => {
@@ -496,23 +497,22 @@ export default function ListingDetailPage() {
     if (listing) setLoanAmount(listing.price);
   }, [listing]);
 
+  const isFallback = listing?.id === 'fallback';
+
   const handleSendMessage = async () => {
-    if (!messageText.trim() || isSending || !listing) return;
+    if (!messageText.trim() || isSending || !listing || isFallback) return;
     if (!isAuthenticated) {
       router.push('/login');
       return;
     }
+    setMessageError('');
     try {
-      await sendFirstMessage(listing.id, messageText.trim());
-      setMessageSent(true);
+      const { threadId } = await sendFirstMessage(listing.id, messageText.trim());
       setMessageText('');
-      setTimeout(() => {
-        setMessageDialogOpen(false);
-        setMessageSent(false);
-        router.push('/messages');
-      }, 1500);
+      setMessageDialogOpen(false);
+      setChatThreadId(threadId);
     } catch {
-      // error handled in store
+      setMessageError('Failed to send message. Please try again.');
     }
   };
 
@@ -876,12 +876,24 @@ export default function ListingDetailPage() {
                             router.push('/login');
                             return;
                           }
+                          if (isFallback) return;
+                          // If we already have a chat thread, just reopen the widget
+                          if (chatThreadId) {
+                            setChatThreadId(chatThreadId);
+                            return;
+                          }
+                          setMessageError('');
                           setMessageDialogOpen(true);
                         }}
-                        className="flex-1 inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg text-sm font-medium text-white bg-gradient-to-b from-accent-400 to-accent-600 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_1px_3px_rgba(0,0,0,0.12)] border border-accent-300/40 hover:from-accent-300 hover:to-accent-500 active:from-accent-500 active:to-accent-700 transition-all"
+                        disabled={isFallback}
+                        className={cn(
+                          'flex-1 inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg text-sm font-medium text-white bg-gradient-to-b from-accent-400 to-accent-600 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_1px_3px_rgba(0,0,0,0.12)] border border-accent-300/40 hover:from-accent-300 hover:to-accent-500 active:from-accent-500 active:to-accent-700 transition-all',
+                          isFallback && 'opacity-50 cursor-not-allowed'
+                        )}
+                        title={isFallback ? 'Listing not available — cannot send messages' : undefined}
                       >
                         <MessageSquare className="w-4 h-4" />
-                        Send Message
+                        {isFallback ? 'Unavailable' : 'Send Message'}
                       </button>
                     </div>
                   </div>
@@ -992,50 +1004,51 @@ export default function ListingDetailPage() {
                 Message to {listing.seller.name} about {listing.title}
               </p>
             </div>
-            {messageSent ? (
-              <div className="flex flex-col items-center py-6">
-                <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-3">
-                  <Check className="w-6 h-6 text-green-600" />
-                </div>
-                <p className="text-sm font-medium text-foreground">Message sent!</p>
-                <p className="text-xs text-muted-foreground mt-1">Redirecting to messages...</p>
-              </div>
-            ) : (
-              <>
-                <textarea
-                  value={messageText}
-                  onChange={(e) => setMessageText(e.target.value)}
-                  placeholder={`Hi, I'm interested in your ${listing.title}. Is it still available?`}
-                  rows={4}
-                  className="w-full rounded-lg border border-border bg-muted/30 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-                />
-                <div className="flex justify-end gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setMessageDialogOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="accent"
-                    size="sm"
-                    onClick={handleSendMessage}
-                    disabled={!messageText.trim() || isSending}
-                  >
-                    {isSending ? (
-                      <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
-                    ) : (
-                      <Send className="w-4 h-4 mr-1.5" />
-                    )}
-                    Send
-                  </Button>
-                </div>
-              </>
+            <textarea
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              placeholder={`Hi, I'm interested in your ${listing.title}. Is it still available?`}
+              rows={4}
+              className="w-full rounded-lg border border-border bg-muted/30 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+            />
+            {messageError && (
+              <p className="text-sm text-red-500">{messageError}</p>
             )}
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setMessageDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="accent"
+                size="sm"
+                onClick={handleSendMessage}
+                disabled={!messageText.trim() || isSending}
+              >
+                {isSending ? (
+                  <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+                ) : (
+                  <Send className="w-4 h-4 mr-1.5" />
+                )}
+                Send
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Chat Widget */}
+      {chatThreadId && (
+        <ChatWidget
+          threadId={chatThreadId}
+          listingTitle={listing.title}
+          sellerName={listing.seller.name}
+          onClose={() => setChatThreadId(null)}
+        />
+      )}
 
       {/* Fullscreen Image Lightbox */}
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>

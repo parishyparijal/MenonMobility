@@ -42,7 +42,7 @@ interface MessagesState {
   fetchThreads: () => Promise<void>;
   fetchMessages: (threadId: string) => Promise<void>;
   sendMessage: (threadId: string, body: string) => Promise<void>;
-  sendFirstMessage: (listingId: string, body: string) => Promise<void>;
+  sendFirstMessage: (listingId: string, body: string) => Promise<{ threadId: string; messageId: string }>;
   fetchUnreadCount: () => Promise<void>;
   setActiveThread: (thread: MessageThread | null) => void;
 }
@@ -165,11 +165,13 @@ export const useMessagesStore = create<MessagesState>((set, get) => ({
   sendFirstMessage: async (listingId: string, body: string) => {
     set({ isSending: true, error: null });
     try {
-      await api.post<any>('/messages', {
+      const response = await api.post<any>('/messages', {
         listingId,
         body,
       });
+      const msg = response.data;
       set({ isSending: false });
+      return { threadId: msg.threadId, messageId: msg.id };
     } catch (error) {
       set({
         isSending: false,
